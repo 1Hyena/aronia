@@ -46,7 +46,7 @@ able to use it to its fullest extent.
 
 This skill requires the acting character to wield a mace type weapon. If that
 condition has been met, it will execute a single attack with the wielded weapon.
-If the skill mastery check succeeds, it will be seens as a _smite_ rather than
+If the skill mastery check succeeds, it will be seen as a _smite_ rather than
 a regular attack.
 
 Based on the acting character's wisdom, the chance of adding the _holy_ label to
