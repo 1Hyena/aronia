@@ -28,7 +28,7 @@ time. Also, if the target is of a short-tempered type, then it is highly likely
 that it will attack the provocateur.
 
 This skill is not cost free though. The acting character must have a small
-amount of protection to maladictions (also known as _saves_) in their disposal.
+amount of protection to maledictions (also known as _saves_) in their disposal.
 Upon successful completion, taunting will drain the actor from all of its saves.
 
 
