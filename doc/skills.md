@@ -29,7 +29,7 @@ that it will attack the provocateur.
 
 This skill is not cost free though. The acting character must have a small
 amount of protection to maledictions (also known as _saves_) at their disposal.
-Upon successful completion, taunting will drain the actor from all of its saves.
+Upon successful completion, taunting will drain the actor of all their saves.
 
 
 ### Cleric #####################################################################
