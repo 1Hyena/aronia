@@ -197,13 +197,13 @@ function meta_load_artwork(id) {
 
     var artwork = [
         {
-            image : "landscape.jpg"
+            image : "bg-autumnal-valley.jpg"
         },
         {
-            image : "landscape.jpg"
+            image : "bg-crimson-valley.jpg"
         },
         {
-            image : "landscape.jpg",
+            image : "bg-elven-valley.jpg",
             position : "center"
         }
     ];
