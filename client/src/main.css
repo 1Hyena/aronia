@@ -61,11 +61,24 @@ body {
     max-height: 600px;
     vertical-align: bottom;
     text-align: left;
+
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-left: 0.5rem;
+    border-top: 0.125rem ridge dimgray;
+    border-left: 0.125rem ridge dimgray;
+    border-right: 0.125rem ridge dimgray;
+    border-radius: 0.5rem 0.5rem 0 0;
+    filter: drop-shadow(0 0 0.25rem rgba(0, 0, 0, 1));
 }
 
 #amc-terminal {
     width: 100%;
     height: 100%;
+}
+
+.xterm-viewport {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
 }
 
 button {

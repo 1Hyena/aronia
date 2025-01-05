@@ -56,7 +56,16 @@ function main() {
     document.fonts.ready.then(
         function (font_face_set) {
             setTimeout(function() {
-                global.xt.terminal = new Terminal();
+                global.xt.terminal = new Terminal(
+                    {
+                        theme: {
+                            background: "#00000000",
+                            cursor: "#FFFFFF40"
+                        },
+                        allowTransparency: true
+                    }
+                );
+
                 global.xt.fitter = new FitAddon.FitAddon();
                 global.xt.terminal.loadAddon(global.xt.fitter);
                 global.xt.terminal.open(
