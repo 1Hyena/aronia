@@ -2,107 +2,109 @@
 <html lang="en">
 <head>
 <title>Aronia MUD</title>
-<link rel="stylesheet" href="lib/xterm.css" />
-<script src="lib/bin/xterm.js"></script>
-<script src="lib/bin/addon-fit.js"></script>
-<style>
-* {margin:0; padding:0; box-sizing: border-box;}
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="amc-server" data-host="aronia.ee" data-port="4004" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="application-name" content="Aronia MUD">
+<meta name="description" content="MUD Client for Aronia">
+<meta name="keywords" content="mud, aronia, multi user dungeon, arion, livonia">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- BEGIN EXTERNAL CSS -->
+<link href="./meta.css" rel="stylesheet" type="text/css">
+<link href="./main.css" rel="stylesheet" type="text/css">
+<link href="./lib/xterm.css" rel="stylesheet" type="text/css">
+<!-- END EXTERNAL CSS -->
 
-html {
-    width: 100dvw;
-    height: 100dvh;
-}
-
-body {
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    font-size: 0; /* Prevents bugs when window is zoomed in by some 500%. */
-    overflow: hidden;
-    padding-left: 0.5rem;
-}
-
-#terminal {
-    width: 100%;
-    height: 100%;
-}
+<style media="screen">
+/* PASTE EXTERNAL CSS HERE */
 </style>
+<!-- BEGIN META SCRIPTS -->
+<script src="./meta.js"></script>
+<!-- END META SCRIPTS -->
+
+<!-- BEGIN MINIFIED EXTERNAL SCRIPTS -->
+<script src="./lib/bin/xterm.js"></script>
+<script src="./lib/bin/addon-fit.js"></script>
+<!-- END MINIFIED EXTERNAL SCRIPTS -->
+
+<!-- BEGIN EXTERNAL SCRIPTS -->
+<script src="./lib/sprintf.js"></script>
+<script src="./main.js"></script>
+<script src="./utils.js"></script>
+<!-- END EXTERNAL SCRIPTS -->
 </head>
 
-<body>
-<div id="terminal"></div>
+
+<body><!--
+--><div id="amc-mobile-overflow"></div><!--
+--><div id="amc" class="fade-in borderbox"><!--
+    --><div id="meta-bg"></div><!--
+    --><div id="amc-body"><!--
+        --><div id="amc-greet" class="amc-tab"><!--
+            --><div id="meta-loader"><!--
+                --><div><!--
+                    --><div><!--
+                        --><div id="meta-no-script-wrapper"><!--
+                            --><span id="meta-no-script" class="meta-hud fade-in"><!--
+                                -->Please enable JavaScript.<!--
+                            --></span><!--
+                        --></div><!--
+                        --><br><!--
+                        --><div id="meta-progress-bg" class="borderbox"><!--
+                            --><div id="meta-progress-fg" class="borderbox" data-buffer="0" data-total="0" data-loaded="0"><!--
+                                --><div id="meta-progress-done" class="borderbox"></div><!--
+                                --><div id="meta-progress-buf"  class="borderbox"></div><!--
+                            --></div><!--
+                            --><div id="meta-progress-left" class="borderbox"></div><!--
+                            --><div id="meta-progress-txt" data-text="" class="meta-hud"></div><!--
+                        --></div><!--
+                    --></div><!--
+                --></div><!--
+            --></div><!--
+        --></div><!--
+        --><div id="amc-main" class="amc-tab amc-hidden-tab"><!--
+            --><span></span><!--
+            --><div id="amc-terminal-wrapper"><!--
+                --><div id="amc-terminal"><!--
+                --></div><!--
+            --></div><!--
+        --></div><!--
+    --></div><!--
+--></div>
+
+<!-- PASTE META JS HERE -->
+
 <script>
-function rawStringToBuffer( str ) {
-    var idx, len = str.length, arr = new Array( len );
-    for ( idx = 0 ; idx < len ; ++idx ) {
-        arr[ idx ] = str.charCodeAt(idx) & 0xFF;
-    }
-
-    return new Uint8Array( arr ).buffer;
-}
-
-var ws = null;
-var term = new Terminal();
-var term_fit = new FitAddon.FitAddon();
-
-term.loadAddon(term_fit);
-
-term.open(document.getElementById('terminal'));
-
-term_fit.fit();
-window.addEventListener('resize', function () {term_fit.fit();});
-
-term.onKey(
-    e => {
-        if (e.domEvent.key == "Backspace") {
-            ws.send(rawStringToBuffer("\b"));
-            term.write("\b \b");
-        }
-        else if (e.key == '\r') {
-            term.write('\n\r');
-            ws.send(rawStringToBuffer("\n"));
-        }
-        else {
-            ws.send(rawStringToBuffer(e.key));
-            term.write(e.key);
-        }
-    }
-);
-
-function connect() {
-    ws = new WebSocket("ws://aronia.ee:4004");
-
-    ws.onmessage = function (evt) {
-        var received_msg = evt.data;
-        var reader = new FileReader();
-
-        reader.onload = function() {
-            term.write(reader.result);
-        }
-
-        reader.readAsText(evt.data);
-    };
-
-    ws.onclose = function() {
-        term.write("\n\r#Disconnected.");
-
-        setTimeout(
-            function() {
-                term.write("\n\r#Reconnecting...\n\r");
-                connect();
-            }, 1000
-        );
-    };
-
-    ws.onerror = function(err) {
-        term.write("\n\r#Error: "+err.message+"\n\r");
-        ws.close();
-    };
-}
-
-connect();
-
+/*** INJECT COMPILER INFO HERE ***/
+meta_init_loading();
 </script>
-</body>
 
+<!-- PASTE MINIFIED EXTERNAL JS HERE -->
+
+<!-- PASTE EXTERNAL JS HERE -->
+
+<!-- BEGIN EXTERNAL SFX -->
+<audio id='sfx-alert' crossOrigin="anonymous" src="../sfx/alert.wav"></audio>
+<!-- END EXTERNAL SFX -->
+
+<div style="display:none;">
+<img
+    id='gfx-background'
+    src="data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs="
+    data-bg="" onload='meta_load_artwork(this.id);' alt=''
+>
+
+<!-- BEGIN EXTERNAL GFX -->
+<img id='gfx-favicon'       src="../gfx/favicon.ico"               alt=''>
+<!-- END EXTERNAL GFX -->
+
+<!-- INLINE RESOURCES HERE -->
+
+</div>
+
+<script>
+meta_deinit_loading();
+</script>
+
+</body>
 </html>

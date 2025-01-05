@@ -1,0 +1,117 @@
+* {margin:0; padding:0; box-sizing: border-box;}
+
+html {
+    width: 100dvw;
+    height: 100dvh;
+    font-family: monospace;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    font-size: 0; /* Prevents bugs when window is zoomed in by some 500%. */
+}
+
+.amc-hidden,
+.amc-hidden-tab {
+    display: none;
+}
+
+#amc {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    overflow: hidden;
+}
+
+#amc-body {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.amc-tab {
+    width: 100%;
+    height: 100%;
+}
+
+#amc-main {
+    opacity: 0;
+}
+
+#amc-main > span:first-of-type {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+#amc-terminal-wrapper {
+    display: inline-block;
+    width: 100%;
+    max-width: 800px;
+    height: calc(100% - 2rem);
+    max-height: 600px;
+    vertical-align: bottom;
+    text-align: left;
+}
+
+#amc-terminal {
+    width: 100%;
+    height: 100%;
+}
+
+button {
+    outline: none;
+    cursor: pointer;
+    background-image: linear-gradient(
+        to top, #D8D9DB 0%, #fff 80%, #FDFDFD 100%
+    );
+    border-radius: 1rem;
+    border: 0.1rem solid #8F9092;
+    transition: all 0.2s ease;
+    font-weight: bold;
+    color: #606060;
+    text-shadow: 0 0.1rem 0.1rem #fff;
+    padding: 0.5rem;
+    opacity: 1;
+    filter: drop-shadow(0rem 0rem 0rem gray);
+}
+
+button:hover {
+    box-shadow: inset 0 0 0.1rem 0.1rem #CECFD1;
+}
+
+button:active {
+    box-shadow: inset 0 0 0.2rem 0.1rem #999, inset 0 0 1rem #aaa;
+    filter: drop-shadow(0rem 0rem 0.2rem gray);
+}
+
+button:focus {
+    box-shadow: inset 0 0 0.2rem 0.1rem #999, inset 0 0 1rem #aaa;
+    filter: drop-shadow(0rem 0rem 0.2rem gray);
+}
+
+#amc.amc-buttons-disabled button {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+input[type="text"], input[type="date"], textarea {
+    background-color : rgba(255, 255, 255, 0.125);
+    border-radius: 0.25rem;
+    border: 0.1rem solid rgba(0,0,0,0.25);
+}
+
+textarea {
+    padding: 0.5rem;
+    border: 0.1rem solid rgba(0,0,0,0.25);
+    border-radius: 0.25rem;
+}
