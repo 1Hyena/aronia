@@ -8,6 +8,9 @@ This GitHub repository is mainly used to keep track of ongoing issues while also
 allowing community feedback and discussion. Anyone is welcome to post new issues
 here.
 
+In order to speed up the resolution of a certain issue, give its opening post a
+thumbs up (👍).
+
 
 # Game Server ##################################################################
 
