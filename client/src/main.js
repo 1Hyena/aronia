@@ -12,7 +12,16 @@ var global = {
         fitter : null
     },
     title : "",
-    alert : true
+    alert : true,
+    mud : {
+        incoming : {
+            data : [],
+            info : []
+        }
+    },
+    log : {
+        data : []
+    }
 };
 
 function main() {
@@ -75,6 +84,10 @@ function amc_main_loop() {
     if (global.alert) {
         play_sound("sfx-alert");
         global.alert = false;
+    }
+
+    if (global.title !== document.title) {
+        document.title = global.title;
     }
 }
 
@@ -419,27 +432,31 @@ function amc_init_terminal(container) {
 }
 
 function amc_connect() {
-    global.ws = new WebSocket("ws://aronia.ee:4004");
+    global.ws = new WebSocket("wss://aronia.ee:4004");
 
     global.ws.onmessage = function (evt) {
         var received_msg = evt.data;
         var reader = new FileReader();
 
         reader.onload = function() {
-            global.xt.terminal.write(reader.result);
+            global.mud.incoming.data.push(
+                ...Array.from(new Uint8Array(reader.result))
+            );
+
+            amc_read_incoming();
         }
 
-        reader.readAsText(evt.data);
+        reader.readAsArrayBuffer(evt.data);
     };
 
     global.ws.onclose = function() {
-        global.xt.terminal.write("\n\r#Disconnected.");
+        global.xt.terminal.write("\n\r#Disconnected.\n\r");
 
         setTimeout(
             function() {
-                global.xt.terminal.write("\n\r#Reconnecting...\n\r");
+                global.xt.terminal.write("#Reconnecting...\n\r");
                 amc_connect();
-            }, 1000
+            }, 3000
         );
     };
 
@@ -447,6 +464,111 @@ function amc_connect() {
         global.xt.terminal.write("\n\r#Error: "+err.message+"\n\r");
         global.ws.close();
     };
+}
+
+function amc_read_incoming() {
+    receive_from_incoming(global.mud.incoming);
+
+    for (var i=0, sz = global.mud.incoming.info.length; i<sz; ++i) {
+        switch (global.mud.incoming.info[i].type) {
+            case "log": {
+                global.log.data.push(...global.mud.incoming.info[i].data);
+
+                break;
+            }
+            default: continue;
+        }
+    }
+
+    global.mud.incoming.info = [];
+
+    if (global.log.data.length > 0) {
+        amc_write_log();
+    }
+}
+
+function amc_write_line(data, start, length) {
+    var buffer = [];
+
+    for (var i=0; i<length; ++i) {
+        buffer.push(data[start+i]);
+    }
+
+    if (buffer.length === 0) {
+        return;
+    }
+
+    global.xt.terminal.write(new Uint8Array(buffer));
+
+    for (;;) {
+        var char = buffer.pop();
+
+        if (char !== 10 && char !== 13) {
+            buffer.push(char);
+            break;
+        }
+    }
+
+    var line = String.fromCharCode(...buffer);
+
+    var regex = new RegExp(
+        "(^(?:.* > )?.+ (?:tells you|tell .+|tells the group|tell the group) ')"
+        +"(.+)(['][.]?.*$)"
+    );
+
+    var arr = regex.exec(line) || [];
+
+    if (arr.length === 4) {
+        global.alert = true;
+    }
+
+    regex = new RegExp(
+        "(^.*\\x1B\\[8m\\x1B\\]0;)(.+)(\\x07\\x1B\\[28m\\x1B\\[0m.*$)"
+    );
+
+    arr = regex.exec(line) || [];
+
+    if (arr.length === 4) {
+        global.title = arr[2];
+    }
+}
+
+function amc_write_prompt() {
+    // TODO: start sending prompt marker from the MUD server
+
+    var length = global.log.data.length;
+
+    if (length >= 2
+    && global.log.data[length - 2] === '>'.charCodeAt()
+    && global.log.data[length - 1] === ' '.charCodeAt()) {
+        global.xt.terminal.write(global.log.data);
+        global.log.data = [];
+    }
+}
+
+function amc_write_log() {
+    var written = 0;
+
+    for (var i=0, sz = global.log.data.length; i<sz; ++i) {
+        if (global.log.data[i] === 10) {
+            var length = (i + 1) - written;
+
+            if (i + 1 < sz && global.log.data[i + 1] === 13) {
+                length++;
+                i++;
+            }
+
+            amc_write_line(global.log.data, written, length);
+
+            written += length;
+        }
+    }
+
+    if (written > 0) {
+        global.log.data = global.log.data.slice(written);
+    }
+
+    amc_write_prompt();
 }
 
 function amc_click_background() {
