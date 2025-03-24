@@ -198,7 +198,6 @@ input[type="text"], input[type="password"], input[type="submit"], textarea {
     border: none;
     color: silver;
     background-color: transparent;
-    border: none;
     color-scheme: dark;
 }
 
