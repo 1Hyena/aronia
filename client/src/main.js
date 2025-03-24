@@ -17,6 +17,11 @@ var global = {
         incoming : {
             data : [],
             info : []
+        },
+        state : "",
+        account : {
+            username : "",
+            password : ""
         }
     },
     log : {
@@ -88,6 +93,14 @@ function amc_main_loop() {
 
     if (global.title !== document.title) {
         document.title = global.title;
+    }
+
+    var amc = document.getElementById("amc");
+
+    if (amc.getAttribute("data-mudstate") !== global.mud.state) {
+        amc.setAttribute("data-mudstate", global.mud.state);
+
+        amc_show_mudstate(global.mud.state);
     }
 }
 
@@ -330,6 +343,207 @@ function amc_create_primary_panel() {
     return panel;
 }
 
+function amc_create_login_form() {
+    var form = document.createElement("form");
+    var table = document.createElement("table");
+
+    var form_cell_width = 20;
+    var form_cols = 2;
+    var form_rows = 3;
+    var cols = form_cols + 1 + form_cols * form_cell_width;
+    var rows = 2 * form_rows + 1;
+
+    var fields = [];
+
+    for (var y=0; y<rows; ++y) {
+        var row = document.createElement("tr");
+
+        for (var x=0; x<cols; ++x) {
+            var text = null;
+            var cell = null;
+
+            if (y % 2 === 1) {
+                if (x % (form_cell_width + 1) === 1) {
+                    cell = document.createElement("td");
+                    cell.setAttribute("colspan", form_cell_width);
+                    fields.push(cell);
+                }
+                else if (x % (form_cell_width + 1) === 0 || x + 1 === cols) {
+                    text = "│";
+                }
+            }
+            else if (y === 0) {
+                if (x === 0) {
+                    text = "┌";
+                }
+                else if (x + 1 === cols) {
+                    text = "┐";
+                }
+                else if (x % (form_cell_width + 1) === 0) {
+                    text = "┬";
+                }
+                else text = "─";
+            }
+            else if (y + 1 === rows) {
+                if (x === 0) {
+                    text = "└";
+                }
+                else if (x + 1 === cols) {
+                    text = "┘";
+                }
+                else if (x % (form_cell_width + 1) === 0) {
+                    text = "┴";
+                }
+                else text = "─";
+            }
+            else if (y % 2 === 0) {
+                if (x === 0) {
+                    text = "├";
+                }
+                else if (x + 1 === cols) {
+                    text = "┤";
+                }
+                else if (x % (form_cell_width + 1) === 0) {
+                    text = "┼";
+                }
+                else text = "─";
+            }
+            else text = "─";
+
+            if (text !== null) {
+                var pre = document.createElement("pre");
+                pre.append(document.createTextNode(text));
+
+                if (cell === null) {
+                    cell = document.createElement("td");
+                }
+
+                cell.append(pre);
+            }
+
+            if (cell !== null) {
+                row.append(cell);
+            }
+        }
+
+        table.append(row);
+    }
+
+    table.classList.add("amc-tui");
+    form.append(table);
+
+    form.setAttribute("method", "post");
+    form.setAttribute("target", "hidden-iframe");
+    form.setAttribute("action", "");
+    form.setAttribute("autocomplete", "on");
+    form.setAttribute("name", "loginform");
+    form.id = "amc-login-form";
+
+    var input_username = document.createElement("input");
+    var input_password = document.createElement("input");
+    var button_submit = document.createElement("input");
+
+    input_username.setAttribute("type", "text");
+    input_username.setAttribute("name", "username");
+    input_username.setAttribute("required", "");
+    input_username.setAttribute("autocomplete", "on");
+    input_username.setAttribute("placeholder", "enter name here");
+    input_username.setAttribute("autofocus", "");
+    input_username.id = "amc-login-input-username";
+
+    if (global.mud.state === "login-wrong-password") {
+        input_username.setAttribute("disabled", "");
+        input_username.value = global.mud.account.username;
+    }
+
+    input_password.setAttribute("type", "password");
+    input_password.setAttribute("name", "password");
+    input_password.setAttribute("required", "");
+    input_password.setAttribute("autocomplete", "on");
+    input_password.setAttribute("placeholder", "enter password here");
+    input_password.id = "amc-login-input-password";
+
+    button_submit.setAttribute("type",  "submit");
+    button_submit.setAttribute("value", "LOGIN");
+    button_submit.id = "amc-login-input-submit";
+
+    form.addEventListener(
+        'submit', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.target.submitted) {
+                return;
+            }
+
+            if (global.mud.state !== "login"
+            &&  global.mud.state !== "login-wrong-password") {
+                return;
+            }
+
+            e.target.submitted = true;
+
+            setTimeout(function(target){
+                global.mud.account.username = document.getElementById(
+                    "amc-login-input-username"
+                ).value;
+
+                global.mud.account.password = document.getElementById(
+                    "amc-login-input-password"
+                ).value;
+
+                if (global.mud.state === "login") {
+                    global.mud.state = "login-sending-username";
+                    global.ws.send(str2buf(global.mud.account.username+"\n"));
+                }
+                else if (global.mud.state === "login-wrong-password") {
+                    global.mud.state = "login-sending-password";
+                    global.ws.send(str2buf(global.mud.account.password+"\n"));
+                }
+
+                target.parentNode.removeChild(target);
+                history.replaceState(history.state, 'Login');
+            }, 1, e.target);
+        }, false
+    );
+
+    for (var i=0; i<fields.length; ++i) {
+        fields[i].id = "amc-login-form-slot-"+i;
+        fields[i].classList.add("amc-login-form-slot");
+
+        switch (i) {
+            case 0: {
+                var label = document.createElement("label");
+                label.setAttribute("for", "amc-login-input-username");
+                label.appendChild(document.createElement("pre")).append(
+                    document.createTextNode("Account:")
+                );
+
+                fields[i].appendChild(label);
+
+                break;
+            }
+            case 2: {
+                var label = document.createElement("label");
+                label.setAttribute("for", "amc-login-input-password");
+                label.appendChild(document.createElement("pre")).append(
+                    document.createTextNode("Password:")
+                );
+
+                fields[i].appendChild(label);
+
+                break;
+            }
+            case 1: fields[i].append(input_username); break;
+            case 3: fields[i].append(input_password); break;
+            case 5: fields[i].append(button_submit); break;
+            default: break;
+        }
+    }
+
+    return form;
+}
+
 function amc_create_tertiary_panel() {
     var panel = document.createElement("div");
     return panel;
@@ -343,12 +557,12 @@ function amc_init_mainview(container) {
     var placeholder = document.createElement("pre");
 
     placeholder.appendChild(
-        document.createTextNode(get_primary_top_placeholder())
+        document.createTextNode(amc_get_primary_top_placeholder())
     );
 
     wrapper.appendChild(placeholder);
 
-    container.appendChild(wrapper);
+    container.replaceChildren(wrapper);
 }
 
 function amc_init_zoneview(container) {
@@ -359,7 +573,7 @@ function amc_init_zoneview(container) {
     var placeholder = document.createElement("pre");
 
     placeholder.appendChild(
-        document.createTextNode(get_secondary_top_placeholder())
+        document.createTextNode(amc_get_secondary_top_placeholder())
     );
 
     wrapper.appendChild(placeholder);
@@ -375,7 +589,7 @@ function amc_init_statview(container) {
     var placeholder = document.createElement("pre");
 
     placeholder.appendChild(
-        document.createTextNode(get_secondary_bottom_placeholder())
+        document.createTextNode(amc_get_secondary_bottom_placeholder())
     );
 
     wrapper.appendChild(placeholder);
@@ -455,6 +669,7 @@ function amc_connect() {
         setTimeout(
             function() {
                 global.xt.terminal.write("#Reconnecting...\n\r");
+                global.mud.state = "";
                 amc_connect();
             }, 3000
         );
@@ -487,6 +702,85 @@ function amc_read_incoming() {
     }
 }
 
+function amc_match_line(line) {
+    var expressions = [];
+
+    switch (global.mud.state) {
+        case "": {
+            expressions.push("(^Login)( )(> $)");
+            break;
+        }
+        case "login": {
+            expressions.push("(^)(Please enter password.)($)");
+            break;
+        }
+        case "login-sending-username": {
+            expressions.push("(^)(Please enter password.)($)");
+            break;
+        }
+        case "login-manual": {
+            expressions.push("(^)( Account Menu:)($)");
+            break;
+        }
+        case "login-wrong-password":
+        case "login-sending-password": {
+            expressions.push("(^)( Account Menu:)($)");
+            expressions.push("(^)(Do you wish to connect anyway\\?)($)");
+            expressions.push("(^)(Wrong password\\! Try again\\.)($)");
+            break;
+        }
+        default: break;
+    }
+
+    if (expressions.length === 0) {
+        return;
+    }
+
+    for (var i=0; i<expressions.length; ++i) {
+        var regex = new RegExp(expressions[i]);
+        var match = regex.exec(line) || [];
+
+        if (match.length !== 4) {
+            continue;
+        }
+
+        switch (global.mud.state) {
+            case "": {
+                global.mud.state = "login";
+                break;
+            }
+            case "login": {
+                global.mud.state = "login-manual";
+                break;
+            }
+            case "login-sending-username": {
+                global.mud.state = "login-sending-password";
+                global.ws.send(str2buf(global.mud.account.password+"\n"));
+                break;
+            }
+            case "login-wrong-password":
+            case "login-sending-password": {
+                if (i === 1) {
+                    global.ws.send(str2buf("yes\n"));
+                    break;
+                }
+                else if (i === 2) {
+                    global.mud.state = "login-wrong-password";
+                    break;
+                }
+
+                global.mud.state = "account-menu";
+                break;
+            }
+            case "login-manual": {
+                global.mud.state = "account-menu";
+                break;
+            }
+            default: break;
+        }
+    }
+}
+
 function amc_write_line(data, start, length) {
     var buffer = [];
 
@@ -510,6 +804,8 @@ function amc_write_line(data, start, length) {
     }
 
     var line = String.fromCharCode(...buffer);
+
+    amc_match_line(line);
 
     var regex = new RegExp(
         "(^(?:.* > )?.+ (?:tells you|tell .+|tells the group|tell the group) ')"
@@ -542,6 +838,7 @@ function amc_write_prompt() {
     && global.log.data[length - 2] === '>'.charCodeAt()
     && global.log.data[length - 1] === ' '.charCodeAt()) {
         global.xt.terminal.write(global.log.data);
+        amc_match_line(String.fromCharCode(...global.log.data));
         global.log.data = [];
     }
 }
@@ -586,7 +883,7 @@ function amc_interpret_hashtag() {
     }
 }
 
-function get_primary_top_placeholder() {
+function amc_get_primary_top_placeholder() {
     var placeholder =
     "╔══════════════╤══╗ A small clearing\n"+
     "║╭───╮ ╭───╮ ╭─┴─╮║   You are in a small clearing in the shadow grove. "+
@@ -614,7 +911,7 @@ function get_primary_top_placeholder() {
     return placeholder;
 }
 
-function get_secondary_top_placeholder() {
+function amc_get_secondary_top_placeholder() {
     var placeholder =
     "n∩n∩n∩n∩.ⁿ.ⁿ.ⁿ.ⁿ \"⌠ \"⌠\"⌠\"⌠⌂ ⌂⌂ ⌂⌂ ⌂ \n"+
     " n∩n∩n∩.ⁿ.ⁿΠ╷.ⁿ.ⁿ ↑↨ \"⌠\"⌠ ⌂⌂⌂ ⌂⌂ ⌂ ⌂\n"+
@@ -635,8 +932,7 @@ function get_secondary_top_placeholder() {
     return placeholder;
 }
 
-
-function get_secondary_bottom_placeholder() {
+function amc_get_secondary_bottom_placeholder() {
     var placeholder =
     "     Courage the Dwarf Cleric       \n"+
     "    ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌      \n"+
@@ -654,4 +950,39 @@ function get_secondary_bottom_placeholder() {
     " 254 Xp → Lvl 33:   ▒▒▒▒▒▒▒▒▒▒▒▒▒▒░ ";
 
     return placeholder;
+}
+
+function amc_show_login(container) {
+    container.replaceChildren(amc_create_login_form());
+}
+
+function amc_show_message(container, message) {
+    var pre = document.createElement("pre");
+    pre.appendChild(document.createTextNode(message));
+    container.replaceChildren(pre);
+}
+
+function amc_show_mudstate(state) {
+    var container = document.getElementById("amc-primary-top");
+
+    switch (state) {
+        case "login-wrong-password":
+        case "login" : {
+            amc_show_login(container);
+            break;
+        }
+        case "account-menu": {
+            amc_show_message(container, "");
+            break;
+        }
+        case "login-manual": {
+            amc_show_message(container, "Please use the console to sign in.");
+            break;
+        }
+        case "": {
+            amc_init_mainview(container);
+            break;
+        }
+        default: break;
+    }
 }

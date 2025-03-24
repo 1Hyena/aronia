@@ -58,16 +58,17 @@ body {
     vertical-align: middle;
     font-size: 2vmin;
     color: silver;
-    background-color: rgba(0,0,0,0.7);
+    background-color: black;
     border-radius: 0.5rem;
     filter: drop-shadow(0 0 0.25rem rgba(0, 0, 0, 1));
-    text-align: left;
+    text-align: center;
 }
 
 #amc-panel-primary,
 #amc-panel-secondary,
 #amc-panel-tertiary {
     display: inline-block;
+    text-align: left;
 }
 
 table.amc-tui {
@@ -76,6 +77,11 @@ table.amc-tui {
 
 table.amc-tui > tr > td {
     vertical-align: top;
+}
+
+#amc[data-mudstate="login"] #amc-primary-top,
+#amc[data-mudstate="login-wrong-password"] #amc-primary-top {
+    vertical-align: middle;
 }
 
 #amc-primary-top,
@@ -114,23 +120,7 @@ table.amc-tui > tr > td {
     right: 0;
     bottom: 0;
     overflow: hidden;
-    /*
-    display: inline-block;
-    width: 100%;
-    max-width: 800px;
-    height: calc(100% - 2rem);
-    max-height: 600px;
-    vertical-align: bottom;
     text-align: left;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding-left: 0.5rem;
-    border-top: 0.125rem ridge dimgray;
-    border-left: 0.125rem ridge dimgray;
-    border-right: 0.125rem ridge dimgray;
-    border-radius: 0.5rem 0.5rem 0 0;
-    filter: drop-shadow(0 0 0.25rem rgba(0, 0, 0, 1));
-    overflow: hidden;
-    */
 }
 
 #amc-terminal {
@@ -141,6 +131,27 @@ table.amc-tui > tr > td {
 .xterm-viewport {
     scrollbar-width: thin;
     scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
+}
+
+#amc-login-form {
+    text-align: center;
+}
+
+#amc-login-form > table {
+    display: inline-block;
+    text-align: left;
+}
+
+.amc-login-form-slot {
+    position: relative;
+}
+
+.amc-login-form-slot > input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 
 button {
@@ -179,14 +190,23 @@ button:focus {
     opacity: 0.5;
 }
 
-input[type="text"], input[type="date"], textarea {
-    background-color : rgba(255, 255, 255, 0.125);
-    border-radius: 0.25rem;
-    border: 0.1rem solid rgba(0,0,0,0.25);
+input[type="text"], input[type="password"], input[type="submit"], textarea {
+    font-family: monospace;
+    font-size: 2vmin;
+    margin: 0;
+    padding: 0;
+    border: none;
+    color: silver;
+    background-color: transparent;
+    border: none;
+    color-scheme: dark;
 }
 
-textarea {
-    padding: 0.5rem;
-    border: 0.1rem solid rgba(0,0,0,0.25);
-    border-radius: 0.25rem;
+input[type="submit"] {
+    text-decoration: underline;
+}
+
+input[type="submit"]:hover {
+    cursor: pointer;
+    color: white;
 }
