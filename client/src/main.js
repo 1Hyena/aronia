@@ -58,8 +58,7 @@ function main() {
 
     global.sfx = init_sound();
 
-    var greet = document.getElementById("amc-greet");
-    greet.classList.add("disappear");
+    document.getElementById("amc-greet").classList.add("disappear");
 
     window.addEventListener(
         'popstate', function(event) {
@@ -70,6 +69,10 @@ function main() {
     document.fonts.ready.then(
         function (font_face_set) {
             setTimeout(function() {
+                document.getElementById("amc-greet").classList.add(
+                    "amc-hidden-tab"
+                );
+
                 amc_init_panel();
             }, 250); // Let's wait for #amc-greet to disappear completely.
         }
@@ -113,16 +116,22 @@ function amc_init_panel() {
     frag_primary.append(amc_create_primary_panel());
     frag_tertiary.append(amc_create_tertiary_panel());
 
-    document.getElementById("amc-panel-secondary").append(frag_secondary);
-    document.getElementById("amc-panel-primary").append(frag_primary);
-    document.getElementById("amc-panel-tertiary").append(frag_tertiary);
+    document.getElementById("amc-panel-secondary").replaceChildren(
+        frag_secondary
+    );
+
+    document.getElementById("amc-panel-primary").replaceChildren(
+        frag_primary
+    );
+
+    document.getElementById("amc-panel-tertiary").replaceChildren(
+        frag_tertiary
+    );
 
     amc_init_terminal(document.getElementById("amc-primary-bottom"));
     amc_init_mainview(document.getElementById("amc-primary-top"));
     amc_init_zoneview(document.getElementById("amc-secondary-top"));
     amc_init_statview(document.getElementById("amc-secondary-bottom"));
-
-    document.getElementById("amc-greet").classList.add("amc-hidden-tab");
 
     var main = document.getElementById("amc-main");
 
