@@ -1,5 +1,24 @@
 "use strict";
 
+function get_timestamp() {
+    return Math.floor(Date.now() / 1000);
+}
+
+function get_timestring(UNIX_timestamp) {
+    var a = new Date(UNIX_timestamp*1000);
+    //a = new Date(a.getTime() - a.getTimezoneOffset() * 60000);
+
+    var year = a.getFullYear();
+    var month = (a.getMonth() + 1).toString().padStart(2, '0');
+    var day = a.getDate().toString().padStart(2, '0');
+    var hour = a.getHours().toString().padStart(2, '0');
+    var min = a.getMinutes().toString().padStart(2, '0');
+    var sec = a.getSeconds().toString().padStart(2, '0');
+    var time = day+'.'+month+'.'+year+' '+hour+':'+min+':'+sec;
+
+    return time;
+}
+
 function shuffle(a) {
     var j, x, i;
     for (i = a.length; i; i--) {
@@ -249,4 +268,52 @@ function is_visible(container, element, partial) {
 
 function capitalize(val) {
     return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+
+function log(text) {
+    console.log(text);
+}
+
+function bug(arg) {
+    arg = typeof arg !== 'undefined' ? arg : null;
+
+    var caller = get_caller();
+
+    if (caller+"" in global.buggy == false) {
+        if (arg !== null) {
+            log(
+                "forbidden condtion '"+arg+"' has been met ("+caller+")"
+            );
+        }
+        else {
+            log("forbidden condtion has been met ("+caller+")");
+        }
+
+        console.trace();
+        global.buggy[caller+""] = true;
+    }
+}
+
+function get_caller() {
+    try {
+        throw new Error();
+    } catch (e) {
+        var all = e.stack.match(/(\w+)@|at (\w+) \(/g);
+
+        if (all.length >= 3) {
+            var parent = all[2].match(/(\w+)@|at (\w+) \(/);
+            return parent[1] || parent[2];
+        }
+    }
+
+    return "unknown caller";
+}
+
+function strip_ansiesc(str) {
+    var regex = new RegExp(
+        "[\\u001b\\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?"+
+        "[0-9A-ORZcf-nqry=><]", "g"
+    );
+
+    return str.replace(regex, '');
 }

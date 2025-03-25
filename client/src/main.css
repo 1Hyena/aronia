@@ -87,8 +87,46 @@ table.amc-tui > tr > td {
 #amc-primary-top,
 #amc-primary-bottom,
 #amc-secondary-top,
-#amc-secondary-bottom {
+#amc-secondary-bottom,
+#amc-tertiary-top,
+#amc-tertiary-bottom {
     position: relative;
+}
+
+#amc-chatview-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
+}
+
+#amc-chatview {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.amc-chat-private > span:nth-of-type(1),
+.amc-chat-private > span:nth-of-type(2) {
+    color: teal;
+}
+
+.amc-chat-private > span:nth-of-type(1)::after {
+    content: " → ";
+}
+
+.amc-chat-public > span:nth-of-type(1)::after,
+.amc-chat-private > span:nth-of-type(2)::after {
+    content: ": ";
+}
+
+.amc-chat-public::before,
+.amc-chat-private::before {
+    content: "[" attr(data-time) "] ";
 }
 
 #amc-mainview-wrapper {
@@ -98,7 +136,7 @@ table.amc-tui > tr > td {
     right: 0;
     bottom: 0;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
 }
@@ -199,6 +237,14 @@ input[type="text"], input[type="password"], input[type="submit"], textarea {
     color: silver;
     background-color: transparent;
     color-scheme: dark;
+    border-left: 0.5vmin dotted transparent;
+    border-right: 0.5vmin dotted transparent;
+}
+
+textarea:focus, input:focus{
+    outline: none;
+    border-right: 0.5vmin dotted rgba(255, 255, 255, 0.25);
+    filter: drop-shadow(0 0 0.5vmin rgba(255, 255, 255, 0.50));
 }
 
 input[type="submit"] {
