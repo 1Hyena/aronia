@@ -108,6 +108,7 @@ table.amc-tui > tr > td {
 #amc-chatview {
     white-space: pre-wrap;
     word-wrap: break-word;
+    font-size: 1rem;
 }
 
 .amc-chat-private > span:nth-of-type(1),
