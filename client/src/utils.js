@@ -4,6 +4,10 @@ function get_timestamp() {
     return Math.floor(Date.now() / 1000);
 }
 
+function get_timestamp_age(unix_timestamp) {
+    return Math.floor(Date.now() / 1000) - unix_timestamp;
+}
+
 function get_timestring(UNIX_timestamp) {
     var a = new Date(UNIX_timestamp*1000);
     //a = new Date(a.getTime() - a.getTimezoneOffset() * 60000);

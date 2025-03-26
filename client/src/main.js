@@ -24,7 +24,8 @@ var global = {
             password : ""
         },
         log : {
-            data : []
+            data : [],
+            time : 0
         }
     },
     offscreen : {

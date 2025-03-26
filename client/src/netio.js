@@ -1,13 +1,15 @@
 "use strict";
 
 var netio = {
-    IAC  : 255,
-    DO   : 253,
-    DONT : 254,
-    WILL : 251,
-    WONT : 252,
-    SE   : 240,
-    SB   : 250
+    IAC         : 255,
+    DO          : 253,
+    DONT        : 254,
+    WILL        : 251,
+    WONT        : 252,
+    SE          : 240,
+    SB          : 250,
+    EOR         : 239,
+    TELOPT_EOR  : 25
 };
 
 function get_iac_sequence_length(data, start, size) {

@@ -1,5 +1,32 @@
 "use strict";
 
+function amc_iac(data) {
+    if (data.length === 2) {
+        if (data[0] !== netio.IAC) {
+            bug();
+            return;
+        }
+
+        if (data[1] === netio.EOR) {
+            amc_flush_log();
+        }
+    }
+    else if (data.length === 3) {
+        if (data[0] !== netio.IAC) {
+            bug();
+            return;
+        }
+
+        if (data[1] === netio.WILL && data[2] === netio.TELOPT_EOR) {
+            global.ws.send(
+                new Uint8Array(
+                    [ netio.IAC, netio.DO, netio.TELOPT_EOR ]
+                ).buffer
+            );
+        }
+    }
+}
+
 function amc_read_incoming() {
     receive_from_incoming(global.mud.incoming);
 
@@ -7,6 +34,12 @@ function amc_read_incoming() {
         switch (global.mud.incoming.info[i].type) {
             case "log": {
                 global.mud.log.data.push(...global.mud.incoming.info[i].data);
+                global.mud.log.time = Date.now();
+
+                break;
+            }
+            case "iac": {
+                amc_iac(global.mud.incoming.info[i].data);
 
                 break;
             }
@@ -18,6 +51,17 @@ function amc_read_incoming() {
 
     if (global.mud.log.data.length > 0) {
         amc_write_log();
+
+        if (global.mud.log.data.length > 0) {
+            setTimeout(
+                function() {
+                    if (global.mud.log.data.length > 0
+                    && (Date.now() - global.mud.log.time) > 250) {
+                        amc_flush_log();
+                    }
+                }, 500
+            );
+        }
     }
 }
 
@@ -242,18 +286,16 @@ function amc_write_line(data, start, length) {
     amc_match_line(line);
 }
 
-function amc_write_prompt() {
-    // TODO: start sending prompt marker from the MUD server
+function amc_flush_log() {
+    amc_write_log();
 
-    var length = global.mud.log.data.length;
-
-    if (length >= 2
-    && global.mud.log.data[length - 2] === '>'.charCodeAt()
-    && global.mud.log.data[length - 1] === ' '.charCodeAt()) {
-        global.xt.terminal.write(global.mud.log.data);
-        amc_match_line(String.fromCharCode(...global.mud.log.data));
-        global.mud.log.data = [];
+    if (global.mud.log.data.length <= 0) {
+        return;
     }
+
+    global.xt.terminal.write(global.mud.log.data);
+    amc_match_line(String.fromCharCode(...global.mud.log.data));
+    global.mud.log.data = [];
 }
 
 function amc_write_log() {
@@ -277,6 +319,4 @@ function amc_write_log() {
     if (written > 0) {
         global.mud.log.data = global.mud.log.data.slice(written);
     }
-
-    amc_write_prompt();
 }
