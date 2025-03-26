@@ -270,6 +270,30 @@ function is_visible(container, element, partial) {
     return (isTotal || isPartial);
 }
 
+function is_scrolled_top(container) {
+    return container !== null ? (Math.floor(container.scrollTop) === 0) : false;
+}
+
+function is_scrolled_bottom(container) {
+    return container !== null ? (
+        (
+        container.scrollHeight - Math.ceil(container.scrollTop)
+        ) <= container.clientHeight
+    ) : false;
+}
+
+function scroll_to_bottom(container_id) {
+    setTimeout(
+        function(id) {
+            var view = document.getElementById(id);
+
+            if (view !== null) {
+                view.scrollTop = view.scrollHeight;
+            }
+        }, 1, container_id
+    );
+}
+
 function capitalize(val) {
     return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }

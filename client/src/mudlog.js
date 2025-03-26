@@ -147,13 +147,13 @@ function amc_match_login_line(line) {
 function amc_match_public_chat(line) {
     var regex = new RegExp(
         "(^(?:.* > )?)(.+) (gossip[s]?|narrate[s]?|chat[s]?|yell[s]?|say[s]?|"+
-        "exclaim[s]?|ask[s]?|state[s]?) '(.+)(['][.]?.*$)"
+        "exclaim[s]?|ask[s]?|state[s]?|chats in the lobby) '(.+)(['][.]?.*$)"
     );
 
     var match = regex.exec(line) || [];
 
     if (match.length !== 6) {
-        return;
+        return false;
     }
 
     var author = match[2];
@@ -163,36 +163,50 @@ function amc_match_public_chat(line) {
     var message = document.createElement("div");
     var span1 = document.createElement("span");
     var span2 = document.createElement("span");
+    var span3 = document.createElement("span");
+    var span4 = document.createElement("span");
 
-    span1.appendChild(document.createTextNode(author));
-    span2.appendChild(document.createTextNode(content));
-    message.append(span1, span2);
-    message.classList.add("amc-chat-"+channel, "amc-chat-public");
-
-    message.setAttribute(
-        "data-time", get_timestring(get_timestamp()).split(" ").pop()
+    span1.appendChild(
+        document.createTextNode(
+            "["+get_timestring(get_timestamp()).split(" ").pop()+"] "
+        )
     );
+
+    span2.appendChild(document.createTextNode(author));
+    span3.appendChild(document.createTextNode(" "+channel+": "));
+    span4.appendChild(document.createTextNode(content));
+
+    message.append(span1, span2, span3, span4);
+    message.classList.add("amc-chat-public");
+    message.setAttribute("data-author", author);
 
     var chat = (
         global.offscreen.chatview || document.getElementById("amc-chatview")
     );
 
+    var bottom = is_scrolled_bottom(chat.parentNode);
+
     chat.appendChild(message);
+
+    if (bottom) {
+        scroll_to_bottom("amc-chatview-wrapper");
+    }
+
+    return true;
 }
 
 function amc_match_chat_line(line) {
     line = strip_ansiesc(line);
 
     var regex = new RegExp(
-        "(^(?:.* > )?)(.+) (?:tells|tell) (.+) '(.+)(['][.]?.*$)"
+        "(^(?:.* > )?)(.+) (?:tells|tell|whisper[s]? to) (.+) "+
+        "'(.+)(['][.]?.*$)"
     );
 
     var match = regex.exec(line) || [];
 
     if (match.length !== 6) {
-        amc_match_public_chat(line);
-
-        return;
+        return amc_match_public_chat(line);
     }
 
     var author = match[2];
@@ -203,22 +217,36 @@ function amc_match_chat_line(line) {
     var span1 = document.createElement("span");
     var span2 = document.createElement("span");
     var span3 = document.createElement("span");
+    var span4 = document.createElement("span");
 
-    span1.appendChild(document.createTextNode(author));
-    span2.appendChild(document.createTextNode(target));
-    span3.appendChild(document.createTextNode(content));
-    message.append(span1, span2, span3);
-    message.classList.add("amc-chat-private");
-
-    message.setAttribute(
-        "data-time", get_timestring(get_timestamp()).split(" ").pop()
+    span1.appendChild(
+        document.createTextNode(
+            "["+get_timestring(get_timestamp()).split(" ").pop()+"] "
+        )
     );
+
+    span2.appendChild(document.createTextNode(author));
+    span3.appendChild(document.createTextNode(" to "+target+": "));
+    span4.appendChild(document.createTextNode(content));
+
+    message.append(span1, span2, span3, span4);
+    message.classList.add("amc-chat-private");
+    message.setAttribute("data-author", author);
+    message.setAttribute("data-target", target);
 
     var chat = (
         global.offscreen.chatview || document.getElementById("amc-chatview")
     );
 
+    var bottom = is_scrolled_bottom(chat.parentNode);
+
     chat.appendChild(message);
+
+    if (bottom) {
+        scroll_to_bottom("amc-chatview-wrapper");
+    }
+
+    return true;
 }
 
 function amc_match_ctrl_line(line) {
