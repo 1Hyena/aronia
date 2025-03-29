@@ -1,15 +1,20 @@
 "use strict";
 
 var netio = {
-    IAC         : 255,
-    DO          : 253,
-    DONT        : 254,
-    WILL        : 251,
-    WONT        : 252,
-    SE          : 240,
-    SB          : 250,
-    EOR         : 239,
-    TELOPT_EOR  : 25
+    IAC                 : 255,
+    DO                  : 253,
+    DONT                : 254,
+    WILL                : 251,
+    WONT                : 252,
+    SE                  : 240,
+    SB                  : 250,
+    EOR                 : 239,
+    TELOPT_EOR          : 25,
+    MSDP                : 69,
+    server : {
+        eor     : false,
+        msdp    : false
+    }
 };
 
 function get_iac_sequence_length(data, start, size) {
@@ -32,20 +37,35 @@ function get_iac_sequence_length(data, start, size) {
             case netio.DONT:
             case netio.WILL:
             case netio.WONT: {
-                if (i + 1 >= start + size) {
-                    return 0;
-                }
-
-                return (i + 2) - start;
+                return size < 3 ? 0 : 3;
             }
             case netio.SB: {
                 // subnegotiation
 
-                for (var j = i + 1; j + 2 < start + size; j++) {
-                    if (data[j] != netio.IAC
-                    &&  data[j + 1] == netio.IAC
-                    &&  data[j + 2] == netio.SE) {
-                        return (j + 3) - start;
+                for (var j = i + 2; ; j++) {
+                    if (j + 1 >= size) {
+                        return 0;
+                    }
+
+                    if (data[j] != netio.IAC) {
+                        continue;
+                    }
+
+                    switch (data[j+1]) {
+                        case netio.SE: {
+                            return (j + 2) - start;
+                        }
+                        case netio.IAC: {
+                            ++j;
+                            continue;
+                        }
+                        default: {
+                            // Anything other than SE or IAC after IAC actually
+                            // violates the telnet option subnegotiation protcol
+                            // because the meaning of it has not been defined.
+
+                            continue;
+                        }
                     }
                 }
 
@@ -54,7 +74,7 @@ function get_iac_sequence_length(data, start, size) {
             case netio.IAC:
             default: {
                 // 2-byte commands such as IAC GA
-                return (i + 1) - start;
+                return 2;
             }
         }
     }

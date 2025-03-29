@@ -155,7 +155,18 @@ function amc_init() {
 }
 
 function amc_connect() {
-    global.ws = new WebSocket("wss://aronia.ee:4004");
+    var servers = [
+        "wss://aronia.ee:4004",
+        "ws://localhost:4004"
+    ];
+
+    var server = servers[0];
+
+    if (typeof COMPILE_TIME === 'undefined' || COMPILE_TIME == null) {
+        server = servers[1];
+    }
+
+    global.ws = new WebSocket(server);
 
     global.ws.onmessage = function (evt) {
         var received_msg = evt.data;

@@ -23,6 +23,39 @@ function amc_iac(data) {
                     [ netio.IAC, netio.DO, netio.TELOPT_EOR ]
                 ).buffer
             );
+
+            netio.server.eor = true;
+        }
+        else if (data[1] === netio.WILL && data[2] === netio.MSDP) {
+            global.ws.send(
+                new Uint8Array(
+                    [ netio.IAC, netio.DO, netio.MSDP ]
+                ).buffer
+            );
+
+            netio.server.msdp = true;
+            msdp_handler();
+        }
+        else if (data[1] === netio.WILL) {
+            global.ws.send(
+                new Uint8Array(
+                    [ netio.IAC, netio.DONT, data[2] ]
+                ).buffer
+            );
+        }
+    }
+    else if (data.length > 5) {
+        if (data[0] !== netio.IAC) {
+            bug();
+            return;
+        }
+
+        if (data[1] === netio.SB
+        &&  data[2] === netio.MSDP
+        &&  data[data.length-2] === netio.IAC
+        &&  data[data.length-1] === netio.SE) {
+            msdp.incoming.push(data);
+            msdp_handler();
         }
     }
 }
@@ -30,24 +63,25 @@ function amc_iac(data) {
 function amc_read_incoming() {
     receive_from_incoming(global.mud.incoming);
 
-    for (var i=0, sz = global.mud.incoming.info.length; i<sz; ++i) {
-        switch (global.mud.incoming.info[i].type) {
+    let incoming_info = global.mud.incoming.info;
+    global.mud.incoming.info = [];
+
+    for (var i=0, sz = incoming_info.length; i<sz; ++i) {
+        switch (incoming_info[i].type) {
             case "log": {
-                global.mud.log.data.push(...global.mud.incoming.info[i].data);
+                global.mud.log.data.push(...incoming_info[i].data);
                 global.mud.log.time = Date.now();
 
                 break;
             }
             case "iac": {
-                amc_iac(global.mud.incoming.info[i].data);
+                amc_iac(incoming_info[i].data);
 
                 break;
             }
             default: continue;
         }
     }
-
-    global.mud.incoming.info = [];
 
     if (global.mud.log.data.length > 0) {
         amc_write_log();
