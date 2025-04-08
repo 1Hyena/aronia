@@ -32,7 +32,8 @@ var global = {
         terminal : null,
         chatview : null
     },
-    buggy : {}
+    buggy : {},
+    last_interval : 0
 };
 
 function main() {
@@ -81,14 +82,16 @@ function main() {
     );
 }
 
-function amc_main_loop() {
-    setTimeout(
-        function() {
-            amc_main_loop();
-        },
-        1000
-    );
+function amc_interval() {
+    let now = Date.now();
 
+    if (now - global.last_interval >= 1000) {
+        global.last_interval = now;
+        amc_main_loop();
+    }
+}
+
+function amc_main_loop() {
     var focus = !document.hidden;
 
     if (global.alert) {
@@ -145,7 +148,13 @@ function amc_init() {
 
                 setTimeout(
                     function() {
-                        amc_main_loop(); // Let's start the main loop.
+                        setInterval(
+                            function() {
+                                // Let's start the main loop.
+                                amc_interval();
+                            }, 250
+                        );
+
                         amc_connect();
                     }, 0
                 );

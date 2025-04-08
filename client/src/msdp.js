@@ -8,7 +8,7 @@ var msdp = {
     ARRAY_OPEN  : 5,
     ARRAY_CLOSE : 6,
     enabled : false,
-    list : {
+    lists : {
         COMMANDS : null,
         LISTS : null,
         CONFIGURABLE_VARIABLES : null,
@@ -20,18 +20,22 @@ var msdp = {
     outgoing : []
 };
 
+function msdp_serialize_sb(obj) {
+    return [
+        netio.IAC, netio.SB, netio.MSDP,
+        ...msdp_serialize(obj),
+        netio.IAC, netio.SE
+    ];
+}
+
 function msdp_init() {
-    msdp.outgoing.push(
-        ...[
-            netio.IAC, netio.SB, netio.MSDP,
-            ...msdp_serialize(
-                {
-                    LIST : "COMMANDS"
-                }
-            ),
-            netio.IAC, netio.SE
-        ]
-    );
+    for (const [key, value] of Object.entries(msdp.lists)) {
+        if (value !== null) {
+            continue;
+        }
+
+        msdp.outgoing.push(...msdp_serialize_sb( { LIST : key } ));
+    }
 }
 
 function msdp_handler() {
@@ -60,7 +64,14 @@ function msdp_handle_incoming() {
 
     for (let i=0; i<incoming.length; ++i) {
         let data = msdp_deserialize(incoming[i], incoming[i].length - 2, 3);
-        console.log(data);
+
+        for (const [key, value] of Object.entries(msdp.lists)) {
+            if (key in data == false) {
+                continue;
+            }
+
+            msdp.lists[key] = data[key];
+        }
     }
 }
 
@@ -109,7 +120,10 @@ function msdp_deserialize_array(bin, length, start) {
                     let obj = msdp_deserialize(bin, i, start + 1);
 
                     if (obj !== null) {
-                        obj.size = i - start + 1;
+                        obj = {
+                            value : obj,
+                            size : i - start + 1
+                        };
                     }
 
                     return obj;
@@ -138,7 +152,10 @@ function msdp_deserialize_table(bin, length, start) {
                     let obj = msdp_deserialize(bin, i, start + 1);
 
                     if (obj !== null) {
-                        obj.size = i - start + 1;
+                        obj = {
+                            value : obj,
+                            size : i - start + 1
+                        };
                     }
 
                     return obj;
@@ -216,11 +233,7 @@ function msdp_deserialize(bin, length, start) {
         i += obj.size - 1;
     }
 
-    return array === null ? {
-        value : dictionary
-    } : {
-        value : array
-    };
+    return array === null ? dictionary : array;
 }
 
 function msdp_serialize(data) {

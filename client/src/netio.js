@@ -1,16 +1,16 @@
 "use strict";
 
 var netio = {
-    IAC                 : 255,
-    DO                  : 253,
-    DONT                : 254,
-    WILL                : 251,
-    WONT                : 252,
-    SE                  : 240,
-    SB                  : 250,
-    EOR                 : 239,
-    TELOPT_EOR          : 25,
-    MSDP                : 69,
+    IAC         : 255,
+    DO          : 253,
+    DONT        : 254,
+    WILL        : 251,
+    WONT        : 252,
+    SE          : 240,
+    SB          : 250,
+    EOR         : 239,
+    TELOPT_EOR  : 25,
+    MSDP        : 69,
     server : {
         eor     : false,
         msdp    : false
