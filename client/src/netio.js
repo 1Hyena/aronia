@@ -17,6 +17,11 @@ var netio = {
     }
 };
 
+function netio_deinit() {
+    netio.server.eor = false;
+    netio.server.msdp = false;
+}
+
 function get_iac_sequence_length(data, start, size) {
     var iac_active = false;
     var i = start;

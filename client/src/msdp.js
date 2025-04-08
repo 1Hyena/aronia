@@ -28,6 +28,16 @@ function msdp_serialize_sb(obj) {
     ];
 }
 
+function msdp_deinit() {
+    for (const [key, value] of Object.entries(msdp.lists)) {
+        msdp.lists[key] = null;
+    }
+
+    msdp.enabled = false;
+    msdp.incoming = [];
+    msdp.outgoing = [];
+}
+
 function msdp_init() {
     for (const [key, value] of Object.entries(msdp.lists)) {
         if (value !== null) {
@@ -58,6 +68,56 @@ function msdp_handler() {
     } while (msdp.outgoing.length > 0 || msdp.incoming.length > 0);
 }
 
+function msdp_configure_variable(variable) {
+    switch (variable) {
+        default: break;
+        case "CLIENT_NAME" : {
+            msdp.outgoing.push(
+                ...msdp_serialize_sb( { [variable] : global.client.name } )
+            );
+            break;
+        }
+        case "CLIENT_VERSION" : {
+            msdp.outgoing.push(
+                ...msdp_serialize_sb( { [variable] : global.client.version } )
+            );
+            break;
+        }
+    }
+}
+
+function msdp_report_variable(variable) {
+    msdp.outgoing.push(
+        ...msdp_serialize_sb( { REPORT : variable } )
+    );
+}
+
+function msdp_configure_variables() {
+    for (let i=0; i<msdp.lists.CONFIGURABLE_VARIABLES.length; ++i) {
+        msdp_configure_variable(msdp.lists.CONFIGURABLE_VARIABLES[i]);
+    }
+}
+
+function msdp_report_variables() {
+    for (let i=0; i<msdp.lists.REPORTABLE_VARIABLES.length; ++i) {
+        msdp_report_variable(msdp.lists.REPORTABLE_VARIABLES[i]);
+    }
+}
+
+function msdp_handle_list(key) {
+    switch (key) {
+        default: break;
+        case "CONFIGURABLE_VARIABLES": {
+            msdp_configure_variables();
+            break;
+        }
+        case "REPORTABLE_VARIABLES": {
+            msdp_report_variables();
+            break;
+        }
+    }
+}
+
 function msdp_handle_incoming() {
     let incoming = msdp.incoming;
     msdp.incoming = [];
@@ -70,7 +130,12 @@ function msdp_handle_incoming() {
                 continue;
             }
 
+            let handle = msdp.lists[key] === null;
             msdp.lists[key] = data[key];
+
+            if (handle) {
+                msdp_handle_list(key);
+            }
         }
     }
 }

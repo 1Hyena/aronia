@@ -1,6 +1,10 @@
 "use strict";
 
 var global = {
+    client : {
+        name : "Arion MUD Client",
+        version : "0.1"
+    },
     sfx : null,
     server : {
         host : null,
@@ -194,6 +198,9 @@ function amc_connect() {
 
     global.ws.onclose = function() {
         global.xt.terminal.write("\n\r#Disconnected.\n\r");
+
+        msdp_deinit();
+        netio_deinit();
 
         setTimeout(
             function() {
