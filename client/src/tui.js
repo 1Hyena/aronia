@@ -44,7 +44,7 @@ function amc_tui_update_health_bar() {
     let health = msdp.variables.HEALTH && msdp.variables.HEALTH_MAX > 0 ? (
         parseInt(msdp.variables.HEALTH) / parseInt(msdp.variables.HEALTH_MAX)
     ) : 0;
-    let left = Math.floor(health * cells);
+    let left = Math.max(Math.min(Math.floor(health * cells), cells), 0);
     let bar = "▒".repeat(left)+"░".repeat(cells - left);
 
     amc_text_to_tui_class(classname, bar);
@@ -56,7 +56,7 @@ function amc_tui_update_energy_bar() {
     let energy = msdp.variables.ENERGY && msdp.variables.ENERGY_MAX > 0 ? (
         parseInt(msdp.variables.ENERGY) / parseInt(msdp.variables.ENERGY_MAX)
     ) : 0;
-    let left = Math.floor(energy * cells);
+    let left = Math.max(Math.min(Math.floor(energy * cells), cells), 0);
     let bar = "▒".repeat(left)+"░".repeat(cells - left);
 
     amc_text_to_tui_class(classname, bar);
@@ -72,7 +72,7 @@ function amc_tui_update_xp_bar() {
             parseInt(msdp.variables.EXPERIENCE_TNL_MAX)
         ) : 0
     );
-    let left = cells - Math.floor(xp * cells);
+    let left = cells - Math.max(Math.min(Math.floor(xp * cells), cells), 0);
     let bar = "▒".repeat(left)+"░".repeat(cells - left);
 
     amc_text_to_tui_class(classname, bar);
