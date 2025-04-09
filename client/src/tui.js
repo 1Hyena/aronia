@@ -66,7 +66,7 @@ function amc_tui_update_xp_bar() {
     let classname = "amc-statview-xp-bar";
     let cells = document.getElementsByClassName(classname).length;
     let xp = (
-        msdp.variables.EXPERIENCE_TNL &&
+        msdp.variables.EXPERIENCE_TNL >= 0 &&
         msdp.variables.EXPERIENCE_TNL_MAX > 0 ? (
             parseInt(msdp.variables.EXPERIENCE_TNL) /
             parseInt(msdp.variables.EXPERIENCE_TNL_MAX)
@@ -84,7 +84,7 @@ function amc_tui_update_xp() {
     let classname = "amc-statview-label-xp";
     let cells = document.getElementsByClassName(classname).length;
     let label = (
-        msdp.variables.EXPERIENCE_TNL && msdp.variables.LEVEL ? (
+        msdp.variables.EXPERIENCE_TNL >= 0 && msdp.variables.LEVEL >= 0 ? (
             msdp.variables.EXPERIENCE_TNL +
             " Xp → Lvl " + (parseInt(msdp.variables.LEVEL) + 1) + ":"
         ) : "Experience:"

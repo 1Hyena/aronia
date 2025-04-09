@@ -6,7 +6,6 @@ function amc_init_mainview(container) {
     }
 
     if (document.getElementById("amc-mainview-wrapper") !== null) {
-        bug();
         return;
     }
 
@@ -89,6 +88,16 @@ function amc_init_statview(container) {
     amc_text_to_tui_class("amc-statview-label-int", "INT:");
     amc_text_to_tui_class("amc-statview-label-wis", "WIS:");
     amc_text_to_tui_class("amc-statview-label-con", "CON:");
+
+    if (msdp.lists.REPORTABLE_VARIABLES !== null) {
+        for (let i=0; i<msdp.lists.REPORTABLE_VARIABLES.length; ++i) {
+            let key = msdp.lists.REPORTABLE_VARIABLES[i];
+
+            if (key in msdp.variables && msdp.variables[key] !== null) {
+                msdp_update_variable(key, msdp.variables[key]);
+            }
+        }
+    }
 }
 
 function amc_create_chatview() {

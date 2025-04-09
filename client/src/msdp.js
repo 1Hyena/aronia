@@ -151,13 +151,9 @@ function msdp_handle_list(key) {
     }
 }
 
-function msdp_handle_variable(key, value) {
+function msdp_update_variable(key, value) {
     if (key in msdp.variables == false) {
         bug();
-        return;
-    }
-
-    if (JSON.stringify(value) === JSON.stringify(msdp.variables[key])) {
         return;
     }
 
@@ -173,11 +169,9 @@ function msdp_handle_variable(key, value) {
             break;
         }
         case "SERVER_ID": {
-            log("Server identifies as "+value+".");
             break;
         }
         case "SERVER_TIME": {
-            log("Server time is "+value+".");
             break;
         }
         case "EXPERIENCE_TNL": {
@@ -302,6 +296,31 @@ function msdp_handle_variable(key, value) {
             break;
         }
     }
+}
+
+function msdp_handle_variable(key, value) {
+    if (key in msdp.variables == false) {
+        bug();
+        return;
+    }
+
+    if (JSON.stringify(value) === JSON.stringify(msdp.variables[key])) {
+        return;
+    }
+
+    switch (key) {
+        default: break;
+        case "SERVER_ID": {
+            log("Server identifies as "+value+".");
+            break;
+        }
+        case "SERVER_TIME": {
+            log("Server time is "+value+".");
+            break;
+        }
+    }
+
+    msdp_update_variable(key, value);
 }
 
 function msdp_handle_incoming() {
