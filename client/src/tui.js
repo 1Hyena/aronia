@@ -1,5 +1,98 @@
 "use strict";
 
+function amc_text_to_tui_class(name, text) {
+    let elements = document.getElementsByClassName(name);
+
+    for (let i = 0; i < elements.length && i < text.length; ++i) {
+        let pre = document.createElement("pre");
+
+        pre.appendChild(document.createTextNode(text.charAt(i)));
+
+        elements[i].replaceChildren(pre);
+        elements[i].setAttribute("data-symbol", text.charAt(i));
+    }
+
+    for (let i = text.length; i < elements.length; ++i) {
+        let pre = document.createElement("pre");
+
+        pre.appendChild(document.createTextNode(" "));
+
+        elements[i].replaceChildren(pre);
+        elements[i].setAttribute("data-symbol", " ");
+    }
+}
+
+function amc_tui_set_character_name(value) {
+    let classname = "amc-statview-title";
+    let cells = document.getElementsByClassName(classname).length;
+    let padding_left = Math.max(Math.floor((cells - value.length) / 2), 0);
+    let padding_right = Math.max((cells - value.length) - padding_left, 0);
+    let title = " ".repeat(padding_left)+value+" ".repeat(padding_right);
+
+    amc_text_to_tui_class(classname, title);
+    amc_text_to_tui_class(
+        "amc-statview-title-underline",
+        " ".repeat(padding_left)+
+        "╌".repeat(value.length)+
+        " ".repeat(padding_right)
+    );
+}
+
+function amc_tui_update_health_bar() {
+    let classname = "amc-statview-health-bar";
+    let cells = document.getElementsByClassName(classname).length;
+    let health = msdp.variables.HEALTH && msdp.variables.HEALTH_MAX > 0 ? (
+        parseInt(msdp.variables.HEALTH) / parseInt(msdp.variables.HEALTH_MAX)
+    ) : 0;
+    let left = Math.floor(health * cells);
+    let bar = "▒".repeat(left)+"░".repeat(cells - left);
+
+    amc_text_to_tui_class(classname, bar);
+}
+
+function amc_tui_update_energy_bar() {
+    let classname = "amc-statview-energy-bar";
+    let cells = document.getElementsByClassName(classname).length;
+    let energy = msdp.variables.ENERGY && msdp.variables.ENERGY_MAX > 0 ? (
+        parseInt(msdp.variables.ENERGY) / parseInt(msdp.variables.ENERGY_MAX)
+    ) : 0;
+    let left = Math.floor(energy * cells);
+    let bar = "▒".repeat(left)+"░".repeat(cells - left);
+
+    amc_text_to_tui_class(classname, bar);
+}
+
+function amc_tui_update_xp_bar() {
+    let classname = "amc-statview-xp-bar";
+    let cells = document.getElementsByClassName(classname).length;
+    let xp = (
+        msdp.variables.EXPERIENCE_TNL &&
+        msdp.variables.EXPERIENCE_TNL_MAX > 0 ? (
+            parseInt(msdp.variables.EXPERIENCE_TNL) /
+            parseInt(msdp.variables.EXPERIENCE_TNL_MAX)
+        ) : 0
+    );
+    let left = cells - Math.floor(xp * cells);
+    let bar = "▒".repeat(left)+"░".repeat(cells - left);
+
+    amc_text_to_tui_class(classname, bar);
+}
+
+function amc_tui_update_xp() {
+    amc_tui_update_xp_bar();
+
+    let classname = "amc-statview-label-xp";
+    let cells = document.getElementsByClassName(classname).length;
+    let label = (
+        msdp.variables.EXPERIENCE_TNL && msdp.variables.LEVEL ? (
+            msdp.variables.EXPERIENCE_TNL +
+            " Xp → Lvl " + (parseInt(msdp.variables.LEVEL) + 1) + ":"
+        ) : "Experience:"
+    );
+
+    amc_text_to_tui_class(classname, label);
+}
+
 function amc_create_secondary_panel(width, height) {
     var panel = document.createElement("div");
     var table = document.createElement("table");
@@ -391,6 +484,227 @@ function amc_create_login_form() {
     }
 
     return form;
+}
+
+function amc_create_statview() {
+    var table = document.createElement("table");
+
+    table.classList.add("amc-tui");
+
+    var cols = 36;
+    var rows = 14;
+
+    for (var y=0; y<rows; ++y) {
+        var row = document.createElement("tr");
+
+        for (var x=0; x<cols; ++x) {
+            var text = " ";
+            var cell = null;
+
+            if (y === 0) {
+                cell = document.createElement("td");
+                cell.classList.add("amc-statview-title");
+            }
+            else if (y === 1) {
+                cell = document.createElement("td");
+                cell.classList.add("amc-statview-title-underline");
+            }
+            else if (y === 3) {
+                if (x >= 1 && x < 8) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-health");
+                }
+                else if (x >= 8 && x < 13) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-health");
+                }
+                else if (x === 13) {
+                    text = "/";
+                }
+                else if (x >= 14 && x < 19) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-health-max");
+                }
+                else if (x >= 20 && x < 35) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-health-bar");
+                }
+            }
+            else if (y === 4) {
+                if (x >= 1 && x < 8) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-energy");
+                }
+                else if (x >= 8 && x < 13) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-energy");
+                }
+                else if (x === 13) {
+                    text = "/";
+                }
+                else if (x >= 14 && x < 19) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-energy-max");
+                }
+                else if (x >= 20 && x < 35) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-energy-bar");
+                }
+            }
+            else if (y === 6) {
+                if (x >= 1 && x < 13) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-ac");
+                }
+                else if (x >= 14 && x < 18) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-ac");
+                }
+                else if (x >= 20 && x < 24) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-str");
+                }
+                else if (x >= 25 && x < 29) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-str");
+                }
+                else if (x === 30) {
+                    text = "/";
+                }
+                else if (x >= 32 && x < 35) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-str-base");
+                }
+            }
+            else if (y === 7) {
+                if (x >= 1 && x < 13) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-hitroll");
+                }
+                else if (x >= 14 && x < 18) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-hitroll");
+                }
+                else if (x >= 20 && x < 24) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-dex");
+                }
+                else if (x >= 25 && x < 29) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-dex");
+                }
+                else if (x === 30) {
+                    text = "/";
+                }
+                else if (x >= 32 && x < 35) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-dex-base");
+                }
+            }
+            else if (y === 8) {
+                if (x >= 1 && x < 13) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-damroll");
+                }
+                else if (x >= 14 && x < 18) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-damroll");
+                }
+                else if (x >= 20 && x < 24) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-int");
+                }
+                else if (x >= 25 && x < 29) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-int");
+                }
+                else if (x === 30) {
+                    text = "/";
+                }
+                else if (x >= 32 && x < 35) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-int-base");
+                }
+            }
+            else if (y === 9) {
+                if (x >= 20 && x < 24) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-wis");
+                }
+                else if (x >= 25 && x < 29) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-wis");
+                }
+                else if (x === 30) {
+                    text = "/";
+                }
+                else if (x >= 32 && x < 35) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-wis-base");
+                }
+            }
+            else if (y === 10) {
+                if (x >= 1 && x < 13) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-affected");
+                }
+                else if (x >= 14 && x < 18) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-affected");
+                }
+                else if (x >= 20 && x < 24) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-con");
+                }
+                else if (x >= 25 && x < 29) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-con");
+                }
+                else if (x === 30) {
+                    text = "/";
+                }
+                else if (x >= 32 && x < 35) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-con-base");
+                }
+            }
+            else if (y === 11) {
+                if (x >= 1 && x < 19) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-affected");
+                }
+            }
+            else if (y === 13) {
+                if (x >= 1 && x < 19) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-label-xp");
+                }
+                else if (x >= 20 && x < 35) {
+                    cell = document.createElement("td");
+                    cell.classList.add("amc-statview-xp-bar");
+                }
+            }
+
+            if (text !== null) {
+                var pre = document.createElement("pre");
+                pre.append(document.createTextNode(text));
+
+                if (cell === null) {
+                    cell = document.createElement("td");
+                }
+
+                cell.append(pre);
+            }
+
+            if (cell !== null) {
+                row.append(cell);
+            }
+        }
+
+        table.append(row);
+    }
+
+    return table;
 }
 
 function amc_create_tertiary_panel(width, height) {

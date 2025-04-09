@@ -64,6 +64,7 @@ function amc_init_statview(container) {
 
     wrapper.id = "amc-statview-wrapper";
 
+    /*
     var placeholder = document.createElement("pre");
 
     placeholder.appendChild(
@@ -71,8 +72,23 @@ function amc_init_statview(container) {
     );
 
     wrapper.appendChild(placeholder);
+    */
+
+    wrapper.appendChild(amc_create_statview());
 
     container.appendChild(wrapper);
+
+    amc_text_to_tui_class("amc-statview-label-health", "Health:");
+    amc_text_to_tui_class("amc-statview-label-energy", "Energy:");
+    amc_text_to_tui_class("amc-statview-label-ac", "Armor Class:");
+    amc_text_to_tui_class("amc-statview-label-hitroll", "To Hit:");
+    amc_text_to_tui_class("amc-statview-label-damroll", "To Damage:");
+    amc_text_to_tui_class("amc-statview-label-affected", "Affected By:");
+    amc_text_to_tui_class("amc-statview-label-str", "STR:");
+    amc_text_to_tui_class("amc-statview-label-dex", "DEX:");
+    amc_text_to_tui_class("amc-statview-label-int", "INT:");
+    amc_text_to_tui_class("amc-statview-label-wis", "WIS:");
+    amc_text_to_tui_class("amc-statview-label-con", "CON:");
 }
 
 function amc_create_chatview() {

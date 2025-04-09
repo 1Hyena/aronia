@@ -16,6 +16,33 @@ var msdp = {
         REPORTED_VARIABLES : null,
         SENDABLE_VARIABLES : null
     },
+    variables : {
+        ACCOUNT_NAME : null,
+        CHARACTER_NAME : null,
+        SERVER_ID : null,
+        SERVER_TIME : null,
+        EXPERIENCE_TNL : null,
+        EXPERIENCE_TNL_MAX : null,
+        HEALTH : null,
+        HEALTH_MAX : null,
+        ENERGY : null,
+        ENERGY_MAX : null,
+        LEVEL : null,
+        MONEY : null,
+        TO_HIT : null,
+        TO_DAM : null,
+        STR : null,
+        STR_BASE : null,
+        DEX : null,
+        DEX_BASE : null,
+        INT : null,
+        INT_BASE : null,
+        WIS : null,
+        WIS_BASE : null,
+        CON : null,
+        CON_BASE : null,
+        AC : null
+    },
     incoming : [],
     outgoing : []
 };
@@ -31,6 +58,10 @@ function msdp_serialize_sb(obj) {
 function msdp_deinit() {
     for (const [key, value] of Object.entries(msdp.lists)) {
         msdp.lists[key] = null;
+    }
+
+    for (const [key, value] of Object.entries(msdp.variables)) {
+        msdp.variables[key] = null;
     }
 
     msdp.enabled = false;
@@ -100,7 +131,9 @@ function msdp_configure_variables() {
 
 function msdp_report_variables() {
     for (let i=0; i<msdp.lists.REPORTABLE_VARIABLES.length; ++i) {
-        msdp_report_variable(msdp.lists.REPORTABLE_VARIABLES[i]);
+        if (msdp.lists.REPORTABLE_VARIABLES[i] in msdp.variables) {
+            msdp_report_variable(msdp.lists.REPORTABLE_VARIABLES[i]);
+        }
     }
 }
 
@@ -118,12 +151,166 @@ function msdp_handle_list(key) {
     }
 }
 
+function msdp_handle_variable(key, value) {
+    if (key in msdp.variables == false) {
+        bug();
+        return;
+    }
+
+    if (JSON.stringify(value) === JSON.stringify(msdp.variables[key])) {
+        return;
+    }
+
+    msdp.variables[key] = value;
+
+    switch (key) {
+        default: break;
+        case "ACCOUNT_NAME": {
+            break;
+        }
+        case "CHARACTER_NAME": {
+            amc_tui_set_character_name(value);
+            break;
+        }
+        case "SERVER_ID": {
+            log("Server identifies as "+value+".");
+            break;
+        }
+        case "SERVER_TIME": {
+            log("Server time is "+value+".");
+            break;
+        }
+        case "EXPERIENCE_TNL": {
+            amc_tui_update_xp();
+            break;
+        }
+        case "EXPERIENCE_TNL_MAX": {
+            amc_tui_update_xp();
+            break;
+        }
+        case "HEALTH": {
+            amc_text_to_tui_class(
+                "amc-statview-health", value.padStart(4, " ")
+            );
+            amc_tui_update_health_bar();
+            break;
+        }
+        case "HEALTH_MAX": {
+            amc_text_to_tui_class(
+                "amc-statview-health-max", value.padStart(4, " ")
+            );
+            amc_tui_update_health_bar();
+            break;
+        }
+        case "ENERGY": {
+            amc_text_to_tui_class(
+                "amc-statview-energy", value.padStart(4, " ")
+            );
+            amc_tui_update_energy_bar();
+            break;
+        }
+        case "ENERGY_MAX": {
+            amc_text_to_tui_class(
+                "amc-statview-energy-max", value.padStart(4, " ")
+            );
+            amc_tui_update_energy_bar();
+            break;
+        }
+        case "LEVEL": {
+            amc_tui_update_xp();
+            break;
+        }
+        case "MONEY": {
+            break;
+        }
+        case "AC": {
+            amc_text_to_tui_class(
+                "amc-statview-ac", value.padStart(4, " ")
+            );
+            break;
+        }
+        case "TO_HIT": {
+            amc_text_to_tui_class(
+                "amc-statview-hitroll", value.padStart(4, " ")
+            );
+            break;
+        }
+        case "TO_DAM": {
+            amc_text_to_tui_class(
+                "amc-statview-damroll", value.padStart(4, " ")
+            );
+            break;
+        }
+        case "STR": {
+            amc_text_to_tui_class(
+                "amc-statview-str", value.padStart(4, " ")
+            );
+            break;
+        }
+        case "STR_BASE": {
+            amc_text_to_tui_class(
+                "amc-statview-str-base", value.padStart(3, " ")
+            );
+            break;
+        }
+        case "DEX": {
+            amc_text_to_tui_class(
+                "amc-statview-dex", value.padStart(4, " ")
+            );
+            break;
+        }
+        case "DEX_BASE": {
+            amc_text_to_tui_class(
+                "amc-statview-dex-base", value.padStart(3, " ")
+            );
+            break;
+        }
+        case "INT": {
+            amc_text_to_tui_class(
+                "amc-statview-int", value.padStart(4, " ")
+            );
+            break;
+        }
+        case "INT_BASE": {
+            amc_text_to_tui_class(
+                "amc-statview-int-base", value.padStart(3, " ")
+            );
+            break;
+        }
+        case "WIS": {
+            amc_text_to_tui_class(
+                "amc-statview-wis", value.padStart(4, " ")
+            );
+            break;
+        }
+        case "WIS_BASE": {
+            amc_text_to_tui_class(
+                "amc-statview-wis-base", value.padStart(3, " ")
+            );
+            break;
+        }
+        case "CON": {
+            amc_text_to_tui_class(
+                "amc-statview-con", value.padStart(4, " ")
+            );
+            break;
+        }
+        case "CON_BASE": {
+            amc_text_to_tui_class(
+                "amc-statview-con-base", value.padStart(3, " ")
+            );
+            break;
+        }
+    }
+}
+
 function msdp_handle_incoming() {
     let incoming = msdp.incoming;
     msdp.incoming = [];
 
     for (let i=0; i<incoming.length; ++i) {
         let data = msdp_deserialize(incoming[i], incoming[i].length - 2, 3);
+        let found = false;
 
         for (const [key, value] of Object.entries(msdp.lists)) {
             if (key in data == false) {
@@ -136,6 +323,24 @@ function msdp_handle_incoming() {
             if (handle) {
                 msdp_handle_list(key);
             }
+
+            found = true;
+
+            break;
+        }
+
+        if (found) {
+            continue;
+        }
+
+        for (const [key, value] of Object.entries(msdp.variables)) {
+            if (key in data == false) {
+                continue;
+            }
+
+            msdp_handle_variable(key, data[key]);
+
+            break;
         }
     }
 }
@@ -246,6 +451,11 @@ function msdp_deserialize(bin, length, start) {
         switch (bin[i]) {
             case msdp.VAL: {
                 if (i + 1 >= length) {
+                    if (variable !== null) {
+                        dictionary[variable] = "";
+                        variable = null;
+                    }
+
                     continue;
                 }
 

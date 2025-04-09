@@ -255,3 +255,27 @@ input[type="submit"]:hover {
     cursor: pointer;
     color: white;
 }
+
+.amc-statview-health-bar[data-symbol="▒"] {
+    color: limegreen;
+}
+
+.amc-statview-health-bar[data-symbol="░"] {
+    color: maroon;
+}
+
+.amc-statview-energy-bar[data-symbol="▒"] {
+    color: royalblue;
+}
+
+.amc-statview-energy-bar[data-symbol="░"] {
+    color: maroon;
+}
+
+.amc-statview-xp-bar[data-symbol="▒"] {
+    color: white;
+}
+
+.amc-statview-xp-bar[data-symbol="░"] {
+    color: gray;
+}

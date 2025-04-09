@@ -49,7 +49,7 @@ function get_iac_sequence_length(data, start, size) {
 
                 for (var j = i + 2; ; j++) {
                     if (j + 1 >= size) {
-                        return 0;
+                        break;
                     }
 
                     if (data[j] != netio.IAC) {
