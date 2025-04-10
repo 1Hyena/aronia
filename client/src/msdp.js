@@ -19,8 +19,12 @@ var msdp = {
     variables : {
         ACCOUNT_NAME : null,
         CHARACTER_NAME : null,
+        CHARACTER_RACE : null,
+        CHARACTER_CLASS : null,
         SERVER_ID : null,
         SERVER_TIME : null,
+        WORLD_TIME : null,
+        EXPERIENCE : null,
         EXPERIENCE_TNL : null,
         EXPERIENCE_TNL_MAX : null,
         HEALTH : null,
@@ -165,13 +169,28 @@ function msdp_update_variable(key, value) {
             break;
         }
         case "CHARACTER_NAME": {
-            amc_tui_set_character_name(value);
+            amc_tui_update_character_title();
+            break;
+        }
+        case "CHARACTER_RACE": {
+            amc_tui_update_character_title();
+            break;
+        }
+        case "CHARACTER_CLASS": {
+            amc_tui_update_character_title();
             break;
         }
         case "SERVER_ID": {
             break;
         }
         case "SERVER_TIME": {
+            break;
+        }
+        case "WORLD_TIME": {
+            break;
+        }
+        case "EXPERIENCE": {
+            amc_tui_update_xp();
             break;
         }
         case "EXPERIENCE_TNL": {
@@ -183,9 +202,7 @@ function msdp_update_variable(key, value) {
             break;
         }
         case "HEALTH": {
-            amc_text_to_tui_class(
-                "amc-statview-health", value.padStart(4, " ")
-            );
+            amc_text_to_tui_class("amc-statview-health", value, "right");
             amc_tui_update_health_bar();
             break;
         }
@@ -197,9 +214,7 @@ function msdp_update_variable(key, value) {
             break;
         }
         case "ENERGY": {
-            amc_text_to_tui_class(
-                "amc-statview-energy", value.padStart(4, " ")
-            );
+            amc_text_to_tui_class("amc-statview-energy", value, "right");
             amc_tui_update_energy_bar();
             break;
         }
@@ -316,6 +331,14 @@ function msdp_handle_variable(key, value) {
         }
         case "SERVER_TIME": {
             log("Server time is "+value+".");
+            break;
+        }
+        case "HEALTH": {
+            amc_event_change_health(value);
+            break;
+        }
+        case "ENERGY": {
+            amc_event_change_energy(value);
             break;
         }
     }

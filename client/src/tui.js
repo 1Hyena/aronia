@@ -1,7 +1,19 @@
 "use strict";
 
-function amc_text_to_tui_class(name, text) {
-    let elements = document.getElementsByClassName(name);
+function amc_text_to_tui_class(name, text, alignment) {
+    alignment = typeof alignment !== 'undefined' ? alignment : "left";
+
+    let live_elements = document.getElementsByClassName(name);
+    let elements = [];
+
+    for (let i =0; i<live_elements.length; ++i) {
+        elements.push(live_elements[i]);
+    }
+
+    if (alignment === "right") {
+        elements.reverse();
+        text = [...text].reverse().join("");
+    }
 
     for (let i = 0; i < elements.length && i < text.length; ++i) {
         let pre = document.createElement("pre");
@@ -22,7 +34,25 @@ function amc_text_to_tui_class(name, text) {
     }
 }
 
-function amc_tui_set_character_name(value) {
+function amc_tui_update_character_title() {
+    let value = "";
+
+    if (msdp.variables.CHARACTER_NAME !== null) {
+        value = capitalize(msdp.variables.CHARACTER_NAME);
+
+        if (msdp.variables.CHARACTER_RACE || msdp.variables.CHARACTER_CLASS) {
+            value += ",";
+
+            if (msdp.variables.CHARACTER_RACE) {
+                value += " "+capitalize(msdp.variables.CHARACTER_RACE);
+            }
+
+            if (msdp.variables.CHARACTER_CLASS) {
+                value += " "+capitalize(msdp.variables.CHARACTER_CLASS);
+            }
+        }
+    }
+
     let classname = "amc-statview-title";
     let cells = document.getElementsByClassName(classname).length;
     let padding_left = Math.max(Math.floor((cells - value.length) / 2), 0);
@@ -64,6 +94,17 @@ function amc_tui_update_energy_bar() {
 
 function amc_tui_update_xp_bar() {
     let classname = "amc-statview-xp-bar";
+
+    if (!(msdp.variables.EXPERIENCE_TNL >= 0 && msdp.variables.LEVEL >= 0)) {
+        amc_text_to_tui_class(
+            classname,
+            msdp.variables.EXPERIENCE !== null ? msdp.variables.EXPERIENCE : "",
+            "right"
+        );
+
+        return;
+    }
+
     let cells = document.getElementsByClassName(classname).length;
     let xp = (
         msdp.variables.EXPERIENCE_TNL >= 0 &&
