@@ -845,29 +845,31 @@ function amc_create_tertiary_panel(width, height) {
 }
 
 function amc_get_primary_top_placeholder() {
-    var placeholder =
-    "╔══════════════╤══╗ A small clearing\n"+
-    "║╭───╮ ╭───╮ ╭─┴─╮║   You are in a small clearing in the shadow grove. "+
-    "There is\n"+
-    "╟┤   ├─┤   ├─┤   │║ charred grass underfoot, and the signs of fire here "+
-    "and\n"+
-    "║╰───╯ ╰─┬─╯ ╰───╯║ there. It is almost as if the plant life shuns this "+
-    "spot.\n"+
-    "║╭───╮ ╭─┴─╮ ╭─┬─╮║ The shadowy mist hovers all around, obscuring your "+
-    "view into\n"+
-    "║│   ├─┤ @ ├─┼─┼─┤║ the grove.\n"+
-    "║╰─┬─╯ ╰───╯ ╰─┼─╯║   A small path leads east to some shadowy structure. "+
-    "All\n"+
-    "║╭─┴─╮       ╭─┴─╮║ other exits are shrouded in shadowy mist.\n"+
-    "║│   │       │   │║\n"+
-    "║╰─┬─╯       ╰─┬─╯║\n"+
-    "╚══╧═══════════╧══╝\n"+
-    " [Exits: north east west]\n"+
-    "A shadow guardian screams a challenge and attacks.\n"+
-    "A shadow guardian screams a challenge and attacks.\n"+
-    "An emaciated adventurer is here looking lost and hopeless.\n"+
+    let placeholder =
+    "╔══════════════════════╤══╗ A small clearing\n"+
+    "║╭───╮     ╭───╮     ╭─┴─╮║   You are in a small clearing in the shadow g"+
+    "rove.\n"+
+    "╟┤   ├─────┤  ↑├─────┤   │║ There is charred grass underfoot, and the sig"+
+    "ns of\n"+
+    "║╰───╯     ╰─┬─╯     ╰───╯║ fire here and there. It is almost as if the p"+
+    "lant\n"+
+    "║      ╭─────┴─────╮      ║ life shuns this spot. The shadowy mist hovers"+
+    " all\n"+
+    "║      │           │      ║ around, obscuring your view into the grove.\n"+
+    "║╭───╮ │           │ ╭─┬─╮║   A small path leads east to some shadowy str"+
+    "ucture.\n"+
+    "║│   ├─┤ c   @  k  ├─┼─┼─┤║ All other exits are shrouded in shadowy mist."+
     "\n"+
-    "8 Mana:Slow Move:Good >";
+    "║╰─┬─╯ │      kk   │ ╰─┼─╯║\n"+
+    "║  │   │           │   │  ║\n"+
+    "║  │   ╰───────────╯   │  ║\n"+
+    "║╭─┴─╮               ╭─┴─╮║\n"+
+    "║│   │               │   │║\n"+
+    "║╰─┬─╯               ╰─┬─╯║ [Exits: north east west]\n"+
+    "╚══╧═══════════════════╧══╝\n"+
+    "A shadow guardian screams a challenge and attacks.\n"+
+    "A shadow guardian screams a challenge and attacks.\n"+
+    "An emaciated adventurer is here looking lost and hopeless.\n";
 
     return placeholder;
 }
