@@ -83,8 +83,6 @@ function main() {
 
     global.sfx = init_sound();
 
-    document.getElementById("amc-greet").classList.add("disappear");
-
     window.addEventListener(
         'popstate', function(event) {
             amc_interpret_hashtag();
@@ -93,6 +91,8 @@ function main() {
 
     document.fonts.ready.then(
         function (font_face_set) {
+            document.getElementById("amc-greet").classList.add("disappear");
+
             setTimeout(function() {
                 document.getElementById("amc").classList.add("amc-main-font");
                 amc_init();
