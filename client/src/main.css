@@ -3,7 +3,7 @@
 html {
     width: 100dvw;
     height: 100dvh;
-    font-family: monospace;
+    font-family: unscii, monospace;
 }
 
 body {
@@ -45,6 +45,15 @@ body {
 
 #amc-main {
     opacity: 0;
+    white-space: nowrap;
+}
+
+.sndc-main-font {
+    font-family: unscii;
+}
+
+pre {
+    font-family: unscii, monospace;
 }
 
 #amc-main > span:first-of-type {
@@ -56,18 +65,12 @@ body {
 #amc-panel-wrapper {
     display: inline-block;
     vertical-align: middle;
-    font-size: 2vmin;
+    font-size: 16px;
+    line-height: 16px;
     color: silver;
     background-color: black;
     border-radius: 0.5rem;
     filter: drop-shadow(0 0 0.25rem rgba(0, 0, 0, 1));
-    text-align: center;
-}
-
-#amc-panel-primary,
-#amc-panel-secondary,
-#amc-panel-tertiary {
-    display: inline-block;
     text-align: left;
 }
 
@@ -79,17 +82,12 @@ table.amc-tui > tr > td {
     vertical-align: top;
 }
 
-#amc[data-mudstate="login"] #amc-primary-top,
-#amc[data-mudstate="login-wrong-password"] #amc-primary-top {
+#amc[data-mudstate="login"] #amc-panel-central-top,
+#amc[data-mudstate="login-wrong-password"] #amc-panel-central-top {
     vertical-align: middle;
 }
 
-#amc-primary-top,
-#amc-primary-bottom,
-#amc-secondary-top,
-#amc-secondary-bottom,
-#amc-tertiary-top,
-#amc-tertiary-bottom {
+.amc-panel {
     position: relative;
 }
 
@@ -108,7 +106,6 @@ table.amc-tui > tr > td {
 #amc-chatview {
     white-space: pre-wrap;
     word-wrap: break-word;
-    font-size: 1rem;
 }
 
 div[data-author="You"].amc-chat-public > span:nth-of-type(2),
@@ -142,7 +139,10 @@ div.amc-chat-public > span:nth-of-type(4) {
 }
 
 #amc-zoneview-wrapper,
-#amc-statview-wrapper {
+#amc-statview-wrapper,
+#amc-roomview-wrapper,
+#amc-eqview-wrapper,
+#amc-inventory-view-wrapper {
     position: absolute;
     top: 0;
     left: 0;
@@ -158,7 +158,6 @@ div.amc-chat-public > span:nth-of-type(4) {
     right: 0;
     bottom: 0;
     overflow: hidden;
-    text-align: left;
 }
 
 #amc-terminal {
@@ -229,8 +228,7 @@ button:focus {
 }
 
 input[type="text"], input[type="password"], input[type="submit"], textarea {
-    font-family: monospace;
-    font-size: 2vmin;
+    font-family: unscii, monospace;
     margin: 0;
     padding: 0;
     border: none;
@@ -239,6 +237,8 @@ input[type="text"], input[type="password"], input[type="submit"], textarea {
     color-scheme: dark;
     border-left: 0.5vmin dotted transparent;
     border-right: 0.5vmin dotted transparent;
+    font-size: 16px;
+    line-height: 16px;
 }
 
 textarea:focus, input:focus{

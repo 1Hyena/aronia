@@ -11,7 +11,7 @@ function amc_show_message(container, message) {
 }
 
 function amc_show_mudstate(state) {
-    var container = document.getElementById("amc-primary-top");
+    var container = document.getElementById("amc-panel-central-top");
 
     switch (state) {
         case "login-wrong-password":

@@ -5,6 +5,16 @@ var global = {
         name : "Arion MUD Client",
         version : "0.1"
     },
+    homedir : "",
+    font : {
+        directory : "font",
+        faces : [
+            {
+                family : "unscii",
+                fname  : "unscii-16-full.woff"
+            }
+        ]
+    },
     sfx : null,
     server : {
         host : null,
@@ -52,6 +62,10 @@ function main() {
         }
     }
 
+    if (typeof COMPILE_TIME === 'undefined' || COMPILE_TIME == null) {
+        global.homedir = "../";
+    }
+
     (
         function() {
             var link = (
@@ -80,10 +94,23 @@ function main() {
     document.fonts.ready.then(
         function (font_face_set) {
             setTimeout(function() {
+                document.getElementById("amc").classList.add("amc-main-font");
                 amc_init();
             }, 250); // Let's wait for #amc-greet to disappear completely.
         }
     );
+
+    for (var i=0; i< global.font.faces.length; ++i) {
+        var face = global.font.faces[i];
+
+        var font_face = new FontFace(
+            face.family,
+            'url('+global.homedir+global.font.directory+'/'+face.fname+')'
+        );
+
+        document.fonts.add(font_face);
+        font_face.load();
+    }
 }
 
 function amc_interval() {

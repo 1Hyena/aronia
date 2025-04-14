@@ -16,7 +16,7 @@ function amc_init_mainview(container) {
     var placeholder = document.createElement("pre");
 
     placeholder.appendChild(
-        document.createTextNode(amc_get_primary_top_placeholder())
+        document.createTextNode(amc_get_roguelike_placeholder())
     );
 
     wrapper.appendChild(placeholder);
@@ -49,6 +49,81 @@ function amc_init_zoneview(container) {
     container.appendChild(wrapper);
 }
 
+function amc_init_eqview(container) {
+    if (container === null) {
+        return;
+    }
+
+    if (document.getElementById("amc-eqview-wrapper") !== null) {
+        bug();
+        return;
+    }
+
+    var wrapper = document.createElement("div");
+
+    wrapper.id = "amc-eqview-wrapper";
+
+    var placeholder = document.createElement("pre");
+
+    placeholder.appendChild(
+        document.createTextNode(amc_get_equipment_placeholder())
+    );
+
+    wrapper.appendChild(placeholder);
+
+    container.appendChild(wrapper);
+}
+
+function amc_init_inventory_view(container) {
+    if (container === null) {
+        return;
+    }
+
+    if (document.getElementById("amc-inventory-view-wrapper") !== null) {
+        bug();
+        return;
+    }
+
+    var wrapper = document.createElement("div");
+
+    wrapper.id = "amc-inventory-view-wrapper";
+
+    var placeholder = document.createElement("pre");
+
+    placeholder.appendChild(
+        document.createTextNode(amc_get_inventory_placeholder())
+    );
+
+    wrapper.appendChild(placeholder);
+
+    container.appendChild(wrapper);
+}
+
+function amc_init_roomview(container) {
+    if (container === null) {
+        return;
+    }
+
+    if (document.getElementById("amc-roomview-wrapper") !== null) {
+        bug();
+        return;
+    }
+
+    var wrapper = document.createElement("div");
+
+    wrapper.id = "amc-roomview-wrapper";
+
+    var placeholder = document.createElement("pre");
+
+    placeholder.appendChild(
+        document.createTextNode(amc_get_roomview_placeholder())
+    );
+
+    wrapper.appendChild(placeholder);
+
+    container.appendChild(wrapper);
+}
+
 function amc_init_statview(container) {
     if (container === null) {
         return;
@@ -62,16 +137,6 @@ function amc_init_statview(container) {
     var wrapper = document.createElement("div");
 
     wrapper.id = "amc-statview-wrapper";
-
-    /*
-    var placeholder = document.createElement("pre");
-
-    placeholder.appendChild(
-        document.createTextNode(amc_get_secondary_bottom_placeholder())
-    );
-
-    wrapper.appendChild(placeholder);
-    */
 
     wrapper.appendChild(amc_create_statview());
 
@@ -133,7 +198,9 @@ function amc_create_terminal() {
                 background: "#00000000",
                 cursor: "#FFFFFF40"
             },
-            allowTransparency: true
+            allowTransparency: true,
+            fontFamily: "unscii",
+            fontSize: 16
         }
     );
 

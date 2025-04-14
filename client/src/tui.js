@@ -844,32 +844,23 @@ function amc_create_tertiary_panel(width, height) {
     return panel;
 }
 
-function amc_get_primary_top_placeholder() {
+function amc_get_roguelike_placeholder() {
     let placeholder =
-    "╔══════════════════════╤══╗ A small clearing\n"+
-    "║╭───╮     ╭───╮     ╭─┴─╮║   You are in a small clearing in the shadow g"+
-    "rove.\n"+
-    "╟┤   ├─────┤  ↑├─────┤   │║ There is charred grass underfoot, and the sig"+
-    "ns of\n"+
-    "║╰───╯     ╰─┬─╯     ╰───╯║ fire here and there. It is almost as if the p"+
-    "lant\n"+
-    "║      ╭─────┴─────╮      ║ life shuns this spot. The shadowy mist hovers"+
-    " all\n"+
-    "║      │           │      ║ around, obscuring your view into the grove.\n"+
-    "║╭───╮ │           │ ╭─┬─╮║   A small path leads east to some shadowy str"+
-    "ucture.\n"+
-    "║│   ├─┤ c   @  k  ├─┼─┼─┤║ All other exits are shrouded in shadowy mist."+
-    "\n"+
+    "╔══════════════════════╤══╗\n"+
+    "║╭───╮     ╭───╮     ╭─┴─╮║\n"+
+    "╟┤   ├─────┤  ↑├─────┤   │║\n"+
+    "║╰───╯     ╰─┬─╯     ╰───╯║\n"+
+    "║      ╭─────┴─────╮      ║\n"+
+    "║      │           │      ║\n"+
+    "║╭───╮ │           │ ╭─┬─╮║\n"+
+    "║│   ├─┤ c   @  k  ├─┼─┼─┤║\n"+
     "║╰─┬─╯ │      kk   │ ╰─┼─╯║\n"+
     "║  │   │           │   │  ║\n"+
     "║  │   ╰───────────╯   │  ║\n"+
     "║╭─┴─╮               ╭─┴─╮║\n"+
     "║│   │               │   │║\n"+
-    "║╰─┬─╯               ╰─┬─╯║ [Exits: north east west]\n"+
-    "╚══╧═══════════════════╧══╝\n"+
-    "A shadow guardian screams a challenge and attacks.\n"+
-    "A shadow guardian screams a challenge and attacks.\n"+
-    "An emaciated adventurer is here looking lost and hopeless.\n";
+    "║╰─┬─╯               ╰─┬─╯║\n"+
+    "╚══╧═══════════════════╧══╝\n";
 
     return placeholder;
 }
@@ -895,22 +886,53 @@ function amc_get_secondary_top_placeholder() {
     return placeholder;
 }
 
-function amc_get_secondary_bottom_placeholder() {
-    var placeholder =
-    "     Courage the Dwarf Cleric       \n"+
-    "    ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌      \n"+
-    "                                    \n"+
-    " Health: 350 / 350  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ \n"+
-    " Energy:  50 / 250  ▒▒▒░░░░░░░░░░░░ \n"+
-    "                                    \n"+
-    " Armor Class:  150  STR:   18 / 18  \n"+
-    " To Hit:       +20  DEX:   17 / 17  \n"+
-    " To Damage:    +11  INT:   12 / 12  \n"+
-    "                    WIS:   15 / 15  \n"+
-    " Affected By:       CON:   22 / 22  \n"+
-    " H|I|S              CHA:   13 / 14  \n"+
-    "                                    \n"+
-    " 254 Xp → Lvl 33:   ▒▒▒▒▒▒▒▒▒▒▒▒▒▒░ ";
+function amc_get_equipment_placeholder() {
+    return (
+        "Equipment:\n"+
+        "\n"+
+        "a gold ring\n"+
+        "a gold ring\n"+
+        "an amulet of Holy Magic\n"+
+        "an amulet of Holy Magic\n"+
+        "a headband with bright jewel\n"+
+        "a pair of green leggings\n"+
+        "a pair of green gloves\n"+
+        "a pair of green sleeves\n"+
+        "a green coat\n"+
+        "a green belt\n"+
+        "a small runed wand\n"+
+        "a crystal gem\n"+
+        "a silver bracer\n"+
+        "a silver bracer\n"+
+        "a small silver shield\n"+
+        "an elven longsword\n"
+    );
+}
 
-    return placeholder;
+function amc_get_inventory_placeholder() {
+    return (
+        "Inventory:\n"+
+        "\n"+
+        "(3) a yellow potion\n"+
+        "a beaverskin bracer\n"+
+        "a runed elven scroll\n"
+    );
+}
+
+function amc_get_roomview_placeholder() {
+    return (
+        "A small clearing\n"+
+        "  You are in a small clearing in the shadow grove. There is\n"+
+        "charred grass underfoot, and the signs of fire here and\n"+
+        "there. It is almost as if the plant life shuns this spot.\n"+
+        "The shadowy mist hovers all around, obscuring your view into\n"+
+        "the grove.\n"+
+        "  A small path leads east to some shadowy structure. All\n"+
+        "other exits are shrouded in shadowy mist.\n"+
+        "\n"+
+        " [Exits: north east west]\n"+
+        "A shadow guardian screams a challenge and attacks.\n"+
+        "A shadow guardian screams a challenge and attacks.\n"+
+        "An emaciated adventurer is here looking lost and hopeless.\n"
+    );
 }
