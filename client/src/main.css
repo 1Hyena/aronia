@@ -49,7 +49,7 @@ body {
 }
 
 .sndc-main-font {
-    font-family: unscii;
+    font-family: unscii, monospace;
 }
 
 pre {
@@ -138,6 +138,8 @@ div.amc-chat-public > span:nth-of-type(4) {
     scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
 }
 
+#amc-terminal-wrapper,
+#amc-inputbar-wrapper,
 #amc-zoneview-wrapper,
 #amc-statview-wrapper,
 #amc-roomview-wrapper,
@@ -151,18 +153,10 @@ div.amc-chat-public > span:nth-of-type(4) {
     overflow: hidden;
 }
 
-#amc-terminal-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-}
-
 #amc-terminal {
     width: 100%;
     height: 100%;
+    white-space: pre;
 }
 
 .xterm-viewport {
@@ -183,6 +177,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     position: relative;
 }
 
+#amc-inputbar,
 .amc-login-form-slot > input {
     position: absolute;
     top: 0;

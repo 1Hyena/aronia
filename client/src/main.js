@@ -21,10 +21,6 @@ var global = {
         port : null
     },
     ws : null,
-    xt : {
-        terminal : null,
-        fitter : null
-    },
     title : "",
     alert : true,
     mud : {
@@ -44,7 +40,8 @@ var global = {
     },
     offscreen : {
         terminal : null,
-        chatview : null
+        chatview : null,
+        inputbar : null
     },
     buggy : {},
     last_interval : 0
@@ -150,6 +147,7 @@ function amc_init() {
 
     amc_create_chatview();
     amc_create_terminal();
+    amc_create_inputbar();
 
     amc_init_panel(amc_calc_panel_width(), amc_calc_panel_height());
 
@@ -175,8 +173,6 @@ function amc_init() {
             m.classList.remove("fade-out");
 
             if (document.getElementById("amc-terminal") !== null) {
-                global.xt.fitter.fit();
-
                 setTimeout(
                     function() {
                         setInterval(
@@ -224,14 +220,14 @@ function amc_connect() {
     };
 
     global.ws.onclose = function() {
-        global.xt.terminal.write("\n\r#Disconnected.\n\r");
+        amc_write("\n\r#Disconnected.\n\r");
 
         msdp_deinit();
         netio_deinit();
 
         setTimeout(
             function() {
-                global.xt.terminal.write("#Reconnecting...\n\r");
+                amc_write("#Reconnecting...\n\r");
                 global.mud.state = "";
                 amc_connect();
             }, 3000
@@ -239,7 +235,7 @@ function amc_connect() {
     };
 
     global.ws.onerror = function(err) {
-        global.xt.terminal.write("\n\r#Error: "+err.message+"\n\r");
+        amc_write("\n\r#Error: "+err.message+"\n\r");
         global.ws.close();
     };
 }

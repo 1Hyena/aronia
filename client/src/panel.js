@@ -526,6 +526,15 @@ function amc_init_panel(width, height) {
         }
     }
 
+    if (global.offscreen.inputbar === null) {
+        var view = document.getElementById("amc-inputbar");
+
+        if (view !== null) {
+            view.parentNode.removeChild(view);
+            global.offscreen.inputbar = view;
+        }
+    }
+
     document.getElementById("amc-panel-wrapper").replaceChildren(panel);
 
     var panel_console = document.getElementById("amc-panel-console");
@@ -536,6 +545,8 @@ function amc_init_panel(width, height) {
         wrapper.append(global.offscreen.terminal);
         panel_console.append(wrapper);
         global.offscreen.terminal = null;
+
+        scroll_to_bottom("amc-terminal-wrapper");
     }
 
     var panel_top_right = document.getElementById("amc-panel-top-right");
@@ -546,6 +557,19 @@ function amc_init_panel(width, height) {
         wrapper.append(global.offscreen.chatview);
         panel_top_right.append(wrapper);
         global.offscreen.chatview = null;
+    }
+
+    var panel_below_console_left = document.getElementById(
+        "amc-panel-below-console-left"
+    );
+
+    if (panel_below_console_left !== null
+    && global.offscreen.inputbar !== null) {
+        var wrapper = document.createElement("div");
+        wrapper.id = global.offscreen.inputbar.id+"-wrapper";
+        wrapper.append(global.offscreen.inputbar);
+        panel_below_console_left.append(wrapper);
+        global.offscreen.inputbar = null;
     }
 
     amc_init_mainview(document.getElementById("amc-panel-central-top"));
