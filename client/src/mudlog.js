@@ -27,6 +27,19 @@ function get_esc_sequence_length(data, start, size) {
             return 0;
         }
 
+        switch (data[i]) {
+            case 91: { // [
+                for (let j=i+1; j < start + size ; ++j) {
+                    if (data[j] === 109) { // m
+                        return j - start + 1;
+                    }
+                }
+
+                break;
+            }
+            default: break;
+        }
+
         return 1;
     }
 
@@ -151,11 +164,108 @@ function amc_handle_txt(data) {
 
     if (unicode.length > 0) {
         global.mud.log.text.utf8.time = Date.now();
-        global.mud.log.text.utf8.data.push(...[...unicode]);
+
+        let list = global.mud.log.ansi;
+        let ansi = {};
+
+        for (const [key, value] of Object.entries(list)) {
+            ansi[key] = list[key];
+        }
+
+        global.mud.log.text.utf8.packets.push(
+            {
+                ansi : ansi,
+                data : [...unicode]
+            }
+        );
     }
 }
 
 function amc_handle_esc(data) {
+    if (data.length > 3) {
+        if (data[0] === 27
+        &&  data[1] === 91
+        &&  data[data.length - 1] === 109) {
+            let parts = String.fromCharCode(
+                ...data.slice(2, data.length - 1)
+            ).split(";");
+
+            for (let i=0; i<parts.length; ++i) {
+                let num = parseInt(parts[i], 10);
+
+                switch (num) {
+                    case 0: { // reset all
+                        let list = global.mud.log.ansi;
+
+                        for (const [key, value] of Object.entries(list)) {
+                            list[key] = null;
+                        }
+
+                        break;
+                    }
+                    case 1: {
+                        global.mud.log.ansi.bold = true;
+                        break;
+                    }
+                    case 3: {
+                        global.mud.log.ansi.italic = true;
+                        break;
+                    }
+                    case 22: {
+                        global.mud.log.ansi.bold = null;
+                    }
+                    case 23: {
+                        global.mud.log.ansi.italic = null;
+                    }
+                    case 8: { // set hidden
+                        global.mud.log.ansi.hidden = true;
+                        break;
+                    }
+                    case 28: { // reset hidden
+                        global.mud.log.ansi.hidden = null;
+                        break;
+                    }
+                    case 30: {
+                        global.mud.log.ansi.fg = "black";
+                        break;
+                    }
+                    case 31: {
+                        global.mud.log.ansi.fg = "red";
+                        break;
+                    }
+                    case 32: {
+                        global.mud.log.ansi.fg = "green";
+                        break;
+                    }
+                    case 33: {
+                        global.mud.log.ansi.fg = "yellow";
+                        break;
+                    }
+                    case 34: {
+                        global.mud.log.ansi.fg = "blue";
+                        break;
+                    }
+                    case 35: {
+                        global.mud.log.ansi.fg = "magenta";
+                        break;
+                    }
+                    case 36: {
+                        global.mud.log.ansi.fg = "cyan";
+                        break;
+                    }
+                    case 37: {
+                        global.mud.log.ansi.fg = "white";
+                        break;
+                    }
+                    case 39: {
+                        global.mud.log.ansi.fg = "default";
+                        break;
+                    }
+                    default: break;
+                }
+            }
+        }
+    }
 }
 
 function amc_read_incoming() {
@@ -194,13 +304,13 @@ function amc_read_incoming() {
         }
     } while (global.mud.incoming.info.length > 0);
 
-    if (global.mud.log.text.utf8.data.length > 0) {
+    if (global.mud.log.text.utf8.packets.length > 0) {
         amc_print_log();
 
-        if (global.mud.log.text.utf8.data.length > 0) {
+        if (global.mud.log.text.utf8.packets.length > 0) {
             setTimeout(
                 function() {
-                    if (global.mud.log.text.utf8.data.length > 0
+                    if (global.mud.log.text.utf8.packets.length > 0
                     && (Date.now()-global.mud.log.text.utf8.time) > 250) {
                         amc_flush_printer();
                     }
@@ -428,80 +538,103 @@ function amc_match_line(line) {
     return;
 }
 
-function amc_print_line(data, start, length) {
-    var buffer = [];
-
-    for (var i=0; i<length; ++i) {
-        buffer.push(data[start+i]);
-    }
-
-    if (buffer.length === 0) {
-        return;
-    }
-
-    amc_print(buffer.join(""));
-
-    for (;;) {
-        var char = buffer.pop();
-
-        if (char !== "\n" && char !== "\r") {
-            buffer.push(char);
-            break;
-        }
-
-        if (buffer.length === 0) {
-            return;
-        }
-    }
-
-    var line = buffer.join("");
-
-    amc_match_line(line);
-}
-
 function amc_flush_printer() {
     amc_print_log();
 
-    if (global.mud.log.text.utf8.data.length <= 0) {
+    if (global.mud.log.text.utf8.packets.length <= 0) {
         return;
     }
 
-    let str = global.mud.log.text.utf8.data.join("");
+    let all = "";
 
-    global.mud.log.text.utf8.data = [];
+    for (let i=0; i<global.mud.log.text.utf8.packets.length; ++i) {
+        let str = global.mud.log.text.utf8.packets[i].data.join("");
 
-    amc_print(str);
-    amc_match_line(str);
+        amc_print(str, global.mud.log.text.utf8.packets[i].ansi);
+        all+=str;
+    }
+
+    global.mud.log.text.utf8.packets = [];
+
+    amc_match_line(all);
 }
 
 function amc_print_log() {
-    let written = 0;
+    let packets = global.mud.log.text.utf8.packets;
+    let split_packet = null;
 
-    for (let i=0, sz = global.mud.log.text.utf8.data.length; i<sz; ++i) {
-        if (global.mud.log.text.utf8.data[i] !== "\n") {
-            continue;
+    for (let i=packets.length - 1; i >= 0; --i) {
+        for (let j=0, sz = packets[i].data.length; j<sz; ++j) {
+            if (packets[i].data[j] === "\n") {
+                split_packet = i;
+                break;
+            }
         }
 
-        let length = (i + 1) - written;
-
-        if (i + 1 < sz && global.mud.log.text.utf8.data[i + 1] === "\r") {
-            length++;
-            i++;
+        if (split_packet !== null) {
+            break;
         }
-
-        amc_print_line(global.mud.log.text.utf8.data, written, length);
-
-        written += length;
     }
 
-    if (written > 0) {
-        global.mud.log.text.utf8.data = global.mud.log.text.utf8.data.slice(
-            written
-        );
+    if (split_packet === null) {
+        return;
+    }
+
+    let line = [];
+
+    for (let i=0; i<=split_packet; ++i) {
+        let print_length = packets[i].data.length;
+
+        for (let j=0, sz = packets[i].data.length; j<sz; ++j) {
+            if (packets[i].data[j] !== "\n") {
+                line.push(packets[i].data[j]);
+                continue;
+            }
+
+            if (j + 1 < sz && packets[i].data[j + 1] === "\r") {
+                ++j;
+                line.push(packets[i].data[j]);
+            }
+
+            if (i === split_packet) {
+                print_length = j + 1;
+            }
+
+            for (;;) {
+                let char = line.pop();
+
+                if (char !== "\n" && char !== "\r") {
+                    line.push(char);
+                    break;
+                }
+
+                if (line.length === 0) {
+                    break;
+                }
+            }
+
+            if (line.length > 0) {
+                amc_match_line(line.join(""));
+                line = [];
+            }
+        }
+
+        let print = packets[i].data.splice(0, print_length);
+
+        amc_print(print.join(""), packets[i].ansi);
+    }
+
+    if (packets[split_packet].data.length === 0) {
+        packets.splice(0, split_packet + 1);
+    }
+    else {
+        packets.splice(0, split_packet);
     }
 }
 
-function amc_print(string) {
+function amc_print(string, ansi) {
+    ansi = typeof ansi !== 'undefined' ? ansi : {};
+
     let output = (
         global.offscreen.terminal || document.getElementById("amc-terminal")
     );
@@ -510,7 +643,45 @@ function amc_print(string) {
         output.parentNode ? is_scrolled_bottom(output.parentNode) : false
     );
 
-    output.appendChild(document.createTextNode(string));
+    let plain = true;
+
+    for (const [key, value] of Object.entries(ansi)) {
+        if (ansi[key] !== null) {
+            plain = false;
+            break;
+        }
+    }
+
+    if (plain) {
+        if (output.lastChild && output.lastChild.nodeType === Node.TEXT_NODE) {
+            output.lastChild.textContent += string;
+        }
+        else {
+            output.appendChild(document.createTextNode(string));
+        }
+    }
+    else {
+        let span = document.createElement("span");
+        span.appendChild(document.createTextNode(string));
+
+        if (ansi.hidden === true) {
+            span.classList.add("ansi-hidden");
+        }
+
+        if (ansi.bold === true) {
+            span.classList.add("ansi-bold");
+        }
+
+        if (ansi.italic === true) {
+            span.classList.add("ansi-italic");
+        }
+
+        if (ansi.fg !== null) {
+            span.classList.add("ansi-fg-"+ansi.fg);
+        }
+
+        output.appendChild(span);
+    }
 
     if (bottom) {
         scroll_to_bottom("amc-terminal-wrapper");

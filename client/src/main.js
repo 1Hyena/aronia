@@ -39,12 +39,15 @@ var global = {
                 data : [],
                 utf8 : {
                     decoder : null,
-                    data : [],
+                    packets : [],
                     time : 0
                 }
             },
             ansi : {
-                data : []
+                hidden : null,
+                bold : null,
+                italic: null,
+                fg : null
             }
         }
     },
