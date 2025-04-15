@@ -22,7 +22,7 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
-    text-align: center;
+    text-align: left;
     overflow: hidden;
 }
 
@@ -54,12 +54,6 @@ body {
 
 pre {
     font-family: unscii, monospace;
-}
-
-#amc-main > span:first-of-type {
-    display: inline-block;
-    height: 100%;
-    vertical-align: middle;
 }
 
 #amc-panel-wrapper {
@@ -126,6 +120,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     font-style: italic;
 }
 
+#amc-terminal-wrapper,
 #amc-mainview-wrapper {
     position: absolute;
     top: 0;
@@ -138,7 +133,6 @@ div.amc-chat-public > span:nth-of-type(4) {
     scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
 }
 
-#amc-terminal-wrapper,
 #amc-inputbar-wrapper,
 #amc-zoneview-wrapper,
 #amc-statview-wrapper,
@@ -156,7 +150,8 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-terminal {
     width: 100%;
     height: 100%;
-    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .xterm-viewport {

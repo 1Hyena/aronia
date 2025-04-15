@@ -477,11 +477,11 @@ function amc_create_login_form() {
 
                 if (global.mud.state === "login") {
                     global.mud.state = "login-sending-username";
-                    global.ws.send(str2buf(global.mud.account.username+"\n"));
+                    amc_send_command(global.mud.account.username);
                 }
                 else if (global.mud.state === "login-wrong-password") {
                     global.mud.state = "login-sending-password";
-                    global.ws.send(str2buf(global.mud.account.password+"\n"));
+                    amc_send_command(global.mud.account.password);
                 }
 
                 target.parentNode.removeChild(target);

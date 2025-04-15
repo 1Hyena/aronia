@@ -152,3 +152,13 @@ function receive_from_incoming(incoming) {
 
     return true;
 }
+
+function amc_send_bytes(array) {
+    global.ws.send(new Uint8Array(array).buffer);
+}
+
+function amc_send_command(line) {
+    let encoder = new TextEncoder();
+
+    global.ws.send(encoder.encode(line+"\n").buffer);
+}

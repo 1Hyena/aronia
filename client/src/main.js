@@ -35,7 +35,17 @@ var global = {
         },
         log : {
             data : [],
-            time : 0
+            text : {
+                data : [],
+                utf8 : {
+                    decoder : null,
+                    data : [],
+                    time : 0
+                }
+            },
+            ansi : {
+                data : []
+            }
         }
     },
     offscreen : {
@@ -203,6 +213,7 @@ function amc_connect() {
     }
 
     global.ws = new WebSocket(server);
+    global.mud.log.text.utf8.decoder = new TextDecoder();
 
     global.ws.onmessage = function (evt) {
         var received_msg = evt.data;
@@ -220,14 +231,14 @@ function amc_connect() {
     };
 
     global.ws.onclose = function() {
-        amc_write("\n\r#Disconnected.\n\r");
+        amc_print("\n#Disconnected.\n");
 
         msdp_deinit();
         netio_deinit();
 
         setTimeout(
             function() {
-                amc_write("#Reconnecting...\n\r");
+                amc_print("#Reconnecting...\n");
                 global.mud.state = "";
                 amc_connect();
             }, 3000
@@ -235,7 +246,7 @@ function amc_connect() {
     };
 
     global.ws.onerror = function(err) {
-        amc_write("\n\r#Error: "+err.message+"\n\r");
+        amc_print("\n#Error: "+err.message+"\n");
         global.ws.close();
     };
 }

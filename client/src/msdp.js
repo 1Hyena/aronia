@@ -94,7 +94,7 @@ function msdp_handler() {
             let outgoing = msdp.outgoing;
             msdp.outgoing = [];
 
-            global.ws.send(new Uint8Array(outgoing).buffer);
+            amc_send_bytes(outgoing);
         }
 
         if (msdp.incoming.length > 0) {

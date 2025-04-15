@@ -195,8 +195,8 @@ function amc_create_inputbar() {
     inputbar.addEventListener(
         "keydown", (event) => {
             if (event.key === "Enter") {
-                amc_write(event.target.value+"\n");
-                global.ws.send(str2buf(event.target.value+"\n"));
+                amc_print(event.target.value+"\n");
+                amc_send_command(event.target.value);
                 event.target.select();
             }
         }

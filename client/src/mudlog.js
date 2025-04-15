@@ -1,6 +1,94 @@
 "use strict";
 
-function amc_iac(data) {
+function get_esc_nonblocking_length(txt) {
+    for (let i = 0, length = txt.length; i < length; ++i) {
+        if (txt[i] != 27) {
+            continue;
+        }
+
+        return i;
+    }
+
+    return txt.length;
+}
+
+function get_esc_sequence_length(data, start, size) {
+    var esc_active = false;
+    var i = start;
+
+    for (; i < start + size; ++i) {
+        if (!esc_active) {
+            if (data[i] == 27) {
+                esc_active = true;
+
+                continue;
+            }
+
+            return 0;
+        }
+
+        return 1;
+    }
+
+    return 0;
+}
+
+function amc_handle_log(data) {
+    if (data.length === 0) {
+        return;
+    }
+
+    global.mud.log.data.push(...data);
+
+    data = global.mud.log.data;
+    global.mud.log.data = [];
+
+    do {
+        if (!data.length) {
+            return;
+        }
+
+        var nonblocking_length = get_esc_nonblocking_length(data);
+        var blocked_length = data.length - nonblocking_length;
+
+        global.mud.incoming.info.push(
+            make_info_packet("txt", data, 0, nonblocking_length)
+        );
+
+        var total_esc_length = 0;
+
+        do {
+            var esc_length = get_esc_sequence_length(
+                data, nonblocking_length + total_esc_length,
+                blocked_length - total_esc_length
+            );
+
+            if (!esc_length) {
+                break;
+            }
+
+            global.mud.incoming.info.push(
+                make_info_packet(
+                    "esc", data,
+                    nonblocking_length + total_esc_length, esc_length
+                )
+            );
+
+            total_esc_length += esc_length;
+        } while (true);
+
+        data = data.slice(nonblocking_length + total_esc_length);
+
+        if (!total_esc_length) {
+            break;
+        }
+    } while (true);
+
+    data.push(...global.mud.log.data);
+    global.mud.log.data = data;
+}
+
+function amc_handle_iac(data) {
     if (data.length === 2) {
         if (data[0] !== netio.IAC) {
             bug();
@@ -8,7 +96,7 @@ function amc_iac(data) {
         }
 
         if (data[1] === netio.EOR) {
-            amc_flush_log();
+            amc_flush_printer();
         }
     }
     else if (data.length === 3) {
@@ -18,30 +106,18 @@ function amc_iac(data) {
         }
 
         if (data[1] === netio.WILL && data[2] === netio.TELOPT_EOR) {
-            global.ws.send(
-                new Uint8Array(
-                    [ netio.IAC, netio.DO, netio.TELOPT_EOR ]
-                ).buffer
-            );
+            amc_send_bytes([ netio.IAC, netio.DO, netio.TELOPT_EOR ]);
 
             netio.server.eor = true;
         }
         else if (data[1] === netio.WILL && data[2] === netio.MSDP) {
-            global.ws.send(
-                new Uint8Array(
-                    [ netio.IAC, netio.DO, netio.MSDP ]
-                ).buffer
-            );
+            amc_send_bytes([ netio.IAC, netio.DO, netio.MSDP ]);
 
             netio.server.msdp = true;
             msdp_handler();
         }
         else if (data[1] === netio.WILL) {
-            global.ws.send(
-                new Uint8Array(
-                    [ netio.IAC, netio.DONT, data[2] ]
-                ).buffer
-            );
+            amc_send_bytes([ netio.IAC, netio.DONT, data[2] ]);
         }
     }
     else if (data.length > 5) {
@@ -60,38 +136,73 @@ function amc_iac(data) {
     }
 }
 
+function amc_handle_txt(data) {
+    global.mud.log.text.data.push(...data);
+
+    if (global.mud.log.text.data.length <= 0) {
+        return;
+    }
+
+    data = new Uint8Array(global.mud.log.text.data);
+
+    global.mud.log.text.data = [];
+
+    let unicode = global.mud.log.text.utf8.decoder.decode(data, {stream: true});
+
+    if (unicode.length > 0) {
+        global.mud.log.text.utf8.time = Date.now();
+        global.mud.log.text.utf8.data.push(...[...unicode]);
+    }
+}
+
+function amc_handle_esc(data) {
+}
+
 function amc_read_incoming() {
     receive_from_incoming(global.mud.incoming);
 
-    let incoming_info = global.mud.incoming.info;
-    global.mud.incoming.info = [];
+    do {
+        let incoming_info = global.mud.incoming.info;
+        global.mud.incoming.info = [];
 
-    for (var i=0, sz = incoming_info.length; i<sz; ++i) {
-        switch (incoming_info[i].type) {
-            case "log": {
-                global.mud.log.data.push(...incoming_info[i].data);
-                global.mud.log.time = Date.now();
+        for (var i=0, sz = incoming_info.length; i<sz; ++i) {
+            if (global.mud.incoming.info.length > 0) {
+                global.mud.incoming.info.push(incoming_info[i]);
 
-                break;
+                continue;
             }
-            case "iac": {
-                amc_iac(incoming_info[i].data);
 
-                break;
+            switch (incoming_info[i].type) {
+                case "log": {
+                    amc_handle_log(incoming_info[i].data);
+                    break;
+                }
+                case "iac": {
+                    amc_handle_iac(incoming_info[i].data);
+                    break;
+                }
+                case "txt": {
+                    amc_handle_txt(incoming_info[i].data);
+                    break;
+                }
+                case "esc": {
+                    amc_handle_esc(incoming_info[i].data);
+                    break;
+                }
+                default: continue;
             }
-            default: continue;
         }
-    }
+    } while (global.mud.incoming.info.length > 0);
 
-    if (global.mud.log.data.length > 0) {
-        amc_write_log();
+    if (global.mud.log.text.utf8.data.length > 0) {
+        amc_print_log();
 
-        if (global.mud.log.data.length > 0) {
+        if (global.mud.log.text.utf8.data.length > 0) {
             setTimeout(
                 function() {
-                    if (global.mud.log.data.length > 0
-                    && (Date.now() - global.mud.log.time) > 250) {
-                        amc_flush_log();
+                    if (global.mud.log.text.utf8.data.length > 0
+                    && (Date.now()-global.mud.log.text.utf8.time) > 250) {
+                        amc_flush_printer();
                     }
                 }, 500
             );
@@ -152,13 +263,13 @@ function amc_match_login_line(line) {
             }
             case "login-sending-username": {
                 global.mud.state = "login-sending-password";
-                global.ws.send(str2buf(global.mud.account.password+"\n"));
+                amc_send_command(global.mud.account.password);
                 break;
             }
             case "login-wrong-password":
             case "login-sending-password": {
                 if (i === 1) {
-                    global.ws.send(str2buf("yes\n"));
+                    amc_send_command("yes");
                     break;
                 }
                 else if (i === 2) {
@@ -230,7 +341,7 @@ function amc_match_public_chat(line) {
 }
 
 function amc_match_chat_line(line) {
-    line = strip_ansiesc(line);
+    //line = strip_ansiesc(line);
 
     var regex = new RegExp(
         "(^(?:.* > )?)(.+) (?:tells|tell|whisper[s]? to) (.+) "+
@@ -283,7 +394,7 @@ function amc_match_chat_line(line) {
     return true;
 }
 
-function amc_match_ctrl_line(line) {
+/*function amc_match_ctrl_line(line) {
     var regex = new RegExp(
         "(^.*\\x1B\\[8m\\x1B\\]0;)(.+)(\\x07\\x1B\\[28m\\x1B\\[0m.*$)"
     );
@@ -295,7 +406,7 @@ function amc_match_ctrl_line(line) {
     }
 
     global.title = match[2];
-}
+}*/
 
 function amc_match_line(line) {
     switch (global.mud.state) {
@@ -312,12 +423,12 @@ function amc_match_line(line) {
     }
 
     amc_match_chat_line(line);
-    amc_match_ctrl_line(line);
+    //amc_match_ctrl_line(line);
 
     return;
 }
 
-function amc_write_line(data, start, length) {
+function amc_print_line(data, start, length) {
     var buffer = [];
 
     for (var i=0; i<length; ++i) {
@@ -328,12 +439,12 @@ function amc_write_line(data, start, length) {
         return;
     }
 
-    amc_write(new Uint8Array(buffer));
+    amc_print(buffer.join(""));
 
     for (;;) {
         var char = buffer.pop();
 
-        if (char !== 10 && char !== 13) {
+        if (char !== "\n" && char !== "\r") {
             buffer.push(char);
             break;
         }
@@ -343,47 +454,54 @@ function amc_write_line(data, start, length) {
         }
     }
 
-    var line = String.fromCharCode(...buffer);
+    var line = buffer.join("");
 
     amc_match_line(line);
 }
 
-function amc_flush_log() {
-    amc_write_log();
+function amc_flush_printer() {
+    amc_print_log();
 
-    if (global.mud.log.data.length <= 0) {
+    if (global.mud.log.text.utf8.data.length <= 0) {
         return;
     }
 
-    amc_write(global.mud.log.data);
-    amc_match_line(String.fromCharCode(...global.mud.log.data));
-    global.mud.log.data = [];
+    let str = global.mud.log.text.utf8.data.join("");
+
+    global.mud.log.text.utf8.data = [];
+
+    amc_print(str);
+    amc_match_line(str);
 }
 
-function amc_write_log() {
-    var written = 0;
+function amc_print_log() {
+    let written = 0;
 
-    for (var i=0, sz = global.mud.log.data.length; i<sz; ++i) {
-        if (global.mud.log.data[i] === 10) {
-            var length = (i + 1) - written;
-
-            if (i + 1 < sz && global.mud.log.data[i + 1] === 13) {
-                length++;
-                i++;
-            }
-
-            amc_write_line(global.mud.log.data, written, length);
-
-            written += length;
+    for (let i=0, sz = global.mud.log.text.utf8.data.length; i<sz; ++i) {
+        if (global.mud.log.text.utf8.data[i] !== "\n") {
+            continue;
         }
+
+        let length = (i + 1) - written;
+
+        if (i + 1 < sz && global.mud.log.text.utf8.data[i + 1] === "\r") {
+            length++;
+            i++;
+        }
+
+        amc_print_line(global.mud.log.text.utf8.data, written, length);
+
+        written += length;
     }
 
     if (written > 0) {
-        global.mud.log.data = global.mud.log.data.slice(written);
+        global.mud.log.text.utf8.data = global.mud.log.text.utf8.data.slice(
+            written
+        );
     }
 }
 
-function amc_write(data) {
+function amc_print(string) {
     let output = (
         global.offscreen.terminal || document.getElementById("amc-terminal")
     );
@@ -392,14 +510,7 @@ function amc_write(data) {
         output.parentNode ? is_scrolled_bottom(output.parentNode) : false
     );
 
-    if (typeof data === 'string' || data instanceof String) {
-        output.appendChild(document.createTextNode(data));
-    }
-    else {
-        output.appendChild(
-            document.createTextNode(String.fromCharCode(...data))
-        );
-    }
+    output.appendChild(document.createTextNode(string));
 
     if (bottom) {
         scroll_to_bottom("amc-terminal-wrapper");

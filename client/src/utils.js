@@ -208,25 +208,6 @@ function stop_all_sound() {
     }
 }
 
-function str2buf(str) {
-    var idx, len = str.length, arr = new Array( len );
-    for ( idx = 0 ; idx < len ; ++idx ) {
-        arr[ idx ] = str.charCodeAt(idx) & 0xFF;
-    }
-    return new Uint8Array( arr ).buffer;
-}
-
-function str2utf8_array(str) {
-    var utf8 = unescape(encodeURIComponent(str));
-
-    var arr = [];
-    for (var i = 0; i < utf8.length; i++) {
-        arr.push(utf8.charCodeAt(i));
-    }
-
-    return arr;
-}
-
 function get_timestamp() {
     return Math.floor(Date.now() / 1000);
 }
