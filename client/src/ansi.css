@@ -62,7 +62,7 @@
 .ansi-bold.ansi-fg-white {
     color: white;
 }
-
+/*
 .ansi-gradient.ansi-bold.ansi-fg-green:has(+ :not(.ansi-bold).ansi-fg-green) {
     background-image: linear-gradient(to right, lime, #00c000);
     color: transparent;
@@ -98,7 +98,7 @@
     color: transparent;
     background-clip: text;
 }
-
+*/
 .ansi-italic {
     font-style: italic;
 }

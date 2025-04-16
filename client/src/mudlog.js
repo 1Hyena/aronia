@@ -29,7 +29,9 @@ function get_esc_sequence_length(data, start, size) {
 
         switch (data[i]) {
             case 32: { // space
-                for (let j=i+1; j < start + size ; ++j) {
+                let j = i + 1;
+
+                if (j < start + size) {
                     let seqlen = j - start + 1;
                     let c = data[j];
 
