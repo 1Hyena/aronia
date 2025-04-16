@@ -46,9 +46,15 @@ var global = {
             ansi : {
                 hidden : null,
                 bold : null,
+                faint: null,
+                underline: null,
+                blinking: null,
+                reverse: null,
                 italic: null,
+                strikethrough: null,
                 fg : null
-            }
+            },
+            buffer : null
         }
     },
     offscreen : {
@@ -150,6 +156,19 @@ function amc_main_loop() {
         amc.setAttribute("data-mudstate", global.mud.state);
 
         amc_show_mudstate(global.mud.state);
+    }
+
+    let blinking_elements = document.getElementsByClassName("ansi-blinking");
+
+    for (let i=0; i<blinking_elements.length; ++i) {
+        let el = blinking_elements[i];
+
+        if (el.classList.contains("ansi-blinked")) {
+            el.classList.remove("ansi-blinked");
+        }
+        else {
+            el.classList.add("ansi-blinked");
+        }
     }
 }
 

@@ -1,0 +1,121 @@
+
+.ansi-fg-black {
+    color: black;
+}
+
+.ansi-fg-red {
+    color: maroon;
+}
+
+.ansi-fg-green {
+    color: green;
+}
+
+.ansi-fg-yellow {
+    color: olive;
+}
+
+.ansi-fg-blue {
+    color: navy;
+}
+
+.ansi-fg-magenta {
+    color: purple;
+}
+
+.ansi-fg-cyan {
+    color: teal;
+}
+
+.ansi-fg-white {
+    color: silver;
+}
+
+.ansi-bold.ansi-fg-black {
+    color: gray;
+}
+
+.ansi-bold.ansi-fg-red {
+    color: red;
+}
+
+.ansi-bold.ansi-fg-green {
+    color: lime;
+}
+
+.ansi-bold.ansi-fg-yellow {
+    color: yellow;
+}
+
+.ansi-bold.ansi-fg-blue {
+    color: blue;
+}
+
+.ansi-bold.ansi-fg-magenta {
+    color: magenta;
+}
+
+.ansi-bold.ansi-fg-cyan {
+    color: cyan;
+}
+
+.ansi-bold.ansi-fg-white {
+    color: white;
+}
+
+.ansi-gradient.ansi-bold.ansi-fg-green:has(+ :not(.ansi-bold).ansi-fg-green) {
+    background-image: linear-gradient(to right, lime, #00c000);
+    color: transparent;
+    background-clip: text;
+}
+
+.ansi-gradient.ansi-bold.ansi-fg-green + :not(.ansi-bold).ansi-fg-green {
+    background-image: linear-gradient(to right, #00c000, green);
+    color: transparent;
+    background-clip: text;
+}
+
+.ansi-gradient:not(.ansi-bold).ansi-fg-green:has(+ :not(.ansi-bold).ansi-fg-red) {
+    background-image: linear-gradient(to right, green, #404000);
+    color: transparent;
+    background-clip: text;
+}
+
+.ansi-gradient:not(.ansi-bold).ansi-fg-green + :not(.ansi-bold).ansi-fg-red {
+    background-image: linear-gradient(to right, #404000, maroon);
+    color: transparent;
+    background-clip: text;
+}
+
+.ansi-gradient:not(.ansi-bold).ansi-fg-red:has(+ .ansi-bold.ansi-fg-red) {
+    background-image: linear-gradient(to right, maroon, #c00000);
+    color: transparent;
+    background-clip: text;
+}
+
+.ansi-gradient:not(.ansi-bold).ansi-fg-red + .ansi-bold.ansi-fg-red {
+    background-image: linear-gradient(to right, #c00000, red);
+    color: transparent;
+    background-clip: text;
+}
+
+.ansi-italic {
+    font-style: italic;
+}
+
+.ansi-underline {
+    text-decoration: underline;
+}
+
+.ansi-faint {
+    opacity: 0.25;
+}
+
+.ansi-strikethrough {
+    text-decoration: line-through;
+}
+
+.ansi-hidden,
+.ansi-blinked {
+    color: transparent;
+}

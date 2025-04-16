@@ -28,22 +28,66 @@ function get_esc_sequence_length(data, start, size) {
         }
 
         switch (data[i]) {
+            case 32: { // space
+                for (let j=i+1; j < start + size ; ++j) {
+                    let seqlen = j - start + 1;
+                    let c = data[j];
+
+                    if (c === "M".charCodeAt(0)
+                    ||  c === "7".charCodeAt(0)
+                    ||  c === "8".charCodeAt(0)) {
+                        return seqlen;
+                    }
+                    else return 1; // invalid sequence
+                }
+
+                return 0; // impartial sequence
+            }
             case 91: { // [
                 for (let j=i+1; j < start + size ; ++j) {
-                    if (data[j] === 109) { // m
-                        return j - start + 1;
+                    let seqlen = j - start + 1;
+                    let c = data[j];
+
+                    if (c !== ";".charCodeAt(0)
+                    && (c < "0".charCodeAt(0) || c > "9".charCodeAt(0))) {
+                        if (c === "m".charCodeAt(0) // colors
+                        ||  c === "n".charCodeAt(0) // request cursor position
+                        ||  c === "H".charCodeAt(0) // move cursor
+                        ||  c === "J".charCodeAt(0) // erasing
+                        ||  c === "K".charCodeAt(0) // erasing
+                        ||  c === "f".charCodeAt(0)) { // move cursor
+                            return seqlen;
+                        }
+                        else if (c === "#".charCodeAt(0)) { // move cursor
+                            if (j + 1 < start + size) {
+                                return seqlen + 1;
+                            }
+                            else return 0;
+                        }
+                        else if (c === "H".charCodeAt(0)
+                        || c === "J".charCodeAt(0)
+                        || c === "K".charCodeAt(0)
+                        || c === "s".charCodeAt(0)
+                        || c === "u".charCodeAt(0)) {
+                            if (seqlen === 3) {
+                                return seqlen;
+                            }
+                        }
+                        else { // unknown sequence
+                            return 1;
+                        }
                     }
                 }
 
-                break;
+                return 0; // impartial sequence
             }
             default: break;
         }
 
-        return 1;
+        return 1; // unknown sequence
     }
 
-    return 0;
+    return 0; // impartial sequence
 }
 
 function amc_handle_log(data) {
@@ -64,9 +108,11 @@ function amc_handle_log(data) {
         var nonblocking_length = get_esc_nonblocking_length(data);
         var blocked_length = data.length - nonblocking_length;
 
-        global.mud.incoming.info.push(
-            make_info_packet("txt", data, 0, nonblocking_length)
-        );
+        if (nonblocking_length > 0) {
+            global.mud.incoming.info.push(
+                make_info_packet("txt", data, 0, nonblocking_length)
+            );
+        }
 
         var total_esc_length = 0;
 
@@ -207,22 +253,56 @@ function amc_handle_esc(data) {
                         global.mud.log.ansi.bold = true;
                         break;
                     }
+                    case 2: {
+                        global.mud.log.ansi.faint = true;
+                        break;
+                    }
                     case 3: {
                         global.mud.log.ansi.italic = true;
                         break;
                     }
+                    case 4: {
+                        global.mud.log.ansi.underline = true;
+                        break;
+                    }
+                    case 5: {
+                        global.mud.log.ansi.blinking = true;
+                        break;
+                    }
+                    case 7: {
+                        global.mud.log.ansi.reverse = true;
+                        break;
+                    }
+                    case 8: {
+                        global.mud.log.ansi.hidden = true;
+                        break;
+                    }
+                    case 9: {
+                        global.mud.log.ansi.strikethrough = true;
+                        break;
+                    }
                     case 22: {
                         global.mud.log.ansi.bold = null;
+                        global.mud.log.ansi.faint = null;
                     }
                     case 23: {
                         global.mud.log.ansi.italic = null;
                     }
-                    case 8: { // set hidden
-                        global.mud.log.ansi.hidden = true;
+                    case 24: {
+                        global.mud.log.ansi.underline = null;
+                    }
+                    case 25: {
+                        global.mud.log.ansi.blinking = null;
+                    }
+                    case 27: {
+                        global.mud.log.ansi.reverse = null;
+                    }
+                    case 28: {
+                        global.mud.log.ansi.hidden = null;
                         break;
                     }
-                    case 28: { // reset hidden
-                        global.mud.log.ansi.hidden = null;
+                    case 29: {
+                        global.mud.log.ansi.strikethrough = null;
                         break;
                     }
                     case 30: {
@@ -313,10 +393,123 @@ function amc_read_incoming() {
                     if (global.mud.log.text.utf8.packets.length > 0
                     && (Date.now()-global.mud.log.text.utf8.time) > 250) {
                         amc_flush_printer();
+                        amc_update_terminal();
                     }
                 }, 500
             );
         }
+    }
+
+    setTimeout(
+        function() {
+            amc_update_terminal();
+        }, 1
+    );
+}
+
+function amc_update_terminal() {
+    if (global.mud.log.buffer === null) {
+        return;
+    }
+
+    let output = (
+        global.offscreen.terminal || document.getElementById("amc-terminal")
+    );
+
+    let bottom = (
+        output.parentNode ? is_scrolled_bottom(output.parentNode) : false
+    );
+
+    let all_text = true;
+    let text = "";
+    let children = global.mud.log.buffer.childNodes;
+
+    for (let i = 0; i < children.length; i++) {
+        let child = children[i];
+
+        if (child.nodeType !== Node.TEXT_NODE) {
+            all_text = false;
+            break;
+        }
+        else {
+            text += child.textContent;
+        }
+    }
+
+    if (!all_text) {
+        // Let's cut heads and tails to enable smooth color transitions.
+        let childbuf = [];
+
+        for (let i = 0; i < children.length; i++) {
+            let child = children[i];
+
+            if (child.nodeType !== Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if (child.tagName.toLowerCase() != 'span'
+            || child.children.length > 0) {
+                continue;
+            }
+
+            childbuf.push(child);
+        }
+
+        for (let i = 0; i < childbuf.length; i++) {
+            let child = childbuf[i];
+            let symbols = [...child.textContent];
+
+            if (symbols.length <= 1) {
+                if (symbols.length === 1 && symbols[0].trim()) {
+                    child.classList.add("ansi-gradient");
+                }
+
+                continue;
+            }
+
+            if (symbols[0].trim()) {
+                let head = symbols.shift();
+                let span = document.createElement("span");
+
+                span.appendChild(document.createTextNode(head));
+                span.classList = child.classList;
+                span.classList.add("ansi-gradient");
+                global.mud.log.buffer.insertBefore(span, child);
+            }
+
+            if (symbols.length > 1 && symbols[symbols.length - 1].trim()) {
+                let tail = symbols.pop();
+                let span = document.createElement("span");
+
+                span.appendChild(document.createTextNode(tail));
+                span.classList = child.classList;
+                span.classList.add("ansi-gradient");
+                child.after(span);
+            }
+
+            if (symbols.length === 1 && symbols[0].trim()) {
+                child.classList.add("ansi-gradient");
+            }
+
+            child.textContent = symbols.join("");
+        }
+    }
+
+    if (output.lastChild && output.lastChild.nodeType === Node.TEXT_NODE
+    && all_text) {
+        output.lastChild.textContent += text;
+    }
+    else if (all_text) {
+        output.appendChild(document.createTextNode(text));
+    }
+    else {
+        output.appendChild(global.mud.log.buffer);
+    }
+
+    global.mud.log.buffer = null;
+
+    if (bottom) {
+        scroll_to_bottom("amc-terminal-wrapper");
     }
 }
 
@@ -635,14 +828,15 @@ function amc_print_log() {
 function amc_print(string, ansi) {
     ansi = typeof ansi !== 'undefined' ? ansi : {};
 
-    let output = (
-        global.offscreen.terminal || document.getElementById("amc-terminal")
-    );
+    if (string.length === 0) {
+        return;
+    }
 
-    let bottom = (
-        output.parentNode ? is_scrolled_bottom(output.parentNode) : false
-    );
+    if (global.mud.log.buffer === null) {
+        global.mud.log.buffer = new DocumentFragment();
+    }
 
+    let output = global.mud.log.buffer;
     let plain = true;
 
     for (const [key, value] of Object.entries(ansi)) {
@@ -651,6 +845,8 @@ function amc_print(string, ansi) {
             break;
         }
     }
+
+    string = string.split("\r").join("");
 
     if (plain) {
         if (output.lastChild && output.lastChild.nodeType === Node.TEXT_NODE) {
@@ -664,8 +860,8 @@ function amc_print(string, ansi) {
         let span = document.createElement("span");
         span.appendChild(document.createTextNode(string));
 
-        if (ansi.hidden === true) {
-            span.classList.add("ansi-hidden");
+        if (ansi.fg !== null) {
+            span.classList.add("ansi-fg-"+ansi.fg);
         }
 
         if (ansi.bold === true) {
@@ -676,14 +872,30 @@ function amc_print(string, ansi) {
             span.classList.add("ansi-italic");
         }
 
-        if (ansi.fg !== null) {
-            span.classList.add("ansi-fg-"+ansi.fg);
+        if (ansi.faint === true) {
+            span.classList.add("ansi-faint");
+        }
+
+        if (ansi.underline === true) {
+            span.classList.add("ansi-underline");
+        }
+
+        if (ansi.reverse === true) {
+            span.classList.add("ansi-reverse");
+        }
+
+        if (ansi.blinking === true) {
+            span.classList.add("ansi-blinking");
+        }
+
+        if (ansi.strikethrough === true) {
+            span.classList.add("ansi-strikethrough");
+        }
+
+        if (ansi.hidden === true) {
+            span.classList.add("ansi-hidden");
         }
 
         output.appendChild(span);
-    }
-
-    if (bottom) {
-        scroll_to_bottom("amc-terminal-wrapper");
     }
 }
