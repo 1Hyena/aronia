@@ -450,7 +450,8 @@ function amc_update_terminal() {
             }
 
             if (child.tagName.toLowerCase() != 'span'
-            || child.children.length > 0) {
+            || child.children.length > 0
+            || !child.classList.contains("ans-fg")) {
                 continue;
             }
 
@@ -461,9 +462,15 @@ function amc_update_terminal() {
             let child = childbuf[i];
             let symbols = [...child.textContent];
 
+            if (child.classList.contains("ans-italic")) {
+                // Text gradient disabled for italic texts because it would
+                // clip too soon.
+                continue;
+            }
+
             if (symbols.length <= 1) {
                 if (symbols.length === 1 && symbols[0].trim()) {
-                    child.classList.add("ansi-gradient");
+                    child.classList.add("ans-lerp");
                 }
 
                 continue;
@@ -475,7 +482,7 @@ function amc_update_terminal() {
 
                 span.appendChild(document.createTextNode(head));
                 span.classList = child.classList;
-                span.classList.add("ansi-gradient");
+                span.classList.add("ans-lerp");
                 global.mud.log.buffer.insertBefore(span, child);
             }
 
@@ -485,12 +492,12 @@ function amc_update_terminal() {
 
                 span.appendChild(document.createTextNode(tail));
                 span.classList = child.classList;
-                span.classList.add("ansi-gradient");
+                span.classList.add("ans-lerp");
                 child.after(span);
             }
 
             if (symbols.length === 1 && symbols[0].trim()) {
-                child.classList.add("ansi-gradient");
+                child.classList.add("ans-lerp");
             }
 
             child.textContent = symbols.join("");
@@ -851,51 +858,49 @@ function amc_print(string, ansi) {
     string = string.split("\r").join("");
 
     if (plain) {
-        if (output.lastChild && output.lastChild.nodeType === Node.TEXT_NODE) {
-            output.lastChild.textContent += string;
-        }
-        else {
-            output.appendChild(document.createTextNode(string));
-        }
+        let span = document.createElement("span");
+        span.appendChild(document.createTextNode(string));
+        output.appendChild(span);
     }
     else {
         let span = document.createElement("span");
         span.appendChild(document.createTextNode(string));
 
         if (ansi.fg !== null) {
-            span.classList.add("ansi-fg-"+ansi.fg);
+            span.classList.add("ans-fg-"+ansi.fg);
+            span.classList.add("ans-fg");
         }
 
         if (ansi.bold === true) {
-            span.classList.add("ansi-bold");
+            span.classList.add("ans-b");
         }
 
         if (ansi.italic === true) {
-            span.classList.add("ansi-italic");
+            span.classList.add("ans-italic");
         }
 
         if (ansi.faint === true) {
-            span.classList.add("ansi-faint");
+            span.classList.add("ans-faint");
         }
 
         if (ansi.underline === true) {
-            span.classList.add("ansi-underline");
+            span.classList.add("ans-underline");
         }
 
         if (ansi.reverse === true) {
-            span.classList.add("ansi-reverse");
+            span.classList.add("ans-reverse");
         }
 
         if (ansi.blinking === true) {
-            span.classList.add("ansi-blinking");
+            span.classList.add("ans-blinking");
         }
 
         if (ansi.strikethrough === true) {
-            span.classList.add("ansi-strikethrough");
+            span.classList.add("ans-strikethrough");
         }
 
         if (ansi.hidden === true) {
-            span.classList.add("ansi-hidden");
+            span.classList.add("ans-hidden");
         }
 
         output.appendChild(span);

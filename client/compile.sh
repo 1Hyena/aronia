@@ -19,12 +19,14 @@ met_src=false
 ext_src=false
 ext_min=false
 ext_css=false
+min_css=false
 ext_sfx=false
 ext_gfx=false
 met_array=
 src_array=
 min_array=
 css_array=
+css_min_array=
 sfx_array=
 gfx_array=
 tsize=0
@@ -60,6 +62,29 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
             --allowed-non-standard-function MIN \
             --allowed-non-standard-function MAX ${files} >> "$out"
         printf "\n" >> "${out}"
+        continue
+    fi
+
+    if [ "$line" == "/* PASTE MINIFIED EXTERNAL CSS HERE */" ]; then
+        files=""
+
+        for file in "${css_min_array[@]}"
+        do
+            if [ -z "$file" ]; then
+                continue
+            else
+                if [ -f "$file" ]; then
+                    files="${files}${file} "
+                    cat ${file} <(echo) >> "$out"
+                else
+                    echo "Minified external CSS '$file' does not exist."
+                fi
+            fi
+        done
+
+        printf "Concatenated minified CSS: %s\n" "${files}"
+        printf "\n" >> "$out"
+
         continue
     fi
 
@@ -106,7 +131,7 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
             fi
         done
 
-        printf "Concatenated: %s\n" "${files}"
+        printf "Concatenated minified JS: %s\n" "${files}"
         printf "\n</script>\n" >> "$out"
 
         continue
@@ -142,6 +167,16 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
 
     if [ "$line" == "<!-- END EXTERNAL CSS -->" ]; then
         ext_css=false
+        continue
+    fi
+
+    if [ "$line" == "<!-- BEGIN MINIFIED EXTERNAL CSS -->" ]; then
+        min_css=true
+        continue
+    fi
+
+    if [ "$line" == "<!-- END MINIFIED EXTERNAL CSS -->" ]; then
+        min_css=false
         continue
     fi
 
@@ -289,6 +324,16 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
 
         if [ ! -z "$file" ]; then
             css_array+=("${dir}$file")
+        fi
+
+        continue
+    fi
+
+    if [ "$min_css" = true ] ; then
+        file=$(grep -oPm1 "href='\K[^']+|href=\"\K[^\"]+" <<< "${line}")
+
+        if [ ! -z "$file" ]; then
+            css_min_array+=("${dir}$file")
         fi
 
         continue
