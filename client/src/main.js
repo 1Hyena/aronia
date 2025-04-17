@@ -158,16 +158,16 @@ function amc_main_loop() {
         amc_show_mudstate(global.mud.state);
     }
 
-    let blinking_elements = document.getElementsByClassName("ansi-blinking");
+    let blinking_elements = document.getElementsByClassName("ans-blinking");
 
     for (let i=0; i<blinking_elements.length; ++i) {
         let el = blinking_elements[i];
 
-        if (el.classList.contains("ansi-blinked")) {
-            el.classList.remove("ansi-blinked");
+        if (el.classList.contains("ans-blinked")) {
+            el.classList.remove("ans-blinked");
         }
         else {
-            el.classList.add("ansi-blinked");
+            el.classList.add("ans-blinked");
         }
     }
 }
