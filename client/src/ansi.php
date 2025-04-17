@@ -1,25 +1,29 @@
 <?php
 
 $colors = array(
-    ":not(.ans-b).ans-fg-black" => array(0, 0, 0),
-    ":not(.ans-b).ans-fg-red" => array(128, 0, 0),
-    ":not(.ans-b).ans-fg-green" => array(0, 128, 0),
-    ":not(.ans-b).ans-fg-yellow" => array(128, 128, 0),
-    ":not(.ans-b).ans-fg-blue" => array(0, 0, 128),
-    ":not(.ans-b).ans-fg-magenta" => array(128, 0, 128),
-    ":not(.ans-b).ans-fg-cyan" => array(0, 128, 128),
-    ":not(.ans-b).ans-fg-white" => array(128, 128, 128),
-    ".ans-b.ans-fg-black" => array(64, 64, 64),
-    ".ans-b.ans-fg-red" => array(255, 0, 0),
-    ".ans-b.ans-fg-green" => array(0, 255, 0),
-    ".ans-b.ans-fg-yellow" => array(255, 255, 0),
-    ".ans-b.ans-fg-blue" => array(0, 0, 255),
-    ".ans-b.ans-fg-magenta" => array(255, 0, 255),
-    ".ans-b.ans-fg-cyan" => array(0, 255, 255),
-    ".ans-b.ans-fg-white" => array(255, 255, 255)
+    ":not(.ans-b).ans-fg-black" => array(46, 52, 54),
+    ":not(.ans-b).ans-fg-red" => array(204, 0, 0),
+    ":not(.ans-b).ans-fg-green" => array(78, 154, 6),
+    ":not(.ans-b).ans-fg-yellow" => array(196, 160, 0),
+    ":not(.ans-b).ans-fg-blue" => array(52, 101, 164),
+    ":not(.ans-b).ans-fg-magenta" => array(117, 80, 123),
+    ":not(.ans-b).ans-fg-cyan" => array(6, 152, 154),
+    ":not(.ans-b).ans-fg-white" => array(211, 215, 207),
+    ".ans-b.ans-fg-black" => array(85, 87, 83),
+    ".ans-b.ans-fg-red" => array(239, 41, 41),
+    ".ans-b.ans-fg-green" => array(138, 226, 52),
+    ".ans-b.ans-fg-yellow" => array(252, 233, 79),
+    ".ans-b.ans-fg-blue" => array(114, 159, 207),
+    ".ans-b.ans-fg-magenta" => array(173, 127, 168),
+    ".ans-b.ans-fg-cyan" => array(52, 226, 226),
+    ".ans-b.ans-fg-white" => array(238, 238, 236)
 );
 
 $styles = array(
+    ".ans-default"         => array(
+        "color"            => "#D3D7CF",
+        "background-color" => "#2E3436"
+    ),
     ".ans-italic"          => array("font-style"       => "italic"         ),
     ".ans-underline"       => array("text-decoration"  => "underline"      ),
     ".ans-faint"           => array("opacity"          => "0.25"           ),
