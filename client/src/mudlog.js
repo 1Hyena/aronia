@@ -422,99 +422,73 @@ function amc_update_terminal() {
         output.parentNode ? is_scrolled_bottom(output.parentNode) : false
     );
 
-    let all_text = true;
-    let text = "";
     let children = global.mud.log.buffer.childNodes;
+
+    // Let's cut heads and tails to enable smooth color transitions.
+    let fg = [];
 
     for (let i = 0; i < children.length; i++) {
         let child = children[i];
 
-        if (child.nodeType !== Node.TEXT_NODE) {
-            all_text = false;
-            break;
+        if (child.nodeType !== Node.ELEMENT_NODE) {
+            continue;
         }
-        else {
-            text += child.textContent;
+
+        if (child.tagName.toLowerCase() != 'span'
+        || child.children.length > 0
+        || !child.classList.contains("ans-fg")) {
+            continue;
         }
+
+        fg.push(child);
     }
 
-    if (!all_text) {
-        // Let's cut heads and tails to enable smooth color transitions.
-        let childbuf = [];
+    for (let i = 0; i < fg.length; i++) {
+        let child = fg[i];
+        let symbols = [...child.textContent];
 
-        for (let i = 0; i < children.length; i++) {
-            let child = children[i];
-
-            if (child.nodeType !== Node.ELEMENT_NODE) {
-                continue;
-            }
-
-            if (child.tagName.toLowerCase() != 'span'
-            || child.children.length > 0
-            || !child.classList.contains("ans-fg")) {
-                continue;
-            }
-
-            childbuf.push(child);
+        if (child.classList.contains("ans-italic")) {
+            // Text gradient disabled for italic texts because it would
+            // clip too soon.
+            continue;
         }
 
-        for (let i = 0; i < childbuf.length; i++) {
-            let child = childbuf[i];
-            let symbols = [...child.textContent];
-
-            if (child.classList.contains("ans-italic")) {
-                // Text gradient disabled for italic texts because it would
-                // clip too soon.
-                continue;
-            }
-
-            if (symbols.length <= 1) {
-                if (symbols.length === 1 && symbols[0].trim()) {
-                    child.classList.add("ans-lerp");
-                }
-
-                continue;
-            }
-
-            if (symbols[0].trim()) {
-                let head = symbols.shift();
-                let span = document.createElement("span");
-
-                span.appendChild(document.createTextNode(head));
-                span.classList = child.classList;
-                span.classList.add("ans-lerp");
-                global.mud.log.buffer.insertBefore(span, child);
-            }
-
-            if (symbols.length > 1 && symbols[symbols.length - 1].trim()) {
-                let tail = symbols.pop();
-                let span = document.createElement("span");
-
-                span.appendChild(document.createTextNode(tail));
-                span.classList = child.classList;
-                span.classList.add("ans-lerp");
-                child.after(span);
-            }
-
+        if (symbols.length <= 1) {
             if (symbols.length === 1 && symbols[0].trim()) {
                 child.classList.add("ans-lerp");
             }
 
-            child.textContent = symbols.join("");
+            continue;
         }
+
+        if (symbols[0].trim()) {
+            let head = symbols.shift();
+            let span = document.createElement("span");
+
+            span.appendChild(document.createTextNode(head));
+            span.classList = child.classList;
+            span.classList.add("ans-lerp");
+            global.mud.log.buffer.insertBefore(span, child);
+        }
+
+        if (symbols.length > 1 && symbols[symbols.length - 1].trim()) {
+            let tail = symbols.pop();
+            let span = document.createElement("span");
+
+            span.appendChild(document.createTextNode(tail));
+            span.classList = child.classList;
+            span.classList.add("ans-lerp");
+            child.after(span);
+        }
+
+        if (symbols.length === 1 && symbols[0].trim()) {
+            child.classList.add("ans-lerp");
+        }
+
+        child.textContent = symbols.join("");
     }
 
-    if (output.lastChild && output.lastChild.nodeType === Node.TEXT_NODE
-    && all_text) {
-        output.lastChild.textContent += text;
-    }
-    else if (all_text) {
-        output.appendChild(document.createTextNode(text));
-    }
-    else {
-        output.appendChild(global.mud.log.buffer);
-    }
-
+    output.appendChild(global.mud.log.buffer);
     global.mud.log.buffer = null;
 
     if (bottom) {
