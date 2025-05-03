@@ -429,9 +429,9 @@ function amc_optimize_terminal() {
 
     let children = output.childNodes;
     let first_visible = null;
-    let last_breakpoint = 0;
     let keep_nodes = [];
     let stash_nodes = [];
+    let breakpoints = [];
 
     for (let i = 0; i < children.length; i++) {
         let child = children[i];
@@ -445,16 +445,26 @@ function amc_optimize_terminal() {
         else {
             if (child.nodeType === Node.COMMENT_NODE) {
                 if (child.nodeValue === "breakpoint") {
-                    last_breakpoint = i;
+                    breakpoints.push(i);
                 }
             }
         }
     }
 
+    for (let i = 0; i < 100; ++i) {
+        if (breakpoints.length === 0) {
+            break;
+        }
+
+        breakpoints.pop();
+    }
+
+    let stash_before = breakpoints.length === 0 ? 0 : breakpoints.pop();
+
     for (let i = 0; i < children.length; ++i) {
         let child = children[i];
 
-        if (i < last_breakpoint) {
+        if (i < stash_before) {
             stash_nodes.push(child);
             continue;
         }
@@ -483,24 +493,6 @@ function amc_optimize_terminal() {
     }
 
     output.prepend(document.createTextNode(strings.join("")));
-
-/*
-    let frag = new DocumentFragment();
-
-    for (let i = 0; i < stash_nodes.length; ++i) {
-        let child = stash_nodes[i];
-
-        if (child.nodeType === Node.ELEMENT_NODE
-        && child.classList.length > 0) {
-            child.setAttribute("data-classlist", child.getAttribute("class"));
-            child.removeAttribute("class");
-        }
-
-        frag.appendChild(child);
-    }
-
-    output.prepend(frag);
-    */
 }
 
 function amc_update_terminal() {
