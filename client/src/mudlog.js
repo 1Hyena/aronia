@@ -532,7 +532,8 @@ function amc_update_terminal() {
     for (let i = 0; i < fg.length; i++) {
         let child = fg[i];
 
-        if (child.classList.contains("ans-italic")) {
+        if (child.classList.contains("ans-italic")
+        || !global.mud.log.settings.lerp) {
             // Text gradient disabled for italic texts because it would
             // clip too soon.
             continue;

@@ -34,6 +34,9 @@ var global = {
             password : ""
         },
         log : {
+            settings : {
+                lerp : false
+            },
             data : [],
             text : {
                 data : [],
