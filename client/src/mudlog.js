@@ -409,6 +409,100 @@ function amc_read_incoming() {
     );
 }
 
+function amc_optimize_terminal() {
+    let now = Date.now();
+
+    if (now - global.mud.log.last_optimized >= 100) {
+        global.mud.log.last_optimized = now;
+    }
+    else return;
+
+    console.log("optimizing terminal");
+
+    let output = (
+        global.offscreen.terminal || document.getElementById("amc-terminal")
+    );
+
+    if (output === global.offscreen.terminal) {
+        return;
+    }
+
+    let children = output.childNodes;
+    let first_visible = null;
+    let last_breakpoint = 0;
+    let keep_nodes = [];
+    let stash_nodes = [];
+
+    for (let i = 0; i < children.length; i++) {
+        let child = children[i];
+
+        if (child.nodeType === Node.ELEMENT_NODE) {
+            if (is_visible(output.parentNode, child, true)) {
+                first_visible = child;
+                break;
+            }
+        }
+        else {
+            if (child.nodeType === Node.COMMENT_NODE) {
+                if (child.nodeValue === "breakpoint") {
+                    last_breakpoint = i;
+                }
+            }
+        }
+    }
+
+    for (let i = 0; i < children.length; ++i) {
+        let child = children[i];
+
+        if (i < last_breakpoint) {
+            stash_nodes.push(child);
+            continue;
+        }
+
+        keep_nodes.push(child);
+    }
+
+    output.replaceChildren(...keep_nodes);
+
+    if (stash_nodes.length === 0) {
+        return;
+    }
+
+    let strings = [];
+
+    for (let i = 0; i < stash_nodes.length; ++i) {
+        let child = stash_nodes[i];
+
+        if (child.nodeType === Node.ELEMENT_NODE
+        && child.tagName.toLowerCase() == 'span') {
+            strings.push(child.textContent);
+        }
+        else if (child.nodeType === Node.TEXT_NODE) {
+            strings.push(child.textContent);
+        }
+    }
+
+    output.prepend(document.createTextNode(strings.join("")));
+
+/*
+    let frag = new DocumentFragment();
+
+    for (let i = 0; i < stash_nodes.length; ++i) {
+        let child = stash_nodes[i];
+
+        if (child.nodeType === Node.ELEMENT_NODE
+        && child.classList.length > 0) {
+            child.setAttribute("data-classlist", child.getAttribute("class"));
+            child.removeAttribute("class");
+        }
+
+        frag.appendChild(child);
+    }
+
+    output.prepend(frag);
+    */
+}
+
 function amc_update_terminal() {
     if (global.mud.log.buffer === null) {
         return;
@@ -445,13 +539,14 @@ function amc_update_terminal() {
 
     for (let i = 0; i < fg.length; i++) {
         let child = fg[i];
-        let symbols = [...child.textContent];
 
         if (child.classList.contains("ans-italic")) {
             // Text gradient disabled for italic texts because it would
             // clip too soon.
             continue;
         }
+
+        let symbols = [...child.textContent];
 
         if (symbols.length <= 1) {
             if (symbols.length === 1 && symbols[0].trim()) {
@@ -488,8 +583,52 @@ function amc_update_terminal() {
         child.textContent = symbols.join("");
     }
 
-    output.appendChild(global.mud.log.buffer);
-    global.mud.log.buffer = null;
+    let input_first = global.mud.log.buffer.firstChild;
+    let output_last = output.lastChild;
+
+    if (input_first !== null
+    && output_last  !== null
+    && output_last.nodeType === Node.ELEMENT_NODE
+    && input_first.nodeType === Node.ELEMENT_NODE
+    && output_last.tagName.toLowerCase() === 'span'
+    && input_first.tagName.toLowerCase() === 'span'
+    && output_last.children.length === 0
+    && input_first.children.length === 0
+    && is_same_classlist(output_last, input_first)) {
+        global.mud.log.buffer.removeChild(input_first);
+
+        let input_fragment = new DocumentFragment();
+
+        while (input_first.childNodes.length > 0) {
+            input_fragment.appendChild(input_first.firstChild);
+        }
+
+        output_last.appendChild(input_fragment);
+        output_last.normalize();
+
+        if (global.mud.log.buffer.childNodes.length > 0) {
+            setTimeout(
+                function() {
+                    amc_update_terminal();
+                }, 1
+            );
+        }
+        else {
+            global.mud.log.buffer = null;
+        }
+    }
+    else {
+        let buffer = global.mud.log.buffer;
+
+        global.mud.log.buffer = null;
+        output.appendChild(buffer);
+
+        setTimeout(
+            function() {
+                amc_optimize_terminal();
+            }, 1
+        );
+    }
 
     if (bottom) {
         scroll_to_bottom("amc-terminal-wrapper");
@@ -831,52 +970,90 @@ function amc_print(string, ansi) {
 
     string = string.split("\r").join("");
 
-    if (plain) {
-        let span = document.createElement("span");
-        span.appendChild(document.createTextNode(string));
-        output.appendChild(span);
-    }
-    else {
-        let span = document.createElement("span");
-        span.appendChild(document.createTextNode(string));
+    let lines = string.split("\n");
 
-        if (ansi.fg !== null) {
-            span.classList.add("ans-fg-"+ansi.fg);
-            span.classList.add("ans-fg");
+    for (let i=0; i<lines.length; ++i) {
+        string = lines[i];
+
+        if (i + 1 < lines.length) {
+            string += "\n";
+        }
+        else if (string === "") {
+            continue;
         }
 
-        if (ansi.bold === true) {
-            span.classList.add("ans-b");
+        let appendage = null;
+
+        if (plain) {
+            let span = document.createElement("span");
+            span.appendChild(document.createTextNode(string));
+            appendage = span;
+        }
+        else {
+            let span = document.createElement("span");
+            span.appendChild(document.createTextNode(string));
+
+            if (ansi.fg !== null) {
+                span.classList.add("ans-fg-"+ansi.fg);
+                span.classList.add("ans-fg");
+            }
+
+            if (ansi.bold === true) {
+                span.classList.add("ans-b");
+            }
+
+            if (ansi.italic === true) {
+                span.classList.add("ans-italic");
+            }
+
+            if (ansi.faint === true) {
+                span.classList.add("ans-faint");
+            }
+
+            if (ansi.underline === true) {
+                span.classList.add("ans-underline");
+            }
+
+            if (ansi.reverse === true) {
+                span.classList.add("ans-reverse");
+            }
+
+            if (ansi.blinking === true) {
+                span.classList.add("ans-blinking");
+            }
+
+            if (ansi.strikethrough === true) {
+                span.classList.add("ans-strikethrough");
+            }
+
+            if (ansi.hidden === true) {
+                span.classList.add("ans-hidden");
+            }
+
+            appendage = span;
         }
 
-        if (ansi.italic === true) {
-            span.classList.add("ans-italic");
+        if (appendage !== null) {
+            let output_last = output.lastChild;
+
+            if (output_last
+            && appendage.nodeType                   === Node.ELEMENT_NODE
+            && output_last.nodeType                 === Node.ELEMENT_NODE
+            && appendage.tagName.toLowerCase()      === 'span'
+            && output_last.tagName.toLowerCase()    === 'span'
+            && appendage.children.length            === 0
+            && output_last.children.length          === 0
+            && is_same_classlist(output_last, appendage)) {
+                output_last.appendChild(document.createTextNode(string));
+                output_last.normalize();
+            }
+            else {
+                output.appendChild(appendage);
+            }
         }
 
-        if (ansi.faint === true) {
-            span.classList.add("ans-faint");
+        if (i + 1 < lines.length) {
+            output.appendChild(document.createComment("breakpoint"));
         }
-
-        if (ansi.underline === true) {
-            span.classList.add("ans-underline");
-        }
-
-        if (ansi.reverse === true) {
-            span.classList.add("ans-reverse");
-        }
-
-        if (ansi.blinking === true) {
-            span.classList.add("ans-blinking");
-        }
-
-        if (ansi.strikethrough === true) {
-            span.classList.add("ans-strikethrough");
-        }
-
-        if (ansi.hidden === true) {
-            span.classList.add("ans-hidden");
-        }
-
-        output.appendChild(span);
     }
 }

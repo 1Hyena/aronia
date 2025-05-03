@@ -326,3 +326,7 @@ function strip_ansiesc(str) {
 
     return str.replace(regex, '');
 }
+
+function is_same_classlist({classList: x}, {classList: y}) {
+    return [...x].every(z=>y.contains(z)) && [...y].every(z=>x.contains(z));
+}

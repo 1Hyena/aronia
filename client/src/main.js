@@ -54,7 +54,8 @@ var global = {
                 strikethrough: null,
                 fg : null
             },
-            buffer : null
+            buffer : null,
+            last_optimized : 0
         }
     },
     offscreen : {
