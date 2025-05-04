@@ -410,14 +410,9 @@ function amc_read_incoming() {
 }
 
 function amc_optimize_terminal() {
-    let now = Date.now();
-
-    if (now - global.mud.log.last_optimized >= 100) {
-        global.mud.log.last_optimized = now;
-    }
-    else return;
-
-    console.log("optimizing terminal");
+    let color_history_lines = 100;
+    let plain_history_lines = 1000;
+    //console.log("optimizing terminal");
 
     let output = (
         global.offscreen.terminal || document.getElementById("amc-terminal")
@@ -451,7 +446,7 @@ function amc_optimize_terminal() {
         }
     }
 
-    for (let i = 0; i < 100; ++i) {
+    for (let i = 0; i < color_history_lines; ++i) {
         if (breakpoints.length === 0) {
             break;
         }
@@ -492,7 +487,15 @@ function amc_optimize_terminal() {
         }
     }
 
-    output.prepend(document.createTextNode(strings.join("")));
+    let lines = strings.join("").split("\n");
+
+    output.prepend(
+        document.createTextNode(
+            lines.slice(
+                Math.max(lines.length - plain_history_lines, 0)
+            ).join("\n")
+        )
+    );
 }
 
 function amc_update_terminal() {
@@ -556,6 +559,7 @@ function amc_update_terminal() {
             span.appendChild(document.createTextNode(head));
             span.classList = child.classList;
             span.classList.add("ans-lerp");
+            span.setAttribute("data-fg", child.getAttribute("data-fg"));
             global.mud.log.buffer.insertBefore(span, child);
         }
 
@@ -566,6 +570,7 @@ function amc_update_terminal() {
             span.appendChild(document.createTextNode(tail));
             span.classList = child.classList;
             span.classList.add("ans-lerp");
+            span.setAttribute("data-fg", child.getAttribute("data-fg"));
             child.after(span);
         }
 
@@ -574,6 +579,60 @@ function amc_update_terminal() {
         }
 
         child.textContent = symbols.join("");
+    }
+
+    let elements = global.mud.log.buffer.children;
+
+    for (let i=0; i<elements.length; ++i) {
+        let el = elements[i];
+
+        if (!el.classList.contains("ans-lerp")) {
+            continue;
+        }
+
+        let el_prev = el.previousElementSibling;
+        let el_next = el.nextElementSibling;
+
+        if (el_next !== null
+        &&  el_prev !== null
+        &&  el_next.classList.contains("ans-lerp")
+        &&  el_prev.classList.contains("ans-lerp")
+        &&  el_prev.getAttribute("data-fg") != el.getAttribute("data-fg")
+        &&  el_next.getAttribute("data-fg") != el.getAttribute("data-fg")) {
+            el.classList.add(
+                "ans-lerp-"+el_prev.getAttribute("data-fg")+
+                "-to-"+el.getAttribute("data-fg")+
+                "-to-"+el_next.getAttribute("data-fg")
+            );
+
+            continue;
+        }
+
+        if (el_next !== null
+        &&  el_next.classList.contains("ans-lerp")
+        &&  el_next.getAttribute("data-fg") != el.getAttribute("data-fg")) {
+            el.classList.add(
+                "ans-lerp-"+el.getAttribute("data-fg")+
+                "-to-"+el_next.getAttribute("data-fg")+"-l"
+            );
+
+            continue;
+        }
+
+        if (el_prev !== null
+        &&  el_prev.classList.contains("ans-lerp")
+        &&  el_prev.getAttribute("data-fg") != el.getAttribute("data-fg")) {
+            el.classList.add(
+                "ans-lerp-"+el_prev.getAttribute("data-fg")+
+                "-to-"+el.getAttribute("data-fg")+"-r"
+            );
+
+            continue;
+        }
+
+        if (el.classList.contains("ans-lerp")) {
+            el.classList.remove("ans-lerp");
+        }
     }
 
     let input_first = global.mud.log.buffer.firstChild;
@@ -605,6 +664,8 @@ function amc_update_terminal() {
                     amc_update_terminal();
                 }, 1
             );
+
+            return;
         }
         else {
             global.mud.log.buffer = null;
@@ -615,16 +676,10 @@ function amc_update_terminal() {
 
         global.mud.log.buffer = null;
         output.appendChild(buffer);
-
-        setTimeout(
-            function() {
-                amc_optimize_terminal();
-            }, 1
-        );
     }
 
     if (bottom) {
-        scroll_to_bottom("amc-terminal-wrapper");
+        scroll_to_bottom("amc-terminal-wrapper", amc_optimize_terminal);
     }
 }
 
@@ -858,7 +913,7 @@ function amc_flush_printer() {
     for (let i=0; i<global.mud.log.text.utf8.packets.length; ++i) {
         let str = global.mud.log.text.utf8.packets[i].data.join("");
 
-        amc_print(str, global.mud.log.text.utf8.packets[i].ansi);
+        amc_print_to_buffer(str, global.mud.log.text.utf8.packets[i].ansi);
         all+=str;
     }
 
@@ -929,7 +984,7 @@ function amc_print_log() {
 
         let print = packets[i].data.splice(0, print_length);
 
-        amc_print(print.join(""), packets[i].ansi);
+        amc_print_to_buffer(print.join(""), packets[i].ansi);
     }
 
     if (packets[split_packet].data.length === 0) {
@@ -941,6 +996,11 @@ function amc_print_log() {
 }
 
 function amc_print(string, ansi) {
+    amc_print_to_buffer(string, ansi);
+    amc_update_terminal();
+}
+
+function amc_print_to_buffer(string, ansi) {
     ansi = typeof ansi !== 'undefined' ? ansi : {};
 
     if (string.length === 0) {
@@ -989,6 +1049,13 @@ function amc_print(string, ansi) {
             if (ansi.fg !== null) {
                 span.classList.add("ans-fg-"+ansi.fg);
                 span.classList.add("ans-fg");
+
+                if (ansi.bold === true) {
+                    span.setAttribute("data-fg", "hi-"+ansi.fg);
+                }
+                else {
+                    span.setAttribute("data-fg", ansi.fg);
+                }
             }
 
             if (ansi.bold === true) {

@@ -263,15 +263,21 @@ function is_scrolled_bottom(container) {
     ) : false;
 }
 
-function scroll_to_bottom(container_id) {
+function scroll_to_bottom(container_id, fun) {
+    fun = typeof fun !== 'undefined' ? fun : null;
+
     setTimeout(
-        function(id) {
-            var view = document.getElementById(id);
+        function(settings) {
+            var view = document.getElementById(settings.container);
 
             if (view !== null) {
                 view.scrollTop = view.scrollHeight;
+
+                if (settings.fun !== null) {
+                    settings.fun();
+                }
             }
-        }, 1, container_id
+        }, 1, { container: container_id, fun: fun }
     );
 }
 

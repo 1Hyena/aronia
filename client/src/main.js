@@ -35,7 +35,7 @@ var global = {
         },
         log : {
             settings : {
-                lerp : false
+                lerp : true
             },
             data : [],
             text : {
@@ -57,8 +57,7 @@ var global = {
                 strikethrough: null,
                 fg : null
             },
-            buffer : null,
-            last_optimized : 0
+            buffer : null
         }
     },
     offscreen : {

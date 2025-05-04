@@ -93,6 +93,7 @@ foreach ($colors as $c => $v) {
     list($r, $g, $b) = sscanf($hex, "#%02x%02x%02x");
 
     $colors[$c] = array(
+        "name" =>  $v,
         "rgb" => array(intval($r), intval($g), intval($b)),
         "lerp" => strcasecmp($themes[$theme]["bg-color"], $hex) ? true : false
     );
@@ -134,7 +135,7 @@ foreach ($styles as $class => $properties) {
     echo("}\n");
 }
 
-echo(".ans-lerp {\n");
+echo(".ans-fg.ans-lerp {\n");
 
 foreach ($colors as $c1 => $c1v) {
     foreach ($colors as $c2 => $c2v) {
@@ -158,20 +159,18 @@ foreach ($colors as $c1 => $c1v) {
         $to = sprintf("#%02X%02X%02X",$v[0], $v[1], $v[2]);
 
         echo(
-            "  &".$c1.":has(+ .ans-lerp".$c2.") {\n".
+            "  &.ans-lerp-".$c1v["name"]."-to-".$c2v["name"]."-l {\n".
             "    background-image: linear-gradient(\n".
             "      to right, ".$from1.", ".$to."\n".
             "    );\n".
-            "    color: transparent;\n".
             "  }\n"
         );
 
         echo(
-            "  &".$c1." + .ans-lerp".$c2." {\n".
+            "  &.ans-lerp-".$c1v["name"]."-to-".$c2v["name"]."-r {\n".
             "    background-image: linear-gradient(\n".
             "      to right, ".$to.", ".$from2."\n".
             "    );\n".
-            "    color: transparent;\n".
             "  }\n"
         );
     }
@@ -209,12 +208,11 @@ foreach ($colors as $c1 => $c1v) {
             $cc = sprintf("#%02X%02X%02X",$v2[0], $v2[1], $v2[2]);
 
             echo(
-                "  &".$c1." + ".$c2.
-                ".ans-lerp:has(+ .ans-lerp".$c3.") {\n".
+                "  &.ans-lerp-".$c1v["name"].
+                "-to-".$c2v["name"]."-to-".$c3v["name"]." {\n".
                 "    background-image: linear-gradient(\n".
                 "      to right, ".$cl.", ".$cc.", ".$cr."\n".
                 "    );\n".
-                "    color: transparent;\n".
                 "  }\n"
             );
         }
@@ -222,6 +220,7 @@ foreach ($colors as $c1 => $c1v) {
 }
 
 echo(
+    "  color: transparent;\n".
     "  background-clip: text;\n".
     "}\n"
 );
