@@ -83,6 +83,22 @@ function get_esc_sequence_length(data, start, size) {
 
                 return 0; // impartial sequence
             }
+            case 93: { // ]
+                if (i+3 < start + size
+                &&  data[i+1] === "0".charCodeAt(0)
+                &&  data[i+2] === ";".charCodeAt(0)) {
+                    for (let j=i+3; j < start + size ; ++j) {
+                        let seqlen = j - start + 1;
+                        let c = data[j];
+
+                        if (c === 7) {
+                            return seqlen;
+                        }
+                    }
+                }
+
+                return 0; // impartial sequence
+            }
             default: break;
         }
 
@@ -231,6 +247,20 @@ function amc_handle_txt(data) {
 
 function amc_handle_esc(data) {
     if (data.length > 3) {
+        if (data.length >= 5) {
+            if (data[0] === 27
+            &&  data[1] === 93
+            &&  data[2] === "0".charCodeAt(0)
+            &&  data[3] === ";".charCodeAt(0)
+            &&  data[data.length  - 1] === 7) {
+                global.title = String.fromCharCode(
+                    ...data.slice(4, data.length - 1)
+                );
+
+                return;
+            }
+        }
+
         if (data[0] === 27
         &&  data[1] === 91
         &&  data[data.length - 1] === 109) {
@@ -346,6 +376,8 @@ function amc_handle_esc(data) {
                     default: break;
                 }
             }
+
+            return;
         }
     }
 }
@@ -874,20 +906,6 @@ function amc_match_chat_line(line) {
     return true;
 }
 
-/*function amc_match_ctrl_line(line) {
-    var regex = new RegExp(
-        "(^.*\\x1B\\[8m\\x1B\\]0;)(.+)(\\x07\\x1B\\[28m\\x1B\\[0m.*$)"
-    );
-
-    var match = regex.exec(line) || [];
-
-    if (match.length !== 4) {
-        return;
-    }
-
-    global.title = match[2];
-}*/
-
 function amc_match_line(line) {
     switch (global.mud.state) {
         case "":
@@ -903,7 +921,6 @@ function amc_match_line(line) {
     }
 
     amc_match_chat_line(line);
-    //amc_match_ctrl_line(line);
 
     return;
 }
