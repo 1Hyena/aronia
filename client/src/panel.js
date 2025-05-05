@@ -2,12 +2,12 @@
 
 function amc_calc_panel_width() {
     var w = document.getElementById('amc-body').clientWidth;
-    return Math.max(Math.floor(w / 8) - 1, 0);
+    return Math.max(Math.floor(w / 16) - 1, 0);
 }
 
 function amc_calc_panel_height() {
     var h = document.getElementById('amc-body').clientHeight;
-    return Math.max(Math.floor(h / 16) - 1, 0);
+    return Math.max(Math.floor(h / 32) - 1, 0);
 }
 
 function amc_fill_panel_framework(framework, width, height) {
@@ -184,8 +184,8 @@ function amc_crop_panel_framework(framework) {
 
 function amc_calc_panel_framework(width, height) {
     let central_top_height = Math.max(Math.floor(height / 2), 1);
-    let console_min_width = width >= 82 ? 80 : Math.max(width - 2, 1);
-    let bottom_left_max_w = Math.max(Math.floor(width / 2) - 40, 1);
+    let console_min_width = width >= 42 ? 40 : Math.max(width - 2, 1);
+    let bottom_left_max_w = Math.max(Math.floor(width / 2) - 20, 1);
 
     let framework = {
         vertical : true,
@@ -254,7 +254,7 @@ function amc_calc_panel_framework(width, height) {
                             {
                                 key: "amc-panel-bottom-left",
                                 min_w: 8,
-                                min_h: 6,
+                                min_h: 3,
                                 max_w: bottom_left_max_w,
                                 priority: 7
                             }, {
@@ -282,7 +282,7 @@ function amc_calc_panel_framework(width, height) {
                                         key: "amc-panel-below-console-left",
                                         min_w: Math.max(1, console_min_width),
                                         min_h: 1,
-                                        max_w: 80,
+                                        max_w: 40,
                                         max_h: 1,
                                         priority: 0
                                     },

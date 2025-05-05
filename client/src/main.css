@@ -59,8 +59,8 @@ pre {
 #amc-panel-wrapper {
     display: inline-block;
     vertical-align: middle;
-    font-size: 16px;
-    line-height: 16px;
+    font-size: 32px;
+    line-height: 32px;
     background-color: black;
     border-radius: 0.5rem;
     filter: drop-shadow(0 0 0.25rem rgba(0, 0, 0, 1));
@@ -73,6 +73,10 @@ table.amc-tui {
 
 table.amc-tui > tr > td {
     vertical-align: top;
+}
+
+#amc-panel-central-top {
+    overflow: hidden;
 }
 
 #amc[data-mudstate="login"] #amc-panel-central-top,
@@ -151,19 +155,28 @@ div.amc-chat-public > span:nth-of-type(4) {
     height: 100%;
     white-space: pre-wrap;
     word-wrap: break-word;
-}
-
-.xterm-viewport {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
+    font-size: 16px;
+    line-height: 16px;
 }
 
 #amc-login-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     text-align: center;
+    font-size: 16px;
+    line-height: 16px;
 }
 
 #amc-login-form > table {
-    display: inline-block;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     text-align: left;
 }
 
@@ -230,10 +243,19 @@ input[type="text"], input[type="password"], input[type="submit"], textarea {
     line-height: 16px;
 }
 
+#amc-inputbar-wrapper > input[type="text"] {
+    font-size: 32px;
+    line-height: 32px;
+}
+
 textarea:focus, input:focus{
     outline: none;
     border-right: 0.5vmin dotted rgba(255, 255, 255, 0.25);
     filter: drop-shadow(0 0 0.5vmin rgba(255, 255, 255, 0.50));
+}
+
+#amc-inputbar-wrapper > input:focus::placeholder {
+    color: transparent;
 }
 
 input[type="submit"] {
