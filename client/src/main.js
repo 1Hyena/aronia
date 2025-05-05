@@ -57,7 +57,12 @@ var global = {
                 strikethrough: null,
                 fg : null
             },
-            buffer : null
+            buffer : null,
+            hidden : [],
+            scrolled : {
+                top : true,
+                bottom : true
+            }
         }
     },
     offscreen : {
@@ -141,6 +146,25 @@ function amc_interval() {
     }
 }
 
+function amc_update_scroll() {
+    let was_bottom = global.mud.log.scrolled.bottom;
+    let was_top = global.mud.log.scrolled.top;
+    let is_bottom = amc_scrolled_bottom();
+    let is_top = amc_scrolled_top();
+
+    global.mud.log.scrolled.bottom = is_bottom;
+    global.mud.log.scrolled.top = is_top;
+
+    if (!was_bottom && is_bottom) {
+        amc_update_terminal();
+        amc_optimize_terminal();
+    }
+
+    if (!was_top && is_top) {
+        amc_load_history();
+    }
+}
+
 function amc_main_loop() {
     var focus = !document.hidden;
 
@@ -173,6 +197,8 @@ function amc_main_loop() {
             el.classList.add("ans-blinked");
         }
     }
+
+    amc_update_scroll();
 }
 
 function amc_init() {

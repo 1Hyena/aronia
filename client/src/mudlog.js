@@ -409,97 +409,104 @@ function amc_read_incoming() {
     );
 }
 
+function amc_load_history() {
+    let output = (
+        global.offscreen.terminal || document.getElementById("amc-terminal")
+    );
+
+    if (output === global.offscreen.terminal || !amc_scrolled_top()) {
+        return;
+    }
+
+    if (global.mud.log.hidden.length === 0) {
+        return;
+    }
+
+    let container = output.parentElement;
+    let scroll_top_before = container.scrollTop;
+    let scroll_height_before = container.scrollHeight;
+
+    output.prepend(global.mud.log.hidden.pop());
+
+    var scroll_height_after = container.scrollHeight;
+    var scroll_height_change = scroll_height_after - scroll_height_before;
+
+    if (scroll_height_change > 0) {
+        container.scrollTop = Math.max(
+            scroll_top_before + scroll_height_change, 0
+        );
+    }
+}
+
 function amc_optimize_terminal() {
-    let color_history_lines = 100;
-    let plain_history_lines = 1000;
-    //console.log("optimizing terminal");
+    let lines_per_div = 50;
 
     let output = (
         global.offscreen.terminal || document.getElementById("amc-terminal")
     );
 
-    if (output === global.offscreen.terminal) {
+    if (output === global.offscreen.terminal || !amc_scrolled_bottom()) {
         return;
     }
 
     let children = output.childNodes;
     let first_visible = null;
     let keep_nodes = [];
-    let stash_nodes = [];
-    let breakpoints = [];
+    let wrap_nodes = [];
+    let wrap_lines = 0;
+    let tail_chain = [];
+    let visible = false;
 
     for (let i = 0; i < children.length; i++) {
         let child = children[i];
 
-        if (child.nodeType === Node.ELEMENT_NODE) {
+        if (child.nodeType === Node.ELEMENT_NODE && !visible) {
             if (is_visible(output.parentNode, child, true)) {
-                first_visible = child;
-                break;
+                visible = true;
             }
         }
-        else {
-            if (child.nodeType === Node.COMMENT_NODE) {
+
+        if (!visible) {
+            if (child.nodeType === Node.ELEMENT_NODE
+            && child.tagName.toLowerCase() == 'div') {
+                keep_nodes.push(child);
+                continue;
+            }
+            else if (child.nodeType === Node.COMMENT_NODE) {
                 if (child.nodeValue === "breakpoint") {
-                    breakpoints.push(i);
+                    if (++wrap_lines >= lines_per_div) {
+                        let div = document.createElement("div");
+                        div.replaceChildren(...wrap_nodes);
+                        keep_nodes.push(div);
+                        tail_chain = [];
+                        wrap_nodes = [];
+                        wrap_lines = 0;
+                    }
                 }
             }
-        }
-    }
-
-    for (let i = 0; i < color_history_lines; ++i) {
-        if (breakpoints.length === 0) {
-            break;
+            else {
+                wrap_nodes.push(child.cloneNode(true));
+            }
         }
 
-        breakpoints.pop();
+        tail_chain.push(child);
     }
 
-    let stash_before = breakpoints.length === 0 ? 0 : breakpoints.pop();
+    global.mud.log.hidden.push(...keep_nodes);
 
-    for (let i = 0; i < children.length; ++i) {
-        let child = children[i];
+    keep_nodes = [];
 
-        if (i < stash_before) {
-            stash_nodes.push(child);
-            continue;
-        }
-
-        keep_nodes.push(child);
+    if (global.mud.log.hidden.length > 0) {
+        keep_nodes.push(global.mud.log.hidden.pop());
     }
 
+    keep_nodes.push(...tail_chain);
     output.replaceChildren(...keep_nodes);
-
-    if (stash_nodes.length === 0) {
-        return;
-    }
-
-    let strings = [];
-
-    for (let i = 0; i < stash_nodes.length; ++i) {
-        let child = stash_nodes[i];
-
-        if (child.nodeType === Node.ELEMENT_NODE
-        && child.tagName.toLowerCase() == 'span') {
-            strings.push(child.textContent);
-        }
-        else if (child.nodeType === Node.TEXT_NODE) {
-            strings.push(child.textContent);
-        }
-    }
-
-    let lines = strings.join("").split("\n");
-
-    output.prepend(
-        document.createTextNode(
-            lines.slice(
-                Math.max(lines.length - plain_history_lines, 0)
-            ).join("\n")
-        )
-    );
 }
 
 function amc_update_terminal() {
-    if (global.mud.log.buffer === null) {
+    if (global.mud.log.buffer === null
+    || !amc_scrolled_bottom()) {
         return;
     }
 
@@ -995,9 +1002,32 @@ function amc_print_log() {
     }
 }
 
+function amc_scrolled_bottom() {
+    let output = (
+        global.offscreen.terminal || document.getElementById("amc-terminal")
+    );
+
+    return (
+        output.parentNode ? is_scrolled_bottom(output.parentNode) : false
+    );
+}
+
+function amc_scrolled_top() {
+    let output = (
+        global.offscreen.terminal || document.getElementById("amc-terminal")
+    );
+
+    return (
+        output.parentNode ? is_scrolled_top(output.parentNode) : false
+    );
+}
+
 function amc_print(string, ansi) {
     amc_print_to_buffer(string, ansi);
-    amc_update_terminal();
+
+    if (amc_scrolled_bottom()) {
+        amc_update_terminal();
+    }
 }
 
 function amc_print_to_buffer(string, ansi) {

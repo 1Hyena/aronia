@@ -543,6 +543,13 @@ function amc_init_panel(width, height) {
         var wrapper = document.createElement("div");
         wrapper.id = global.offscreen.terminal.id+"-wrapper";
         wrapper.append(global.offscreen.terminal);
+        wrapper.addEventListener(
+            'scroll',
+            function(e) {
+                amc_update_scroll();
+            }
+        );
+
         panel_console.append(wrapper);
         global.offscreen.terminal = null;
 
