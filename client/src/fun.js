@@ -1,13 +1,11 @@
 "use strict";
 
 function amc_show_login(container) {
-    container.replaceChildren(amc_create_login_form());
+    container.replaceChildren(amc_tui_create_login_form());
 }
 
 function amc_show_message(container, message) {
-    var pre = document.createElement("pre");
-    pre.appendChild(document.createTextNode(message));
-    container.replaceChildren(pre);
+    amc_init_noteview(container, document.createTextNode(message));
 }
 
 function amc_show_mudstate(state) {

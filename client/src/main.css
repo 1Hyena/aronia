@@ -100,11 +100,6 @@ table.amc-tui > tr > td {
     scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
 }
 
-#amc-chatview {
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
 div[data-author="You"].amc-chat-public > span:nth-of-type(2),
 div[data-author="You"].amc-chat-public > span:nth-of-type(3),
 div.amc-chat-private > span:nth-of-type(2),
@@ -123,8 +118,8 @@ div.amc-chat-public > span:nth-of-type(4) {
     font-style: italic;
 }
 
-#amc-terminal-wrapper,
-#amc-mainview-wrapper {
+#amc-noteview-wrapper,
+#amc-terminal-wrapper {
     position: absolute;
     top: 0;
     left: 0;
@@ -136,6 +131,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
 }
 
+#amc-mainview-wrapper,
 #amc-inputbar-wrapper,
 #amc-zoneview-wrapper,
 #amc-statview-wrapper,
@@ -148,6 +144,38 @@ div.amc-chat-public > span:nth-of-type(4) {
     right: 0;
     bottom: 0;
     overflow: hidden;
+}
+
+#amc-terminal-wrapper {
+    top: -14px;
+    right: -2px;
+    bottom: -12px;
+}
+
+#amc-inputbar-wrapper {
+    top: -14px;
+    left: -4px;
+    right: -2px;
+    bottom: -12px;
+}
+
+#amc-roomview-wrapper,
+#amc-eqview-wrapper,
+#amc-inventory-view-wrapper,
+#amc-statview-wrapper,
+#amc-chatview-wrapper {
+    font-size: 16px;
+    line-height: 16px;
+}
+
+#amc-mainview {
+    white-space: pre-wrap;
+}
+
+#amc-noteview,
+#amc-chatview {
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 #amc-terminal {

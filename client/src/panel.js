@@ -2,12 +2,12 @@
 
 function amc_calc_panel_width() {
     var w = document.getElementById('amc-body').clientWidth;
-    return Math.max(Math.floor(w / 16) - 1, 0);
+    return Math.max(Math.round(w / 16) - 1, 0);
 }
 
 function amc_calc_panel_height() {
     var h = document.getElementById('amc-body').clientHeight;
-    return Math.max(Math.floor(h / 32) - 1, 0);
+    return Math.max(Math.round(h / 32) - 1, 0);
 }
 
 function amc_fill_panel_framework(framework, width, height) {
@@ -198,23 +198,23 @@ function amc_calc_panel_framework(width, height) {
                         contents : [
                             {
                                 key: "amc-panel-char-sheet",
-                                min_w : 20,
-                                min_h : 6,
-                                priority : 3
+                                min_w : 18,
+                                min_h : 1,
+                                priority : 4
                             }, {
                                 vertical : false,
                                 contents : [
                                     {
                                         key: "amc-panel-below-char-sheet-1st",
                                         min_w: 8,
-                                        min_h: 6,
+                                        min_h: 1,
                                         priority : 8
                                     },
                                     {
                                         key: "amc-panel-below-char-sheet-2nd",
-                                        min_w: 5,
-                                        min_h: 3,
-                                        priority: 4
+                                        min_w: 1,
+                                        min_h: 1,
+                                        priority: 3
                                     }
                                 ]
                             }
@@ -232,13 +232,13 @@ function amc_calc_panel_framework(width, height) {
                         contents : [
                             {
                                 key: "amc-panel-top-right",
-                                min_w: 20,
-                                min_h: 2,
+                                min_w: 8,
+                                min_h: 1,
                                 priority : 5
                             }, {
                                 key: "amc-panel-below-top-right",
-                                min_w: 8,
-                                min_h: 7,
+                                min_w: 12,
+                                min_h: 1,
                                 priority : 6
                             }
                         ]
@@ -253,8 +253,8 @@ function amc_calc_panel_framework(width, height) {
                         contents : [
                             {
                                 key: "amc-panel-bottom-left",
-                                min_w: 8,
-                                min_h: 3,
+                                min_w: 1,
+                                min_h: 1,
                                 max_w: bottom_left_max_w,
                                 priority: 7
                             }, {
@@ -273,7 +273,7 @@ function amc_calc_panel_framework(width, height) {
                             {
                                 key: "amc-panel-console",
                                 min_w: Math.max(8, console_min_width),
-                                min_h: 3,
+                                min_h: 1,
                                 priority: 1
                             }, {
                                 vertical : false,
@@ -282,7 +282,6 @@ function amc_calc_panel_framework(width, height) {
                                         key: "amc-panel-below-console-left",
                                         min_w: Math.max(1, console_min_width),
                                         min_h: 1,
-                                        max_w: 40,
                                         max_h: 1,
                                         priority: 0
                                     },
@@ -419,8 +418,8 @@ function amc_get_border_symbol(map, x, y) {
 
 function amc_create_panel(framework) {
     let buf = [ ...framework.contents ];
-    var map = new Array(framework.height + 1);
-    var tui = {};
+    let map = new Array(framework.height + 1);
+    let tui = {};
 
     for (let y = 0; y < map.length; ++y) {
         map[y] = new Array(framework.width + 1);

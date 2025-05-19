@@ -1,11 +1,38 @@
 "use strict";
 
+function amc_init_noteview(container, contents) {
+    if (container === null) {
+        return;
+    }
+
+    if (document.getElementById("amc-noteview-wrapper") !== null) {
+        return;
+    }
+
+    var wrapper = document.createElement("div");
+
+    wrapper.id = "amc-noteview-wrapper";
+
+    var noteview = document.createElement("div");
+
+    noteview.id = "amc-noteview";
+
+    wrapper.appendChild(noteview);
+
+    if (contents !== null) {
+        noteview.appendChild(contents);
+    }
+
+    container.replaceChildren(wrapper);
+}
+
 function amc_init_mainview(container) {
     if (container === null) {
         return;
     }
 
     if (document.getElementById("amc-mainview-wrapper") !== null) {
+        bug();
         return;
     }
 
@@ -13,13 +40,12 @@ function amc_init_mainview(container) {
 
     wrapper.id = "amc-mainview-wrapper";
 
-    var placeholder = document.createElement("pre");
-
-    placeholder.appendChild(
-        document.createTextNode(amc_get_roguelike_placeholder())
+    wrapper.appendChild(
+        amc_tui_create_mainview(
+            parseInt(container.getAttribute("colspan"), 10),
+            parseInt(container.getAttribute("rowspan"), 10)
+        )
     );
-
-    wrapper.appendChild(placeholder);
 
     container.replaceChildren(wrapper);
 }
@@ -41,7 +67,7 @@ function amc_init_zoneview(container) {
     var placeholder = document.createElement("pre");
 
     placeholder.appendChild(
-        document.createTextNode(amc_get_secondary_top_placeholder())
+        document.createTextNode(amc_tui_get_secondary_top_placeholder())
     );
 
     wrapper.appendChild(placeholder);
@@ -66,7 +92,7 @@ function amc_init_eqview(container) {
     var placeholder = document.createElement("pre");
 
     placeholder.appendChild(
-        document.createTextNode(amc_get_equipment_placeholder())
+        document.createTextNode(amc_tui_get_equipment_placeholder())
     );
 
     wrapper.appendChild(placeholder);
@@ -91,7 +117,7 @@ function amc_init_inventory_view(container) {
     var placeholder = document.createElement("pre");
 
     placeholder.appendChild(
-        document.createTextNode(amc_get_inventory_placeholder())
+        document.createTextNode(amc_tui_get_inventory_placeholder())
     );
 
     wrapper.appendChild(placeholder);
@@ -116,7 +142,7 @@ function amc_init_roomview(container) {
     var placeholder = document.createElement("pre");
 
     placeholder.appendChild(
-        document.createTextNode(amc_get_roomview_placeholder())
+        document.createTextNode(amc_tui_get_roomview_placeholder())
     );
 
     wrapper.appendChild(placeholder);
@@ -138,7 +164,7 @@ function amc_init_statview(container) {
 
     wrapper.id = "amc-statview-wrapper";
 
-    wrapper.appendChild(amc_create_statview());
+    wrapper.appendChild(amc_tui_create_statview());
 
     container.appendChild(wrapper);
 

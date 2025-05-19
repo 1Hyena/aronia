@@ -133,200 +133,219 @@ function amc_tui_update_xp() {
 
     amc_text_to_tui_class(classname, label);
 }
+/*
+function amc_tui_get_roguelike_placeholder() {
+    let placeholder =
+    "╔══════════════════════╤══╗\n"+
+    "║╭───╮     ╭───╮     ╭─┴─╮║\n"+
+    "╟┤   ├─────┤  ↑├─────┤   │║\n"+
+    "║╰───╯     ╰─┬─╯     ╰───╯║\n"+
+    "║      ╭─────┴─────╮      ║\n"+
+    "║      │           │      ║\n"+
+    "║╭───╮ │           │ ╭─┬─╮║\n"+
+    "║│   ├─┤ c   @  k  ├─┼─┼─┤║\n"+
+    "║╰─┬─╯ │      kk   │ ╰─┼─╯║\n"+
+    "║  │   │           │   │  ║\n"+
+    "║  │   ╰───────────╯   │  ║\n"+
+    "║╭─┴─╮               ╭─┴─╮║\n"+
+    "║│   │               │   │║\n"+
+    "║╰─┬─╯               ╰─┬─╯║\n"+
+    "╚══╧═══════════════════╧══╝\n";
 
-function amc_create_secondary_panel(width, height) {
-    var panel = document.createElement("div");
-    var table = document.createElement("table");
+    return placeholder;
+}
+*/
+function amc_tui_draw_room(map, room) {
+    let top_left_x = room.x - Math.floor(room.w/2);
+    let top_left_y = room.y - Math.floor(room.h/2);
 
-    table.classList.add("amc-tui");
+    for (let y=0; y<room.h; ++y) {
+        for (let x=0; x<room.w; ++x) {
+            let value = " ";
+            let type = null;
 
-    var cols = width;
-    var rows = height;
-
-    var upper_rows = Math.floor((rows - 3) / 2);
-    var lower_rows = (rows - 3) - upper_rows;
-
-    for (var y=0; y<rows; ++y) {
-        var row = document.createElement("tr");
-
-        for (var x=0; x<cols; ++x) {
-            var text = null;
-            var cell = null;
-
-            if (y === 0) {
-                if (x === 0) {
-                    text = "╔";
+            if (x === 0 || y === 0 || x + 1 === room.w || y + 1 === room.h) {
+                if (x === 0 && y === 0) {
+                    value = "╭";
                 }
-                else if (x + 1 === cols) {
-                    text = "╗";
+                else if (x + 1 === room.w && y === 0) {
+                    value = "╮";
                 }
-                else {
-                    text = "═";
+                else if (x === 0 && y + 1 === room.h) {
+                    value = "╰";
                 }
-            }
-            else if (y + 1 == rows) {
-                if (x === 0) {
-                    text = "╚";
+                else if (x + 1 === room.w && y + 1 === room.h) {
+                    value = "╯";
                 }
-                else if (x + 1 === cols) {
-                    text = "╝";
-                }
-                else {
-                    text = "═";
-                }
-            }
-            else if (x === 0 || x + 1 === cols) {
-                if (y === upper_rows + 1) {
-                    if (x === 0) {
-                        text = "╠";
+                else if (x === 0 || x + 1 === room.w) {
+                    value = "│";
+
+                    if (y === Math.floor(room.h / 2)) {
+                        if (x === 0) {
+                            value = "┤";
+                            type = "exit";
+                        }
+                        else if (x + 1 === room.w) {
+                            value = "├";
+                            type = "exit";
+                        }
                     }
-                    else {
-                        text = "╣";
+                }
+                else if (y === 0 || y + 1 === room.h) {
+                    value = "─";
+
+                    if (x === Math.floor(room.w / 2)) {
+                        if (y === 0) {
+                            value = "┴";
+                            type = "exit";
+                        }
+                        else if (y + 1 === room.h) {
+                            value = "┬";
+                            type = "exit";
+                        }
                     }
                 }
-                else {
-                    text = "║";
-                }
-            }
-            else if (y === upper_rows + 1) {
-                text = "═";
-            }
-            else {
-                if (x === 1 && y === 1) {
-                    cell = document.createElement("td");
-                    cell.setAttribute("colspan", cols - 2);
-                    cell.setAttribute("rowspan", upper_rows);
-                    cell.id = "amc-secondary-top";
-                }
-                else if (x === 1 && y === upper_rows + 2) {
-                    cell = document.createElement("td");
-                    cell.setAttribute("colspan", cols - 2);
-                    cell.setAttribute("rowspan", lower_rows);
-                    cell.id = "amc-secondary-bottom";
-                }
+                else value = "?";
             }
 
-            if (text !== null) {
-                var pre = document.createElement("pre");
-                pre.append(document.createTextNode(text));
-
-                if (cell === null) {
-                    cell = document.createElement("td");
-                }
-
-                cell.append(pre);
-            }
-
-            if (cell !== null) {
-                row.append(cell);
-            }
+            map[top_left_y + y][top_left_x + x] = {
+                sector: room.key,
+                symbol: value,
+                type: type
+            };
         }
-
-        table.append(row);
     }
-
-    panel.append(table);
-
-    return panel;
 }
 
-function amc_create_primary_panel(width, height) {
-    var panel = document.createElement("div");
-    var table = document.createElement("table");
+function amc_tui_create_mainview(cols, rows) {
+    let mainview = document.createElement("div");
 
-    table.classList.add("amc-tui");
+    mainview.id = "amc-mainview";
 
-    var cols = width;
-    var rows = height;
+    let map = new Array(rows);
 
-    var upper_rows = Math.floor((rows - 3) / 2);
-    var lower_rows = (rows - 3) - upper_rows;
-
-    for (var y=0; y<rows; ++y) {
-        var row = document.createElement("tr");
-
-        for (var x=0; x<cols; ++x) {
-            var text = null;
-            var cell = null;
-
-            if (y === 0) {
-                if (x === 0) {
-                    text = "╭";
-                }
-                else if (x + 1 === cols) {
-                    text = "╮";
-                }
-                else {
-                    text = "─";
-                }
-            }
-            else if (y + 1 == rows) {
-                if (x === 0) {
-                    text = "╰";
-                }
-                else if (x + 1 === cols) {
-                    text = "╯";
-                }
-                else {
-                    text = "─";
-                }
-            }
-            else if (x === 0 || x + 1 === cols) {
-                if (y === upper_rows + 1) {
-                    if (x === 0) {
-                        text = "╞";
-                    }
-                    else {
-                        text = "╡";
-                    }
-                }
-                else {
-                    text = "│";
-                }
-            }
-            else if (y === upper_rows + 1) {
-                text = "═";
-            }
-            else {
-                if (x === 1 && y === 1) {
-                    cell = document.createElement("td");
-                    cell.setAttribute("colspan", cols - 2);
-                    cell.setAttribute("rowspan", upper_rows);
-                    cell.id = "amc-primary-top";
-                }
-                else if (x === 1 && y === upper_rows + 2) {
-                    cell = document.createElement("td");
-                    cell.setAttribute("colspan", cols - 2);
-                    cell.setAttribute("rowspan", lower_rows);
-                    cell.id = "amc-primary-bottom";
-                }
-            }
-
-            if (text !== null) {
-                var pre = document.createElement("pre");
-                pre.append(document.createTextNode(text));
-
-                if (cell === null) {
-                    cell = document.createElement("td");
-                }
-
-                cell.append(pre);
-            }
-
-            if (cell !== null) {
-                row.append(cell);
-            }
-        }
-
-        table.append(row);
+    for (let y = 0; y < map.length; ++y) {
+        map[y] = new Array(cols);
+        map[y].fill(null);
     }
 
-    panel.append(table);
+    let rooms = [
+        {x: 2, y: 1, w: 5, h: 3, key: "nw"},
+        {x: Math.floor(cols / 2), y: 1, w: 5, h: 3, key: "n"},
+        {x: cols - 3, y: 1, w: 5, h: 3, key: "ne"},
+        {x: 2, y: Math.floor(rows / 2), w: 5, h: 3, key: "w"},
+        {
+            x: Math.floor(cols / 2),
+            y: Math.floor(rows / 2),
+            w: cols - 10,
+            h: rows - 6,
+            key: "c"
+        },
+        {x: cols - 3, y: Math.floor(rows / 2), w: 5, h: 3, key: "e"},
+        {x: 2, y: rows - 2, w: 5, h: 3, key: "sw"},
+        {x: Math.floor(cols / 2), y: rows - 2, w: 5, h: 3, key: "s"},
+        {x: cols - 3, y: rows - 2, w: 5, h: 3, key: "se"}
+    ];
 
-    return panel;
+    for (let i=0; i<rooms.length; ++i) {
+        let r = rooms[i];
+
+        amc_tui_draw_room(map, r);
+    }
+
+    let fill = [];
+
+    for (let y=0; y<map.length; ++y) {
+        for (let x=0; x<map[y].length; ++x) {
+            if (map[y][x] === null) {
+                continue;
+            }
+
+            switch (map[y][x].symbol) {
+                case "┤": {
+                    fill.push([x-1, y, "─", map[y][x].sector]);
+                    break;
+                }
+                case "├": {
+                    fill.push([x+1, y, "─", map[y][x].sector]);
+                    break;
+                }
+                case "┴": {
+                    fill.push([x, y-1, "│", map[y][x].sector]);
+                    break;
+                }
+                case "┬": {
+                    fill.push([x, y+1, "│", map[y][x].sector]);
+                    break;
+                }
+                default: break;
+            }
+        }
+    }
+
+    while (fill.length > 0) {
+        let pos = fill.shift();
+        let x = pos[0];
+        let y = pos[1];
+        let c = pos[2];
+        let s = pos[3];
+
+        if (y < 0 || y >= map.length || x < 0 || x >= map[y].length) {
+            continue;
+        }
+
+        if (map[y][x] !== null) {
+            continue;
+        }
+
+        map[y][x] = {
+            sector: s,
+            symbol: c,
+            type: "exit"
+        };
+
+        if (c === "│") {
+            fill.push([x, y - 1, c, s]);
+            fill.push([x, y + 1, c, s]);
+        }
+        else if (c === "─") {
+            fill.push([x - 1, y, c, s]);
+            fill.push([x + 1, y, c, s]);
+        }
+    }
+
+    let view = new DocumentFragment();
+
+    for (let y=0; y<map.length; ++y) {
+        for (let x=0; x<map[y].length; ++x) {
+            let room = map[y][x];
+
+            if (room === null) {
+                view.appendChild(document.createTextNode(" "));
+                continue;
+            }
+
+            let span = document.createElement("span");
+            span.appendChild(document.createTextNode(room.symbol));
+            span.classList.add("amc-room-"+room.sector);
+            span.setAttribute("data-symbol", room.symbol);
+
+            if (room.type !== null) {
+                span.classList.add("amc-room-"+room.type);
+            }
+
+            view.appendChild(span);
+        }
+
+        view.appendChild(document.createTextNode("\n"));
+    }
+
+    mainview.appendChild(view);
+
+    return mainview;
 }
 
-function amc_create_login_form() {
+function amc_tui_create_login_form() {
     var form = document.createElement("form");
     var table = document.createElement("table");
 
@@ -527,7 +546,7 @@ function amc_create_login_form() {
     return form;
 }
 
-function amc_create_statview() {
+function amc_tui_create_statview() {
     var table = document.createElement("table");
 
     table.classList.add("amc-tui");
@@ -748,124 +767,7 @@ function amc_create_statview() {
     return table;
 }
 
-function amc_create_tertiary_panel(width, height) {
-    var panel = document.createElement("div");
-    var table = document.createElement("table");
-
-    table.classList.add("amc-tui");
-
-    var cols = width;
-    var rows = height;
-
-    var upper_rows = Math.floor((rows - 3) / 2);
-    var lower_rows = (rows - 3) - upper_rows;
-
-    for (var y=0; y<rows; ++y) {
-        var row = document.createElement("tr");
-
-        for (var x=0; x<cols; ++x) {
-            var text = null;
-            var cell = null;
-
-            if (y === 0) {
-                if (x === 0) {
-                    text = "╔";
-                }
-                else if (x + 1 === cols) {
-                    text = "╗";
-                }
-                else {
-                    text = "═";
-                }
-            }
-            else if (y + 1 == rows) {
-                if (x === 0) {
-                    text = "╚";
-                }
-                else if (x + 1 === cols) {
-                    text = "╝";
-                }
-                else {
-                    text = "═";
-                }
-            }
-            else if (x === 0 || x + 1 === cols) {
-                if (y === upper_rows + 1) {
-                    if (x === 0) {
-                        text = "╠";
-                    }
-                    else {
-                        text = "╣";
-                    }
-                }
-                else {
-                    text = "║";
-                }
-            }
-            else if (y === upper_rows + 1) {
-                text = "═";
-            }
-            else {
-                if (x === 1 && y === 1) {
-                    cell = document.createElement("td");
-                    cell.setAttribute("colspan", cols - 2);
-                    cell.setAttribute("rowspan", upper_rows);
-                    cell.id = "amc-tertiary-top";
-                }
-                else if (x === 1 && y === upper_rows + 2) {
-                    cell = document.createElement("td");
-                    cell.setAttribute("colspan", cols - 2);
-                    cell.setAttribute("rowspan", lower_rows);
-                    cell.id = "amc-tertiary-bottom";
-                }
-            }
-
-            if (text !== null) {
-                var pre = document.createElement("pre");
-                pre.append(document.createTextNode(text));
-
-                if (cell === null) {
-                    cell = document.createElement("td");
-                }
-
-                cell.append(pre);
-            }
-
-            if (cell !== null) {
-                row.append(cell);
-            }
-        }
-
-        table.append(row);
-    }
-
-    panel.append(table);
-
-    return panel;
-}
-
-function amc_get_roguelike_placeholder() {
-    let placeholder =
-    "╔══════════════════════╤══╗\n"+
-    "║╭───╮     ╭───╮     ╭─┴─╮║\n"+
-    "╟┤   ├─────┤  ↑├─────┤   │║\n"+
-    "║╰───╯     ╰─┬─╯     ╰───╯║\n"+
-    "║      ╭─────┴─────╮      ║\n"+
-    "║      │           │      ║\n"+
-    "║╭───╮ │           │ ╭─┬─╮║\n"+
-    "║│   ├─┤ c   @  k  ├─┼─┼─┤║\n"+
-    "║╰─┬─╯ │      kk   │ ╰─┼─╯║\n"+
-    "║  │   │           │   │  ║\n"+
-    "║  │   ╰───────────╯   │  ║\n"+
-    "║╭─┴─╮               ╭─┴─╮║\n"+
-    "║│   │               │   │║\n"+
-    "║╰─┬─╯               ╰─┬─╯║\n"+
-    "╚══╧═══════════════════╧══╝\n";
-
-    return placeholder;
-}
-
-function amc_get_secondary_top_placeholder() {
+function amc_tui_get_secondary_top_placeholder() {
     var placeholder =
     "n∩n∩n∩n∩.ⁿ.ⁿ.ⁿ.ⁿ \"⌠ \"⌠\"⌠\"⌠⌂ ⌂⌂ ⌂⌂ ⌂ \n"+
     " n∩n∩n∩.ⁿ.ⁿΠ╷.ⁿ.ⁿ ↑↨ \"⌠\"⌠ ⌂⌂⌂ ⌂⌂ ⌂ ⌂\n"+
@@ -886,7 +788,7 @@ function amc_get_secondary_top_placeholder() {
     return placeholder;
 }
 
-function amc_get_equipment_placeholder() {
+function amc_tui_get_equipment_placeholder() {
     return (
         "Equipment:\n"+
         "\n"+
@@ -909,7 +811,7 @@ function amc_get_equipment_placeholder() {
     );
 }
 
-function amc_get_inventory_placeholder() {
+function amc_tui_get_inventory_placeholder() {
     return (
         "Inventory:\n"+
         "\n"+
@@ -919,7 +821,7 @@ function amc_get_inventory_placeholder() {
     );
 }
 
-function amc_get_roomview_placeholder() {
+function amc_tui_get_roomview_placeholder() {
     return (
         "A small clearing\n"+
         "  You are in a small clearing in the shadow grove. There is\n"+

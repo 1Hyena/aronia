@@ -45,7 +45,8 @@ var msdp = {
         WIS_BASE : null,
         CON : null,
         CON_BASE : null,
-        AC : null
+        AC : null,
+        EXITS : null
     },
     incoming : [],
     outgoing : []
