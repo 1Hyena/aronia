@@ -34,105 +34,6 @@ function amc_text_to_tui_class(name, text, alignment) {
     }
 }
 
-function amc_tui_update_character_title() {
-    let value = "";
-
-    if (msdp.variables.CHARACTER_NAME !== null) {
-        value = capitalize(msdp.variables.CHARACTER_NAME);
-
-        if (msdp.variables.CHARACTER_RACE || msdp.variables.CHARACTER_CLASS) {
-            value += ",";
-
-            if (msdp.variables.CHARACTER_RACE) {
-                value += " "+capitalize(msdp.variables.CHARACTER_RACE);
-            }
-
-            if (msdp.variables.CHARACTER_CLASS) {
-                value += " "+capitalize(msdp.variables.CHARACTER_CLASS);
-            }
-        }
-    }
-
-    let classname = "amc-statview-title";
-    let cells = document.getElementsByClassName(classname).length;
-    let padding_left = Math.max(Math.floor((cells - value.length) / 2), 0);
-    let padding_right = Math.max((cells - value.length) - padding_left, 0);
-    let title = " ".repeat(padding_left)+value+" ".repeat(padding_right);
-
-    amc_text_to_tui_class(classname, title);
-    amc_text_to_tui_class(
-        "amc-statview-title-underline",
-        " ".repeat(padding_left)+
-        "╌".repeat(value.length)+
-        " ".repeat(padding_right)
-    );
-}
-
-function amc_tui_update_health_bar() {
-    let classname = "amc-statview-health-bar";
-    let cells = document.getElementsByClassName(classname).length;
-    let health = msdp.variables.HEALTH && msdp.variables.HEALTH_MAX > 0 ? (
-        parseInt(msdp.variables.HEALTH) / parseInt(msdp.variables.HEALTH_MAX)
-    ) : 0;
-    let left = Math.max(Math.min(Math.floor(health * cells), cells), 0);
-    let bar = "▒".repeat(left)+"░".repeat(cells - left);
-
-    amc_text_to_tui_class(classname, bar);
-}
-
-function amc_tui_update_energy_bar() {
-    let classname = "amc-statview-energy-bar";
-    let cells = document.getElementsByClassName(classname).length;
-    let energy = msdp.variables.ENERGY && msdp.variables.ENERGY_MAX > 0 ? (
-        parseInt(msdp.variables.ENERGY) / parseInt(msdp.variables.ENERGY_MAX)
-    ) : 0;
-    let left = Math.max(Math.min(Math.floor(energy * cells), cells), 0);
-    let bar = "▒".repeat(left)+"░".repeat(cells - left);
-
-    amc_text_to_tui_class(classname, bar);
-}
-
-function amc_tui_update_xp_bar() {
-    let classname = "amc-statview-xp-bar";
-
-    if (!(msdp.variables.EXPERIENCE_TNL >= 0 && msdp.variables.LEVEL >= 0)) {
-        amc_text_to_tui_class(
-            classname,
-            msdp.variables.EXPERIENCE !== null ? msdp.variables.EXPERIENCE : "",
-            "right"
-        );
-
-        return;
-    }
-
-    let cells = document.getElementsByClassName(classname).length;
-    let xp = (
-        msdp.variables.EXPERIENCE_TNL >= 0 &&
-        msdp.variables.EXPERIENCE_TNL_MAX > 0 ? (
-            parseInt(msdp.variables.EXPERIENCE_TNL) /
-            parseInt(msdp.variables.EXPERIENCE_TNL_MAX)
-        ) : 0
-    );
-    let left = cells - Math.max(Math.min(Math.floor(xp * cells), cells), 0);
-    let bar = "▒".repeat(left)+"░".repeat(cells - left);
-
-    amc_text_to_tui_class(classname, bar);
-}
-
-function amc_tui_update_xp() {
-    amc_tui_update_xp_bar();
-
-    let classname = "amc-statview-label-xp";
-    let cells = document.getElementsByClassName(classname).length;
-    let label = (
-        msdp.variables.EXPERIENCE_TNL >= 0 && msdp.variables.LEVEL >= 0 ? (
-            msdp.variables.EXPERIENCE_TNL +
-            " Xp → Lvl " + (parseInt(msdp.variables.LEVEL) + 1) + ":"
-        ) : "Experience:"
-    );
-
-    amc_text_to_tui_class(classname, label);
-}
 /*
 function amc_tui_get_roguelike_placeholder() {
     let placeholder =
@@ -183,11 +84,11 @@ function amc_tui_draw_room(map, room) {
                     if (y === Math.floor(room.h / 2)) {
                         if (x === 0) {
                             value = "┤";
-                            type = "exit";
+                            type = "exit-w";
                         }
                         else if (x + 1 === room.w) {
                             value = "├";
-                            type = "exit";
+                            type = "exit-e";
                         }
                     }
                 }
@@ -197,11 +98,11 @@ function amc_tui_draw_room(map, room) {
                     if (x === Math.floor(room.w / 2)) {
                         if (y === 0) {
                             value = "┴";
-                            type = "exit";
+                            type = "exit-n";
                         }
                         else if (y + 1 === room.h) {
                             value = "┬";
-                            type = "exit";
+                            type = "exit-s";
                         }
                     }
                 }
@@ -239,7 +140,7 @@ function amc_tui_create_mainview(cols, rows) {
             y: Math.floor(rows / 2),
             w: cols - 10,
             h: rows - 6,
-            key: "c"
+            key: "origin"
         },
         {x: cols - 3, y: Math.floor(rows / 2), w: 5, h: 3, key: "e"},
         {x: 2, y: rows - 2, w: 5, h: 3, key: "sw"},
@@ -263,19 +164,19 @@ function amc_tui_create_mainview(cols, rows) {
 
             switch (map[y][x].symbol) {
                 case "┤": {
-                    fill.push([x-1, y, "─", map[y][x].sector]);
+                    fill.push([x-1, y, "─", map[y][x]]);
                     break;
                 }
                 case "├": {
-                    fill.push([x+1, y, "─", map[y][x].sector]);
+                    fill.push([x+1, y, "─", map[y][x]]);
                     break;
                 }
                 case "┴": {
-                    fill.push([x, y-1, "│", map[y][x].sector]);
+                    fill.push([x, y-1, "│", map[y][x]]);
                     break;
                 }
                 case "┬": {
-                    fill.push([x, y+1, "│", map[y][x].sector]);
+                    fill.push([x, y+1, "│", map[y][x]]);
                     break;
                 }
                 default: break;
@@ -287,8 +188,8 @@ function amc_tui_create_mainview(cols, rows) {
         let pos = fill.shift();
         let x = pos[0];
         let y = pos[1];
-        let c = pos[2];
-        let s = pos[3];
+        let sym = pos[2];
+        let src = pos[3];
 
         if (y < 0 || y >= map.length || x < 0 || x >= map[y].length) {
             continue;
@@ -299,18 +200,18 @@ function amc_tui_create_mainview(cols, rows) {
         }
 
         map[y][x] = {
-            sector: s,
-            symbol: c,
-            type: "exit"
+            sector: src.sector,
+            symbol: sym,
+            type: src.type
         };
 
-        if (c === "│") {
-            fill.push([x, y - 1, c, s]);
-            fill.push([x, y + 1, c, s]);
+        if (sym === "│") {
+            fill.push([x, y - 1, sym, src]);
+            fill.push([x, y + 1, sym, src]);
         }
-        else if (c === "─") {
-            fill.push([x - 1, y, c, s]);
-            fill.push([x + 1, y, c, s]);
+        else if (sym === "─") {
+            fill.push([x - 1, y, sym, src]);
+            fill.push([x + 1, y, sym, src]);
         }
     }
 

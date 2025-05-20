@@ -46,7 +46,24 @@ var msdp = {
         CON : null,
         CON_BASE : null,
         AC : null,
-        EXITS : null
+        EXITS : null,
+        EXITS_N : null,
+        EXITS_S : null,
+        EXITS_E : null,
+        EXITS_W : null,
+        EXITS_NE : null,
+        EXITS_NW : null,
+        EXITS_SE : null,
+        EXITS_SW : null,
+        SECTOR : null,
+        SECTOR_N : null,
+        SECTOR_S : null,
+        SECTOR_E : null,
+        SECTOR_W : null,
+        SECTOR_NE : null,
+        SECTOR_NW : null,
+        SECTOR_SE : null,
+        SECTOR_SW : null
     },
     incoming : [],
     outgoing : []
@@ -128,6 +145,12 @@ function msdp_report_variable(variable) {
     );
 }
 
+function msdp_unreport_variable(variable) {
+    msdp.outgoing.push(
+        ...msdp_serialize_sb( { UNREPORT : variable } )
+    );
+}
+
 function msdp_configure_variables() {
     for (let i=0; i<msdp.lists.CONFIGURABLE_VARIABLES.length; ++i) {
         msdp_configure_variable(msdp.lists.CONFIGURABLE_VARIABLES[i]);
@@ -166,19 +189,43 @@ function msdp_update_variable(key, value) {
 
     switch (key) {
         default: break;
+        case "EXITS":
+        case "EXITS_N":
+        case "EXITS_S":
+        case "EXITS_E":
+        case "EXITS_W":
+        case "EXITS_NE":
+        case "EXITS_NW":
+        case "EXITS_SE":
+        case "EXITS_SW": {
+            amc_view_update_exits(key);
+            break;
+        }
+        case "SECTOR":
+        case "SECTOR_N":
+        case "SECTOR_S":
+        case "SECTOR_E":
+        case "SECTOR_W":
+        case "SECTOR_NE":
+        case "SECTOR_NW":
+        case "SECTOR_SE":
+        case "SECTOR_SW": {
+            amc_view_update_sectors(key);
+            break;
+        }
         case "ACCOUNT_NAME": {
             break;
         }
         case "CHARACTER_NAME": {
-            amc_tui_update_character_title();
+            amc_view_update_character_title();
             break;
         }
         case "CHARACTER_RACE": {
-            amc_tui_update_character_title();
+            amc_view_update_character_title();
             break;
         }
         case "CHARACTER_CLASS": {
-            amc_tui_update_character_title();
+            amc_view_update_character_title();
             break;
         }
         case "SERVER_ID": {
@@ -191,43 +238,43 @@ function msdp_update_variable(key, value) {
             break;
         }
         case "EXPERIENCE": {
-            amc_tui_update_xp();
+            amc_view_update_xp();
             break;
         }
         case "EXPERIENCE_TNL": {
-            amc_tui_update_xp();
+            amc_view_update_xp();
             break;
         }
         case "EXPERIENCE_TNL_MAX": {
-            amc_tui_update_xp();
+            amc_view_update_xp();
             break;
         }
         case "HEALTH": {
             amc_text_to_tui_class("amc-statview-health", value, "right");
-            amc_tui_update_health_bar();
+            amc_view_update_health_bar();
             break;
         }
         case "HEALTH_MAX": {
             amc_text_to_tui_class(
                 "amc-statview-health-max", value.padStart(4, " ")
             );
-            amc_tui_update_health_bar();
+            amc_view_update_health_bar();
             break;
         }
         case "ENERGY": {
             amc_text_to_tui_class("amc-statview-energy", value, "right");
-            amc_tui_update_energy_bar();
+            amc_view_update_energy_bar();
             break;
         }
         case "ENERGY_MAX": {
             amc_text_to_tui_class(
                 "amc-statview-energy-max", value.padStart(4, " ")
             );
-            amc_tui_update_energy_bar();
+            amc_view_update_energy_bar();
             break;
         }
         case "LEVEL": {
-            amc_tui_update_xp();
+            amc_view_update_xp();
             break;
         }
         case "MONEY": {
@@ -332,6 +379,8 @@ function msdp_handle_variable(key, value) {
         }
         case "SERVER_TIME": {
             log("Server time is "+value+".");
+            msdp_unreport_variable(key);
+
             break;
         }
         case "HEALTH": {
