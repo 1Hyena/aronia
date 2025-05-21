@@ -343,6 +343,10 @@ input[type="submit"]:hover {
     color: blue;
 }
 
+#amc-mainview > span[data-sector="noswim"] {
+    color: darkblue;
+}
+
 #amc-mainview > span[data-sector="underground"] {
     color: darkslategray;
 }
