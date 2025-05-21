@@ -151,7 +151,6 @@ function msdp_send_variable(variable) {
     );
 
     msdp_flush();
-    console.log("asking "+variable);
 }
 
 function msdp_report_variable(variable) {

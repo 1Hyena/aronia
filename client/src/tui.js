@@ -141,22 +141,25 @@ function amc_tui_create_mainview(cols, rows) {
         map[y].fill(null);
     }
 
+    let rw = 5;
+    let rh = 3;
+
     let rooms = [
-        {x: 2, y: 1, w: 5, h: 3, key: "nw"},
-        {x: Math.floor(cols / 2), y: 1, w: 5, h: 3, key: "n"},
-        {x: cols - 3, y: 1, w: 5, h: 3, key: "ne"},
-        {x: 2, y: Math.floor(rows / 2), w: 5, h: 3, key: "w"},
+        {x: 3, y: 1, w: rw, h: rh, key: "nw"},
+        {x: Math.floor(cols / 2), y: 1, w: rw, h: rh, key: "n"},
+        {x: cols - 4, y: 1, w: rw, h: rh, key: "ne"},
+        {x: 3, y: Math.floor(rows / 2), w: rw, h: rh, key: "w"},
         {
             x: Math.floor(cols / 2),
             y: Math.floor(rows / 2),
-            w: cols - 12,
-            h: rows - 6,
+            w: rw+4,//cols - 12,
+            h: rh+2,//rows - 6,
             key: "origin"
         },
-        {x: cols - 3, y: Math.floor(rows / 2), w: 5, h: 3, key: "e"},
-        {x: 2, y: rows - 2, w: 5, h: 3, key: "sw"},
-        {x: Math.floor(cols / 2), y: rows - 2, w: 5, h: 3, key: "s"},
-        {x: cols - 3, y: rows - 2, w: 5, h: 3, key: "se"}
+        {x: cols - 4, y: Math.floor(rows / 2), w: rw, h: rh, key: "e"},
+        {x: 3, y: rows - 2, w: rw, h: rh, key: "sw"},
+        {x: Math.floor(cols / 2), y: rows - 2, w: rw, h: rh, key: "s"},
+        {x: cols - 4, y: rows - 2, w: rw, h: rh, key: "se"}
     ];
 
     for (let i=0; i<rooms.length; ++i) {

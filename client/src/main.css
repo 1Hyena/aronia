@@ -319,6 +319,38 @@ input[type="submit"]:hover {
     color: gray;
 }
 
-.amc-room-border[data-sector="city"] {
+#amc-mainview > span[data-sector="city"] {
+    color: lightgray;
+}
+
+#amc-mainview > span[data-sector="inside"] {
     color: gray;
+}
+
+#amc-mainview > span[data-sector="road"] {
+    color: goldenrod;
+}
+
+#amc-mainview > span[data-sector="forest"] {
+    color: darkgreen;
+}
+
+#amc-mainview > span[data-sector="field"] {
+    color: limegreen;
+}
+
+#amc-mainview > span[data-sector="swim"] {
+    color: blue;
+}
+
+#amc-mainview > span[data-sector="underground"] {
+    color: darkslategray;
+}
+
+#amc-mainview > span[data-sector="moors"] {
+    color: teal;
+}
+
+#amc-mainview > span[data-sector="hills"] {
+    color: greenyellow;
 }
