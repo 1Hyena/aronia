@@ -23,3 +23,22 @@ function amc_event_change_energy(value) {
         play_sound("sfx-energy", 0.5);
     }
 }
+
+function amc_event_change_character(value) {
+    if (value.length === 0) {
+        return;
+    }
+
+    let mainview_variables = [
+        "EXITS",        "EXITS_N",      "EXITS_S",      "EXITS_E",  "EXITS_W",
+        "EXITS_NE",     "EXITS_NW",     "EXITS_SE",     "EXITS_SW", "SECTOR",
+        "SECTOR_N",     "SECTOR_S",     "SECTOR_E",     "SECTOR_W", "SECTOR_NE",
+        "SECTOR_NW",    "SECTOR_SE",    "SECTOR_SW"
+    ];
+
+    amc_show_mudstate("");
+
+    for (let i=0; i<mainview_variables.length; ++i) {
+        msdp_send_variable(mainview_variables[i]);
+    }
+}

@@ -389,7 +389,7 @@ function amc_read_incoming() {
         let incoming_info = global.mud.incoming.info;
         global.mud.incoming.info = [];
 
-        for (var i=0, sz = incoming_info.length; i<sz; ++i) {
+        for (let i=0, sz = incoming_info.length; i<sz; ++i) {
             if (global.mud.incoming.info.length > 0) {
                 global.mud.incoming.info.push(incoming_info[i]);
 

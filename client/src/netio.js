@@ -48,7 +48,7 @@ function get_iac_sequence_length(data, start, size) {
                 // subnegotiation
 
                 for (var j = i + 2; ; j++) {
-                    if (j + 1 >= size) {
+                    if (j + 1 >= start + size) {
                         break;
                     }
 
@@ -109,15 +109,17 @@ function make_info_packet(type, array, start, size) {
 function receive_from_incoming(incoming) {
     do {
         if (!incoming.data.length) {
-            return true;
+            break;
         }
 
         var nonblocking_length = get_iac_nonblocking_length(incoming.data);
         var blocked_length = incoming.data.length - nonblocking_length;
 
-        incoming.info.push(
-            make_info_packet("log", incoming.data, 0, nonblocking_length)
-        );
+        if (nonblocking_length > 0) {
+            incoming.info.push(
+                make_info_packet("log", incoming.data, 0, nonblocking_length)
+            );
+        }
 
         var total_iac_length = 0;
 

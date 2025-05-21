@@ -101,6 +101,15 @@ function msdp_init() {
     }
 }
 
+function msdp_flush() {
+    if (msdp.outgoing.length > 0) {
+        let outgoing = msdp.outgoing;
+        msdp.outgoing = [];
+
+        amc_send_bytes(outgoing);
+    }
+}
+
 function msdp_handler() {
     if (netio.server.msdp === true && msdp.enabled === false) {
         msdp.enabled = true;
@@ -108,12 +117,7 @@ function msdp_handler() {
     }
 
     do {
-        if (msdp.outgoing.length > 0) {
-            let outgoing = msdp.outgoing;
-            msdp.outgoing = [];
-
-            amc_send_bytes(outgoing);
-        }
+        msdp_flush();
 
         if (msdp.incoming.length > 0) {
             msdp_handle_incoming();
@@ -137,18 +141,33 @@ function msdp_configure_variable(variable) {
             break;
         }
     }
+
+    msdp_flush();
+}
+
+function msdp_send_variable(variable) {
+    msdp.outgoing.push(
+        ...msdp_serialize_sb( { SEND : variable } )
+    );
+
+    msdp_flush();
+    console.log("asking "+variable);
 }
 
 function msdp_report_variable(variable) {
     msdp.outgoing.push(
         ...msdp_serialize_sb( { REPORT : variable } )
     );
+
+    msdp_flush();
 }
 
 function msdp_unreport_variable(variable) {
     msdp.outgoing.push(
         ...msdp_serialize_sb( { UNREPORT : variable } )
     );
+
+    msdp_flush();
 }
 
 function msdp_configure_variables() {
@@ -389,6 +408,10 @@ function msdp_handle_variable(key, value) {
         }
         case "ENERGY": {
             amc_event_change_energy(value);
+            break;
+        }
+        case "CHARACTER_NAME": {
+            amc_event_change_character(value);
             break;
         }
     }

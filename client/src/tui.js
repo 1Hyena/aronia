@@ -108,11 +108,22 @@ function amc_tui_draw_room(map, room) {
                 }
                 else value = "?";
             }
+            else if (y === Math.floor(room.h/2)) {
+                if (x === Math.floor(room.w/2) + 1) {
+                    value = "↑";
+                    type = "exit-u";
+                }
+                else if (x === Math.floor(room.w/2) - 1) {
+                    value = "↓";
+                    type = "exit-d";
+                }
+            }
 
             map[top_left_y + y][top_left_x + x] = {
                 sector: room.key,
                 symbol: value,
-                type: type
+                type: type,
+                border: true
             };
         }
     }
@@ -138,7 +149,7 @@ function amc_tui_create_mainview(cols, rows) {
         {
             x: Math.floor(cols / 2),
             y: Math.floor(rows / 2),
-            w: cols - 10,
+            w: cols - 12,
             h: rows - 6,
             key: "origin"
         },
@@ -202,7 +213,8 @@ function amc_tui_create_mainview(cols, rows) {
         map[y][x] = {
             sector: src.sector,
             symbol: sym,
-            type: src.type
+            type: src.type,
+            border: false
         };
 
         if (sym === "│") {
@@ -227,12 +239,16 @@ function amc_tui_create_mainview(cols, rows) {
             }
 
             let span = document.createElement("span");
-            span.appendChild(document.createTextNode(room.symbol));
+            span.appendChild(document.createTextNode(" "));
             span.classList.add("amc-room-"+room.sector);
             span.setAttribute("data-symbol", room.symbol);
 
             if (room.type !== null) {
                 span.classList.add("amc-room-"+room.type);
+            }
+
+            if (room.border === true) {
+                span.classList.add("amc-room-border");
             }
 
             view.appendChild(span);

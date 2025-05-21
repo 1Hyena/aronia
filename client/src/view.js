@@ -77,7 +77,9 @@ function amc_view_update_sectors(msdp_var) {
         "amc-room-exit-n": null,
         "amc-room-exit-s": null,
         "amc-room-exit-e": null,
-        "amc-room-exit-w": null
+        "amc-room-exit-w": null,
+        "amc-room-exit-u": null,
+        "amc-room-exit-d": null
     };
 
     let sector_type = msdp.variables[msdp_var];
@@ -90,6 +92,10 @@ function amc_view_update_sectors(msdp_var) {
         let el = elements[i];
 
         if (sector_type !== "") {
+            if (el.getAttribute("data-sector") !== sector_type) {
+                el.setAttribute("data-sector", sector_type);
+            }
+
             let classes = el.className.split(" ");
             let found = false;
 
@@ -102,6 +108,11 @@ function amc_view_update_sectors(msdp_var) {
 
             if (found) {
                 continue;
+            }
+        }
+        else {
+            if (el.hasAttribute("data-sector")) {
+                el.removeAttribute("data-sector");
             }
         }
 
@@ -129,7 +140,9 @@ function amc_view_update_exits(msdp_var) {
         N: "amc-room-exit-n",
         S: "amc-room-exit-s",
         E: "amc-room-exit-e",
-        W: "amc-room-exit-w"
+        W: "amc-room-exit-w",
+        U: "amc-room-exit-u",
+        D: "amc-room-exit-d"
     };
 
     let msdp_var_to_class_map = {
