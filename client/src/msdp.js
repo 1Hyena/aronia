@@ -65,6 +65,7 @@ var msdp = {
         SECTOR_SE : null,
         SECTOR_SW : null
     },
+    renewing : {},
     incoming : [],
     outgoing : []
 };
@@ -151,6 +152,8 @@ function msdp_send_variable(variable) {
     );
 
     msdp_flush();
+
+    msdp.renewing[variable] = undefined;
 }
 
 function msdp_report_variable(variable) {
@@ -385,7 +388,10 @@ function msdp_handle_variable(key, value) {
         return;
     }
 
-    if (JSON.stringify(value) === JSON.stringify(msdp.variables[key])) {
+    if (key in msdp.renewing) {
+        delete msdp.renewing[key];
+    }
+    else if (JSON.stringify(value) === JSON.stringify(msdp.variables[key])) {
         return;
     }
 

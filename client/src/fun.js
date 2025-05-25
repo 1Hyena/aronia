@@ -18,7 +18,7 @@ function amc_show_mudstate(state) {
             break;
         }
         case "account-menu": {
-            amc_show_message(container, "");
+            amc_show_message(container, "Account menu");
             break;
         }
         case "login-manual": {
