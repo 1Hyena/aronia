@@ -136,8 +136,8 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-zoneview-wrapper,
 #amc-statview-wrapper,
 #amc-roomview-wrapper,
-#amc-eqview-wrapper,
-#amc-inventory-view-wrapper {
+#amc-gearview-wrapper,
+#amc-itemview-wrapper {
     position: absolute;
     top: 0;
     left: 0;
@@ -160,8 +160,8 @@ div.amc-chat-public > span:nth-of-type(4) {
 }
 
 #amc-roomview-wrapper,
-#amc-eqview-wrapper,
-#amc-inventory-view-wrapper,
+#amc-gearview-wrapper,
+#amc-itemview-wrapper,
 #amc-statview-wrapper,
 #amc-chatview-wrapper {
     font-size: 16px;
@@ -176,6 +176,21 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-chatview {
     white-space: pre-wrap;
     word-wrap: break-word;
+}
+
+#amc-roomview {
+    white-space: pre;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#amc-roomview > div {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+#amc-roomview-desc::before {
+    content: "  ";
 }
 
 #amc-terminal {

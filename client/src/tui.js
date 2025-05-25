@@ -265,6 +265,31 @@ function amc_tui_create_mainview(cols, rows) {
     return mainview;
 }
 
+function amc_tui_create_roomview() {
+    let roomview = document.createElement("div");
+
+    roomview.id = "amc-roomview";
+
+    let room_name = document.createElement("div");
+    let room_desc = document.createElement("div");
+    let room_exit = document.createElement("div");
+
+    room_name.id = "amc-roomview-name";
+    room_desc.id = "amc-roomview-desc";
+    room_exit.id = "amc-roomview-exits";
+
+    room_name.classList.add("ansi-fg-white", "ansi-fg");
+    room_desc.classList.add("ans-fg-black", "ans-fg", "ans-b");
+    room_exit.classList.add("ans-fg-green", "ans-fg");
+
+    roomview.appendChild(room_name);
+    roomview.appendChild(room_desc);
+    roomview.appendChild(document.createTextNode("\n"));
+    roomview.appendChild(room_exit);
+
+    return roomview;
+}
+
 function amc_tui_create_login_form() {
     var form = document.createElement("form");
     var table = document.createElement("table");
@@ -738,23 +763,5 @@ function amc_tui_get_inventory_placeholder() {
         "(3) a yellow potion\n"+
         "a beaverskin bracer\n"+
         "a runed elven scroll\n"
-    );
-}
-
-function amc_tui_get_roomview_placeholder() {
-    return (
-        "A small clearing\n"+
-        "  You are in a small clearing in the shadow grove. There is\n"+
-        "charred grass underfoot, and the signs of fire here and\n"+
-        "there. It is almost as if the plant life shuns this spot.\n"+
-        "The shadowy mist hovers all around, obscuring your view into\n"+
-        "the grove.\n"+
-        "  A small path leads east to some shadowy structure. All\n"+
-        "other exits are shrouded in shadowy mist.\n"+
-        "\n"+
-        " [Exits: north east west]\n"+
-        "A shadow guardian screams a challenge and attacks.\n"+
-        "A shadow guardian screams a challenge and attacks.\n"+
-        "An emaciated adventurer is here looking lost and hopeless.\n"
     );
 }

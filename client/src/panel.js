@@ -585,10 +585,19 @@ function amc_init_panel(width, height) {
     );
 
     amc_init_statview(document.getElementById("amc-panel-char-sheet"));
-
-    amc_init_eqview(document.getElementById("amc-panel-below-char-sheet-1st"));
-    amc_init_inventory_view(document.getElementById("amc-panel-bottom-left"));
+    amc_init_gearview(document.getElementById("amc-panel-below-char-sheet-1st"));
+    amc_init_itemview(document.getElementById("amc-panel-bottom-left"));
     amc_init_roomview(document.getElementById("amc-panel-below-top-right"));
+
+    if (msdp.lists.REPORTABLE_VARIABLES !== null) {
+        for (let i=0; i<msdp.lists.REPORTABLE_VARIABLES.length; ++i) {
+            let key = msdp.lists.REPORTABLE_VARIABLES[i];
+
+            if (key in msdp.variables && msdp.variables[key] !== null) {
+                msdp_update_variable(key, msdp.variables[key]);
+            }
+        }
+    }
 
     return;
 }

@@ -226,19 +226,19 @@ function amc_init_zoneview(container) {
     container.appendChild(wrapper);
 }
 
-function amc_init_eqview(container) {
+function amc_init_gearview(container) {
     if (container === null) {
         return;
     }
 
-    if (document.getElementById("amc-eqview-wrapper") !== null) {
+    if (document.getElementById("amc-gearview-wrapper") !== null) {
         bug();
         return;
     }
 
     var wrapper = document.createElement("div");
 
-    wrapper.id = "amc-eqview-wrapper";
+    wrapper.id = "amc-gearview-wrapper";
 
     var placeholder = document.createElement("pre");
 
@@ -251,19 +251,19 @@ function amc_init_eqview(container) {
     container.appendChild(wrapper);
 }
 
-function amc_init_inventory_view(container) {
+function amc_init_itemview(container) {
     if (container === null) {
         return;
     }
 
-    if (document.getElementById("amc-inventory-view-wrapper") !== null) {
+    if (document.getElementById("amc-itemview-wrapper") !== null) {
         bug();
         return;
     }
 
     var wrapper = document.createElement("div");
 
-    wrapper.id = "amc-inventory-view-wrapper";
+    wrapper.id = "amc-itemview-wrapper";
 
     var placeholder = document.createElement("pre");
 
@@ -290,15 +290,67 @@ function amc_init_roomview(container) {
 
     wrapper.id = "amc-roomview-wrapper";
 
-    var placeholder = document.createElement("pre");
+    wrapper.appendChild(amc_tui_create_roomview());
 
-    placeholder.appendChild(
-        document.createTextNode(amc_tui_get_roomview_placeholder())
-    );
+    container.replaceChildren(wrapper);
+}
 
-    wrapper.appendChild(placeholder);
+function amc_view_update_room(msdp_var) {
+    let msdp_var_to_id_map = {
+        ROOM_NAME: "amc-roomview-name",
+        ROOM_DESC: "amc-roomview-desc",
+        EXIT_INFO: "amc-roomview-exits"
+    };
 
-    container.appendChild(wrapper);
+    if (msdp_var in msdp_var_to_id_map == false
+    ||  msdp_var in msdp.variables == false
+    ||  msdp.variables[msdp_var] === null) {
+        bug();
+        return;
+    }
+
+    let el = document.getElementById(msdp_var_to_id_map[msdp_var]);
+
+    if (el === null) {
+        return;
+    }
+
+    switch (msdp_var) {
+        case "ROOM_NAME":
+        case "ROOM_DESC": {
+            if (el.textContent !== msdp.variables[msdp_var]) {
+                el.replaceChildren(
+                    document.createTextNode(msdp.variables[msdp_var])
+                );
+            }
+
+            break;
+        }
+        case "EXIT_INFO": {
+            let oldval = el.textContent;
+            let newval = "";
+
+            if (msdp.variables.ROOM_NAME) {
+                let exits = Object.keys(msdp.variables[msdp_var]);
+
+                if (exits.length === 0) {
+                    exits.push("none");
+                }
+
+                newval = "Exits: "+exits.join(" ");
+            }
+
+            if (oldval !== newval) {
+                el.replaceChildren(document.createTextNode(newval));
+            }
+
+            break;
+        }
+        default: {
+            bug();
+            break;
+        }
+    }
 }
 
 function amc_init_statview(container) {
@@ -330,16 +382,6 @@ function amc_init_statview(container) {
     amc_text_to_tui_class("amc-statview-label-int", "INT:");
     amc_text_to_tui_class("amc-statview-label-wis", "WIS:");
     amc_text_to_tui_class("amc-statview-label-con", "CON:");
-
-    if (msdp.lists.REPORTABLE_VARIABLES !== null) {
-        for (let i=0; i<msdp.lists.REPORTABLE_VARIABLES.length; ++i) {
-            let key = msdp.lists.REPORTABLE_VARIABLES[i];
-
-            if (key in msdp.variables && msdp.variables[key] !== null) {
-                msdp_update_variable(key, msdp.variables[key]);
-            }
-        }
-    }
 }
 
 function amc_view_update_character_title() {

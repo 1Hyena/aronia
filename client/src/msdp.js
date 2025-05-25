@@ -63,7 +63,11 @@ var msdp = {
         SECTOR_NE : null,
         SECTOR_NW : null,
         SECTOR_SE : null,
-        SECTOR_SW : null
+        SECTOR_SW : null,
+        ROOM_NAME : null,
+        ROOM_AREA : null,
+        ROOM_DESC : null,
+        EXIT_INFO : null
     },
     renewing : {},
     incoming : [],
@@ -232,6 +236,12 @@ function msdp_update_variable(key, value) {
         case "SECTOR_SE":
         case "SECTOR_SW": {
             amc_view_update_sectors(key);
+            break;
+        }
+        case "ROOM_NAME":
+        case "ROOM_DESC":
+        case "EXIT_INFO": {
+            amc_view_update_room(key);
             break;
         }
         case "ACCOUNT_NAME": {
