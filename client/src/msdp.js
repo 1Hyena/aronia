@@ -223,7 +223,7 @@ function msdp_update_variable(key, value) {
         case "EXITS_NW":
         case "EXITS_SE":
         case "EXITS_SW": {
-            amc_view_update_exits(key);
+            amc_update_mainview_exits(key);
             break;
         }
         case "SECTOR":
@@ -235,28 +235,28 @@ function msdp_update_variable(key, value) {
         case "SECTOR_NW":
         case "SECTOR_SE":
         case "SECTOR_SW": {
-            amc_view_update_sectors(key);
+            amc_update_mainview_sectors(key);
             break;
         }
         case "ROOM_NAME":
         case "ROOM_DESC":
         case "EXIT_INFO": {
-            amc_view_update_room(key);
+            amc_update_roomview(key);
             break;
         }
         case "ACCOUNT_NAME": {
             break;
         }
         case "CHARACTER_NAME": {
-            amc_view_update_character_title();
+            amc_update_statview_character_title();
             break;
         }
         case "CHARACTER_RACE": {
-            amc_view_update_character_title();
+            amc_update_statview_character_title();
             break;
         }
         case "CHARACTER_CLASS": {
-            amc_view_update_character_title();
+            amc_update_statview_character_title();
             break;
         }
         case "SERVER_ID": {
@@ -269,43 +269,43 @@ function msdp_update_variable(key, value) {
             break;
         }
         case "EXPERIENCE": {
-            amc_view_update_xp();
+            amc_update_statview_xp();
             break;
         }
         case "EXPERIENCE_TNL": {
-            amc_view_update_xp();
+            amc_update_statview_xp();
             break;
         }
         case "EXPERIENCE_TNL_MAX": {
-            amc_view_update_xp();
+            amc_update_statview_xp();
             break;
         }
         case "HEALTH": {
             amc_text_to_tui_class("amc-statview-health", value, "right");
-            amc_view_update_health_bar();
+            amc_update_statview_health_bar();
             break;
         }
         case "HEALTH_MAX": {
             amc_text_to_tui_class(
                 "amc-statview-health-max", value.padStart(4, " ")
             );
-            amc_view_update_health_bar();
+            amc_update_statview_health_bar();
             break;
         }
         case "ENERGY": {
             amc_text_to_tui_class("amc-statview-energy", value, "right");
-            amc_view_update_energy_bar();
+            amc_update_statview_energy_bar();
             break;
         }
         case "ENERGY_MAX": {
             amc_text_to_tui_class(
                 "amc-statview-energy-max", value.padStart(4, " ")
             );
-            amc_view_update_energy_bar();
+            amc_update_statview_energy_bar();
             break;
         }
         case "LEVEL": {
-            amc_view_update_xp();
+            amc_update_statview_xp();
             break;
         }
         case "MONEY": {

@@ -11,6 +11,8 @@ function amc_show_message(container, message) {
 function amc_show_mudstate(state) {
     var container = document.getElementById("amc-panel-central-top");
 
+    global.mud.state = state;
+
     switch (state) {
         case "login-wrong-password":
         case "login" : {
@@ -25,7 +27,7 @@ function amc_show_mudstate(state) {
             amc_show_message(container, "Please use the console to sign in.");
             break;
         }
-        case "": {
+        case "in-game": {
             amc_init_mainview(container);
             break;
         }

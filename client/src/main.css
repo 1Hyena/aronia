@@ -179,9 +179,14 @@ div.amc-chat-public > span:nth-of-type(4) {
 }
 
 #amc-roomview {
+    display: none;
     white-space: pre;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+#amc[data-mudstate="in-game"] #amc-roomview {
+    display: initial;
 }
 
 #amc-roomview > div {
@@ -189,8 +194,12 @@ div.amc-chat-public > span:nth-of-type(4) {
     overflow: hidden;
 }
 
-#amc-roomview-desc::before {
+#amc-roomview[data-room] #amc-roomview-desc::before {
     content: "  ";
+}
+
+#amc-roomview:not([data-room]) #amc-roomview-exit-info {
+    display: none;
 }
 
 #amc-terminal {

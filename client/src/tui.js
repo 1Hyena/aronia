@@ -243,15 +243,15 @@ function amc_tui_create_mainview(cols, rows) {
 
             let span = document.createElement("span");
             span.appendChild(document.createTextNode(" "));
-            span.classList.add("amc-room-"+room.sector);
+            span.classList.add("amc-mainview-room-"+room.sector);
             span.setAttribute("data-symbol", room.symbol);
 
             if (room.type !== null) {
-                span.classList.add("amc-room-"+room.type);
+                span.classList.add("amc-mainview-room-"+room.type);
             }
 
             if (room.border === true) {
-                span.classList.add("amc-room-border");
+                span.classList.add("amc-mainview-room-border");
             }
 
             view.appendChild(span);
@@ -272,20 +272,52 @@ function amc_tui_create_roomview() {
 
     let room_name = document.createElement("div");
     let room_desc = document.createElement("div");
-    let room_exit = document.createElement("div");
+    let exit_info = document.createElement("div");
 
     room_name.id = "amc-roomview-name";
     room_desc.id = "amc-roomview-desc";
-    room_exit.id = "amc-roomview-exits";
+    exit_info.id = "amc-roomview-exit-info";
 
     room_name.classList.add("ansi-fg-white", "ansi-fg");
     room_desc.classList.add("ans-fg-black", "ans-fg", "ans-b");
-    room_exit.classList.add("ans-fg-green", "ans-fg");
+
+    let exits = [
+        "none", "north", "east", "south", "west", "up", "down"
+    ];
+
+    let exit_info_label = document.createElement("span");
+
+    exit_info_label.appendChild(document.createTextNode("Exits: "));
+    exit_info_label.classList.add("ans-fg-green", "ans-fg");
+    exit_info.appendChild(exit_info_label);
+
+    for (let i=0; i<exits.length; ++i) {
+        let dir_span = document.createElement("span");
+        let dir_span_prefix = document.createElement("span");
+        let dir_span_label  = document.createElement("span");
+        let dir_span_suffix = document.createElement("span");
+
+        if (i > 0) {
+            dir_span_label.classList.add("ans-fg-green", "ans-fg");
+        }
+
+        dir_span.id = "amc-roomview-exit-"+exits[i];
+        dir_span_label.id = dir_span.id+"-label";
+        dir_span_prefix.id = dir_span.id+"-prefix";
+        dir_span_suffix.id = dir_span.id+"-suffix";
+        dir_span_label.appendChild(document.createTextNode(exits[i]));
+
+        dir_span.appendChild(dir_span_prefix);
+        dir_span.appendChild(dir_span_label);
+        dir_span.appendChild(dir_span_suffix);
+
+        exit_info.appendChild(dir_span);
+    }
 
     roomview.appendChild(room_name);
     roomview.appendChild(room_desc);
     roomview.appendChild(document.createTextNode("\n"));
-    roomview.appendChild(room_exit);
+    roomview.appendChild(exit_info);
 
     return roomview;
 }

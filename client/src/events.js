@@ -26,6 +26,7 @@ function amc_event_change_energy(value) {
 
 function amc_event_change_character(value) {
     if (value.length === 0) {
+        amc_show_mudstate("");
         return;
     }
 
@@ -38,7 +39,7 @@ function amc_event_change_character(value) {
         "EXIT_INFO"
     ];
 
-    amc_show_mudstate("");
+    amc_show_mudstate("in-game");
 
     for (let i=0; i<mainview_variables.length; ++i) {
         msdp_send_variable(mainview_variables[i]);
