@@ -36,7 +36,7 @@ function amc_event_change_character(value) {
         "EXITS_SW",     "SECTOR",       "SECTOR_N",     "SECTOR_S",
         "SECTOR_E",     "SECTOR_W",     "SECTOR_NE",    "SECTOR_NW",
         "SECTOR_SE",    "SECTOR_SW",    "ROOM_NAME",    "ROOM_DESC",
-        "EXIT_INFO"
+        "EXIT_INFO",    "ROOM_ITEM_LIST"
     ];
 
     amc_show_mudstate("in-game");

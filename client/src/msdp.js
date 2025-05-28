@@ -67,7 +67,8 @@ var msdp = {
         ROOM_NAME : null,
         ROOM_AREA : null,
         ROOM_DESC : null,
-        EXIT_INFO : null
+        EXIT_INFO : null,
+        ROOM_ITEM_LIST : null
     },
     renewing : {},
     incoming : [],
@@ -156,7 +157,6 @@ function msdp_send_variable(variable) {
     );
 
     msdp_flush();
-
     msdp.renewing[variable] = undefined;
 }
 
