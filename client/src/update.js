@@ -175,7 +175,6 @@ function amc_update_roomview(msdp_var) {
     switch (msdp_var) {
         case "ROOM_NAME": {
             let roomview = document.getElementById("amc-roomview");
-            let roomname = msdp.variables[msdp_var];
 
             if (msdp.variables[msdp_var] == false) {
                 if (roomview.hasAttribute("data-room")) {
@@ -183,16 +182,33 @@ function amc_update_roomview(msdp_var) {
                 }
             }
             else {
+                let roomname = msdp.variables[msdp_var];
+                let fragment = new DocumentFragment();
+
+                terminal_data_to_node(roomname, fragment);
+
+                roomname = fragment.textContent;
+
                 if (roomview.getAttribute("data-room") !== roomname) {
                     roomview.setAttribute("data-room", roomname);
                 }
+
+                fragment.appendChild(document.createTextNode("\n"));
+
+                el.replaceChildren(fragment);
             }
+
+            break;
         }
         case "ROOM_DESC": {
-            if (el.textContent !== msdp.variables[msdp_var]) {
-                el.replaceChildren(
-                    document.createTextNode(msdp.variables[msdp_var])
-                );
+            let roomdesc = msdp.variables[msdp_var];
+            let fragment = new DocumentFragment();
+
+            terminal_data_to_node(roomdesc, fragment);
+            roomdesc = fragment.textContent;
+
+            if (el.textContent !== roomdesc) {
+                el.replaceChildren(fragment);
             }
 
             break;

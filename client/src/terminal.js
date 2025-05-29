@@ -313,7 +313,43 @@ function terminal_deserialize_esc(data) {
     return state;
 }
 
-function terminal_print_to_node(string, ansi, output) {
+function terminal_data_to_node(data, output) {
+    if (typeof data === 'string' || data instanceof String) {
+        let encoder = new TextEncoder();
+        data = Array.from(encoder.encode(data));
+    }
+
+    let packets = terminal_deserialize(data);
+    let state = {};
+    let decoder = new TextDecoder();
+
+    for (let i=0; i<packets.length; ++i) {
+        let packet = packets[i];
+
+        if (packet.type === "esc") {
+            let state_changes = terminal_deserialize_esc(packet.data);
+
+            for (const [key, value] of Object.entries(state_changes)) {
+                state[key] = value;
+            }
+
+            continue;
+        }
+        else if (packet.type !== "txt") {
+            continue;
+        }
+
+        let unicode = decoder.decode(new Uint8Array(packet.data), {stream: true});
+
+        if (unicode.length > 0) {
+            terminal_text_to_node(unicode, output, state);
+        }
+    }
+}
+
+function terminal_text_to_node(string, output, ansi) {
+    ansi = typeof ansi !== 'undefined' ? ansi : {};
+
     let plain = true;
 
     for (const [key, value] of Object.entries(ansi)) {
@@ -348,11 +384,11 @@ function terminal_print_to_node(string, ansi, output) {
             let span = document.createElement("span");
             span.appendChild(document.createTextNode(string));
 
-            if (ansi.fg !== null) {
+            if ("fg" in ansi && ansi.fg !== null) {
                 span.classList.add("ans-fg-"+ansi.fg);
                 span.classList.add("ans-fg");
 
-                if (ansi.bold === true) {
+                if ("bold" in ansi && ansi.bold === true) {
                     span.setAttribute("data-fg", "hi-"+ansi.fg);
                 }
                 else {
@@ -360,35 +396,35 @@ function terminal_print_to_node(string, ansi, output) {
                 }
             }
 
-            if (ansi.bold === true) {
+            if ("bold" in ansi && ansi.bold === true) {
                 span.classList.add("ans-b");
             }
 
-            if (ansi.italic === true) {
+            if ("italic" in ansi && ansi.italic === true) {
                 span.classList.add("ans-italic");
             }
 
-            if (ansi.faint === true) {
+            if ("faint" in ansi && ansi.faint === true) {
                 span.classList.add("ans-faint");
             }
 
-            if (ansi.underline === true) {
+            if ("underline" in ansi && ansi.underline === true) {
                 span.classList.add("ans-underline");
             }
 
-            if (ansi.reverse === true) {
+            if ("reverse" in ansi && ansi.reverse === true) {
                 span.classList.add("ans-reverse");
             }
 
-            if (ansi.blinking === true) {
+            if ("blinking" in ansi && ansi.blinking === true) {
                 span.classList.add("ans-blinking");
             }
 
-            if (ansi.strikethrough === true) {
+            if ("strikethrough" in ansi && ansi.strikethrough === true) {
                 span.classList.add("ans-strikethrough");
             }
 
-            if (ansi.hidden === true) {
+            if ("hidden" in ansi && ansi.hidden === true) {
                 span.classList.add("ans-hidden");
             }
 

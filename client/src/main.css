@@ -181,17 +181,10 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-roomview {
     display: none;
     white-space: pre;
-    text-overflow: ellipsis;
-    overflow: hidden;
 }
 
 #amc[data-mudstate="in-game"] #amc-roomview {
     display: initial;
-}
-
-#amc-roomview > div {
-    text-overflow: ellipsis;
-    overflow: hidden;
 }
 
 #amc-roomview[data-room] #amc-roomview-desc::before {

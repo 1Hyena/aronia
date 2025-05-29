@@ -791,8 +791,6 @@ function amc_print(string, ansi) {
 }
 
 function amc_print_to_buffer(string, ansi) {
-    ansi = typeof ansi !== 'undefined' ? ansi : {};
-
     if (string.length === 0) {
         return;
     }
@@ -801,5 +799,5 @@ function amc_print_to_buffer(string, ansi) {
         global.mud.log.buffer = new DocumentFragment();
     }
 
-    terminal_print_to_node(string, ansi, global.mud.log.buffer);
+    terminal_text_to_node(string, global.mud.log.buffer, ansi);
 }
