@@ -156,7 +156,8 @@ function amc_update_roomview(msdp_var) {
     let msdp_var_to_id_map = {
         ROOM_NAME: "amc-roomview-name",
         ROOM_DESC: "amc-roomview-desc",
-        EXIT_INFO: "amc-roomview-exit-info"
+        EXIT_INFO: "amc-roomview-exit-info",
+        ROOM_ITEM_LIST: "amc-roomview-item-list"
     };
 
     if (msdp_var in msdp_var_to_id_map == false
@@ -208,6 +209,25 @@ function amc_update_roomview(msdp_var) {
             roomdesc = fragment.textContent;
 
             if (el.textContent !== roomdesc) {
+                el.replaceChildren(fragment);
+            }
+
+            break;
+        }
+        case "ROOM_ITEM_LIST": {
+            let item_list = msdp.variables[msdp_var];
+
+            if (item_list == false) {
+                item_list = [];
+            }
+
+            item_list = "\n"+item_list.join("\n");
+            let fragment = new DocumentFragment();
+
+            terminal_data_to_node(item_list, fragment);
+            item_list = fragment.textContent;
+
+            if (el.textContent !== item_list) {
                 el.replaceChildren(fragment);
             }
 

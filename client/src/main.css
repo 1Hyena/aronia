@@ -118,6 +118,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     font-style: italic;
 }
 
+#amc-roomview-wrapper,
 #amc-noteview-wrapper,
 #amc-terminal-wrapper {
     position: absolute;
@@ -135,7 +136,6 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-inputbar-wrapper,
 #amc-zoneview-wrapper,
 #amc-statview-wrapper,
-#amc-roomview-wrapper,
 #amc-gearview-wrapper,
 #amc-itemview-wrapper {
     position: absolute;
@@ -146,6 +146,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     overflow: hidden;
 }
 
+#amc-roomview-wrapper,
 #amc-terminal-wrapper {
     top: -14px;
     right: -2px;

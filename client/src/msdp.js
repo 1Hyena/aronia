@@ -238,6 +238,7 @@ function msdp_update_variable(key, value) {
             amc_update_mainview_sectors(key);
             break;
         }
+        case "ROOM_ITEM_LIST":
         case "ROOM_NAME":
         case "ROOM_DESC":
         case "EXIT_INFO": {
@@ -517,7 +518,13 @@ function msdp_deserialize_array(bin, length, start) {
             }
             case msdp.ARRAY_CLOSE: {
                 if (--depth === 0) {
-                    let obj = msdp_deserialize(bin, i, start + 1);
+                    let next_length = i;
+                    let next_start = start + 1;
+                    let obj = [];
+
+                    if (next_start < next_length) {
+                        obj = msdp_deserialize(bin, next_length, next_start);
+                    }
 
                     if (obj !== null) {
                         obj = {
