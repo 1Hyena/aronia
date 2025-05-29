@@ -77,9 +77,9 @@ var msdp = {
 
 function msdp_serialize_sb(obj) {
     return [
-        netio.IAC, netio.SB, netio.MSDP,
+        telnet.IAC, telnet.SB, telnet.MSDP,
         ...msdp_serialize(obj),
-        netio.IAC, netio.SE
+        telnet.IAC, telnet.SE
     ];
 }
 
@@ -117,7 +117,7 @@ function msdp_flush() {
 }
 
 function msdp_handler() {
-    if (netio.server.msdp === true && msdp.enabled === false) {
+    if (telnet.server.msdp === true && msdp.enabled === false) {
         msdp.enabled = true;
         msdp_init();
     }

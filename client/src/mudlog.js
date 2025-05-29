@@ -1,113 +1,5 @@
 "use strict";
 
-function get_esc_nonblocking_length(txt) {
-    for (let i = 0, length = txt.length; i < length; ++i) {
-        if (txt[i] != 27) {
-            continue;
-        }
-
-        return i;
-    }
-
-    return txt.length;
-}
-
-function get_esc_sequence_length(data, start, size) {
-    var esc_active = false;
-    var i = start;
-
-    for (; i < start + size; ++i) {
-        if (!esc_active) {
-            if (data[i] == 27) {
-                esc_active = true;
-
-                continue;
-            }
-
-            return 0;
-        }
-
-        switch (data[i]) {
-            case 32: { // space
-                let j = i + 1;
-
-                if (j < start + size) {
-                    let seqlen = j - start + 1;
-                    let c = data[j];
-
-                    if (c === "M".charCodeAt(0)
-                    ||  c === "7".charCodeAt(0)
-                    ||  c === "8".charCodeAt(0)) {
-                        return seqlen;
-                    }
-                    else return 1; // invalid sequence
-                }
-
-                return 0; // impartial sequence
-            }
-            case 91: { // [
-                for (let j=i+1; j < start + size ; ++j) {
-                    let seqlen = j - start + 1;
-                    let c = data[j];
-
-                    if (c !== ";".charCodeAt(0)
-                    && (c < "0".charCodeAt(0) || c > "9".charCodeAt(0))) {
-                        if (c === "m".charCodeAt(0) // colors
-                        ||  c === "n".charCodeAt(0) // request cursor position
-                        ||  c === "H".charCodeAt(0) // move cursor
-                        ||  c === "J".charCodeAt(0) // erasing
-                        ||  c === "K".charCodeAt(0) // erasing
-                        ||  c === "f".charCodeAt(0)) { // move cursor
-                            return seqlen;
-                        }
-                        else if (c === "#".charCodeAt(0)) { // move cursor
-                            if (j + 1 < start + size) {
-                                return seqlen + 1;
-                            }
-                            else return 0;
-                        }
-                        else if (c === "H".charCodeAt(0)
-                        || c === "J".charCodeAt(0)
-                        || c === "K".charCodeAt(0)
-                        || c === "s".charCodeAt(0)
-                        || c === "u".charCodeAt(0)) {
-                            if (seqlen === 3) {
-                                return seqlen;
-                            }
-                        }
-                        else { // unknown sequence
-                            return 1;
-                        }
-                    }
-                }
-
-                return 0; // impartial sequence
-            }
-            case 93: { // ]
-                if (i+3 < start + size
-                &&  data[i+1] === "0".charCodeAt(0)
-                &&  data[i+2] === ";".charCodeAt(0)) {
-                    for (let j=i+3; j < start + size ; ++j) {
-                        let seqlen = j - start + 1;
-                        let c = data[j];
-
-                        if (c === 7) {
-                            return seqlen;
-                        }
-                    }
-                }
-
-                return 0; // impartial sequence
-            }
-            default: break;
-        }
-
-        return 1; // unknown sequence
-    }
-
-    return 0; // impartial sequence
-}
-
 function amc_handle_log(data) {
     if (data.length === 0) {
         return;
@@ -118,95 +10,68 @@ function amc_handle_log(data) {
     data = global.mud.log.data;
     global.mud.log.data = [];
 
-    do {
-        if (!data.length) {
-            return;
+    let info = telnet_deserialize(data);
+
+    let remaining = [];
+
+    while (info.length > 0) {
+        let packet = info.shift();
+
+        if (packet.type !== "log" && remaining.length === 0) {
+            global.mud.incoming.info.push(packet);
+            continue;
         }
 
-        var nonblocking_length = get_esc_nonblocking_length(data);
-        var blocked_length = data.length - nonblocking_length;
+        remaining.push(...packet.data);
+    }
 
-        if (nonblocking_length > 0) {
-            global.mud.incoming.info.push(
-                make_info_packet("txt", data, 0, nonblocking_length)
-            );
-        }
-
-        var total_esc_length = 0;
-
-        do {
-            var esc_length = get_esc_sequence_length(
-                data, nonblocking_length + total_esc_length,
-                blocked_length - total_esc_length
-            );
-
-            if (!esc_length) {
-                break;
-            }
-
-            global.mud.incoming.info.push(
-                make_info_packet(
-                    "esc", data,
-                    nonblocking_length + total_esc_length, esc_length
-                )
-            );
-
-            total_esc_length += esc_length;
-        } while (true);
-
-        data = data.slice(nonblocking_length + total_esc_length);
-
-        if (!total_esc_length) {
-            break;
-        }
-    } while (true);
-
-    data.push(...global.mud.log.data);
-    global.mud.log.data = data;
+    remaining.push(...data);
+    remaining.push(...global.mud.log.data);
+    global.mud.log.data = remaining;
 }
 
 function amc_handle_iac(data) {
     if (data.length === 2) {
-        if (data[0] !== netio.IAC) {
+        if (data[0] !== telnet.IAC) {
             bug();
             return;
         }
 
-        if (data[1] === netio.EOR) {
+        if (data[1] === telnet.EOR) {
             amc_flush_printer();
         }
     }
     else if (data.length === 3) {
-        if (data[0] !== netio.IAC) {
+        if (data[0] !== telnet.IAC) {
             bug();
             return;
         }
 
-        if (data[1] === netio.WILL && data[2] === netio.TELOPT_EOR) {
-            amc_send_bytes([ netio.IAC, netio.DO, netio.TELOPT_EOR ]);
+        if (data[1] === telnet.WILL && data[2] === telnet.TELOPT_EOR) {
+            amc_send_bytes([ telnet.IAC, telnet.DO, telnet.TELOPT_EOR ]);
 
-            netio.server.eor = true;
+            telnet.server.eor = true;
         }
-        else if (data[1] === netio.WILL && data[2] === netio.MSDP) {
-            amc_send_bytes([ netio.IAC, netio.DO, netio.MSDP ]);
+        else if (data[1] === telnet.WILL && data[2] === telnet.MSDP) {
+            amc_send_bytes([ telnet.IAC, telnet.DO, telnet.MSDP ]);
 
-            netio.server.msdp = true;
+            telnet.server.msdp = true;
             msdp_handler();
         }
-        else if (data[1] === netio.WILL) {
-            amc_send_bytes([ netio.IAC, netio.DONT, data[2] ]);
+        else if (data[1] === telnet.WILL) {
+            amc_send_bytes([ telnet.IAC, telnet.DONT, data[2] ]);
         }
     }
     else if (data.length > 5) {
-        if (data[0] !== netio.IAC) {
+        if (data[0] !== telnet.IAC) {
             bug();
             return;
         }
 
-        if (data[1] === netio.SB
-        &&  data[2] === netio.MSDP
-        &&  data[data.length-2] === netio.IAC
-        &&  data[data.length-1] === netio.SE) {
+        if (data[1] === telnet.SB
+        &&  data[2] === telnet.MSDP
+        &&  data[data.length-2] === telnet.IAC
+        &&  data[data.length-1] === telnet.SE) {
             msdp.incoming.push(data);
             msdp_handler();
         }
@@ -246,144 +111,22 @@ function amc_handle_txt(data) {
 }
 
 function amc_handle_esc(data) {
-    if (data.length > 3) {
-        if (data.length >= 5) {
-            if (data[0] === 27
-            &&  data[1] === 93
-            &&  data[2] === "0".charCodeAt(0)
-            &&  data[3] === ";".charCodeAt(0)
-            &&  data[data.length  - 1] === 7) {
-                global.title = String.fromCharCode(
-                    ...data.slice(4, data.length - 1)
-                );
+    let state = telnet_deserialize_esc(data);
 
-                return;
-            }
-        }
+    if ("title" in state) {
+        global.title = state.title;
+        delete state.title;
+    }
 
-        if (data[0] === 27
-        &&  data[1] === 91
-        &&  data[data.length - 1] === 109) {
-            let parts = String.fromCharCode(
-                ...data.slice(2, data.length - 1)
-            ).split(";");
-
-            for (let i=0; i<parts.length; ++i) {
-                let num = parseInt(parts[i], 10);
-
-                switch (num) {
-                    case 0: { // reset all
-                        let list = global.mud.log.ansi;
-
-                        for (const [key, value] of Object.entries(list)) {
-                            list[key] = null;
-                        }
-
-                        break;
-                    }
-                    case 1: {
-                        global.mud.log.ansi.bold = true;
-                        break;
-                    }
-                    case 2: {
-                        global.mud.log.ansi.faint = true;
-                        break;
-                    }
-                    case 3: {
-                        global.mud.log.ansi.italic = true;
-                        break;
-                    }
-                    case 4: {
-                        global.mud.log.ansi.underline = true;
-                        break;
-                    }
-                    case 5: {
-                        global.mud.log.ansi.blinking = true;
-                        break;
-                    }
-                    case 7: {
-                        global.mud.log.ansi.reverse = true;
-                        break;
-                    }
-                    case 8: {
-                        global.mud.log.ansi.hidden = true;
-                        break;
-                    }
-                    case 9: {
-                        global.mud.log.ansi.strikethrough = true;
-                        break;
-                    }
-                    case 22: {
-                        global.mud.log.ansi.bold = null;
-                        global.mud.log.ansi.faint = null;
-                    }
-                    case 23: {
-                        global.mud.log.ansi.italic = null;
-                    }
-                    case 24: {
-                        global.mud.log.ansi.underline = null;
-                    }
-                    case 25: {
-                        global.mud.log.ansi.blinking = null;
-                    }
-                    case 27: {
-                        global.mud.log.ansi.reverse = null;
-                    }
-                    case 28: {
-                        global.mud.log.ansi.hidden = null;
-                        break;
-                    }
-                    case 29: {
-                        global.mud.log.ansi.strikethrough = null;
-                        break;
-                    }
-                    case 30: {
-                        global.mud.log.ansi.fg = "black";
-                        break;
-                    }
-                    case 31: {
-                        global.mud.log.ansi.fg = "red";
-                        break;
-                    }
-                    case 32: {
-                        global.mud.log.ansi.fg = "green";
-                        break;
-                    }
-                    case 33: {
-                        global.mud.log.ansi.fg = "yellow";
-                        break;
-                    }
-                    case 34: {
-                        global.mud.log.ansi.fg = "blue";
-                        break;
-                    }
-                    case 35: {
-                        global.mud.log.ansi.fg = "magenta";
-                        break;
-                    }
-                    case 36: {
-                        global.mud.log.ansi.fg = "cyan";
-                        break;
-                    }
-                    case 37: {
-                        global.mud.log.ansi.fg = "white";
-                        break;
-                    }
-                    case 39: {
-                        global.mud.log.ansi.fg = "default";
-                        break;
-                    }
-                    default: break;
-                }
-            }
-
-            return;
-        }
+    for (const [key, value] of Object.entries(state)) {
+        global.mud.log.ansi[key] = value;
     }
 }
 
 function amc_read_incoming() {
-    receive_from_incoming(global.mud.incoming);
+    global.mud.incoming.info.push(
+        ...telnet_deserialize(global.mud.incoming.data)
+    );
 
     do {
         let incoming_info = global.mud.incoming.info;
@@ -1058,7 +801,10 @@ function amc_print_to_buffer(string, ansi) {
         global.mud.log.buffer = new DocumentFragment();
     }
 
-    let output = global.mud.log.buffer;
+    amc_print_to_node(string, ansi, global.mud.log.buffer);
+}
+
+function amc_print_to_node(string, ansi, output) {
     let plain = true;
 
     for (const [key, value] of Object.entries(ansi)) {

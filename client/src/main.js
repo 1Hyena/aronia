@@ -211,7 +211,7 @@ function amc_connect() {
         amc_print("\n#Disconnected.\n");
 
         msdp_deinit();
-        netio_deinit();
+        telnet_deinit();
 
         setTimeout(
             function() {
@@ -241,4 +241,14 @@ function amc_interpret_hashtag() {
             console.log("hashtag: "+tag);
         }
     }
+}
+
+function amc_send_bytes(array) {
+    global.ws.send(new Uint8Array(array).buffer);
+}
+
+function amc_send_command(line) {
+    let encoder = new TextEncoder();
+
+    global.ws.send(encoder.encode(line+"\n").buffer);
 }
