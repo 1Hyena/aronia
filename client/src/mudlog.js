@@ -111,7 +111,7 @@ function amc_handle_txt(data) {
 }
 
 function amc_handle_esc(data) {
-    let state = telnet_deserialize_esc(data);
+    let state = terminal_deserialize_esc(data);
 
     if ("title" in state) {
         global.title = state.title;
@@ -801,112 +801,5 @@ function amc_print_to_buffer(string, ansi) {
         global.mud.log.buffer = new DocumentFragment();
     }
 
-    amc_print_to_node(string, ansi, global.mud.log.buffer);
-}
-
-function amc_print_to_node(string, ansi, output) {
-    let plain = true;
-
-    for (const [key, value] of Object.entries(ansi)) {
-        if (ansi[key] !== null) {
-            plain = false;
-            break;
-        }
-    }
-
-    string = string.split("\r").join("");
-
-    let lines = string.split("\n");
-
-    for (let i=0; i<lines.length; ++i) {
-        string = lines[i];
-
-        if (i + 1 < lines.length) {
-            string += "\n";
-        }
-        else if (string === "") {
-            continue;
-        }
-
-        let appendage = null;
-
-        if (plain) {
-            let span = document.createElement("span");
-            span.appendChild(document.createTextNode(string));
-            appendage = span;
-        }
-        else {
-            let span = document.createElement("span");
-            span.appendChild(document.createTextNode(string));
-
-            if (ansi.fg !== null) {
-                span.classList.add("ans-fg-"+ansi.fg);
-                span.classList.add("ans-fg");
-
-                if (ansi.bold === true) {
-                    span.setAttribute("data-fg", "hi-"+ansi.fg);
-                }
-                else {
-                    span.setAttribute("data-fg", ansi.fg);
-                }
-            }
-
-            if (ansi.bold === true) {
-                span.classList.add("ans-b");
-            }
-
-            if (ansi.italic === true) {
-                span.classList.add("ans-italic");
-            }
-
-            if (ansi.faint === true) {
-                span.classList.add("ans-faint");
-            }
-
-            if (ansi.underline === true) {
-                span.classList.add("ans-underline");
-            }
-
-            if (ansi.reverse === true) {
-                span.classList.add("ans-reverse");
-            }
-
-            if (ansi.blinking === true) {
-                span.classList.add("ans-blinking");
-            }
-
-            if (ansi.strikethrough === true) {
-                span.classList.add("ans-strikethrough");
-            }
-
-            if (ansi.hidden === true) {
-                span.classList.add("ans-hidden");
-            }
-
-            appendage = span;
-        }
-
-        if (appendage !== null) {
-            let output_last = output.lastChild;
-
-            if (output_last
-            && appendage.nodeType                   === Node.ELEMENT_NODE
-            && output_last.nodeType                 === Node.ELEMENT_NODE
-            && appendage.tagName.toLowerCase()      === 'span'
-            && output_last.tagName.toLowerCase()    === 'span'
-            && appendage.children.length            === 0
-            && output_last.children.length          === 0
-            && is_same_classlist(output_last, appendage)) {
-                output_last.appendChild(document.createTextNode(string));
-                output_last.normalize();
-            }
-            else {
-                output.appendChild(appendage);
-            }
-        }
-
-        if (i + 1 < lines.length) {
-            output.appendChild(document.createComment("breakpoint"));
-        }
-    }
+    terminal_print_to_node(string, ansi, global.mud.log.buffer);
 }
