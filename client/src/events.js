@@ -31,12 +31,12 @@ function amc_event_change_character(value) {
     }
 
     let mainview_variables = [
-        "EXITS",        "EXITS_N",      "EXITS_S",      "EXITS_E",
-        "EXITS_W",      "EXITS_NE",     "EXITS_NW",     "EXITS_SE",
-        "EXITS_SW",     "SECTOR",       "SECTOR_N",     "SECTOR_S",
-        "SECTOR_E",     "SECTOR_W",     "SECTOR_NE",    "SECTOR_NW",
-        "SECTOR_SE",    "SECTOR_SW",    "ROOM_NAME",    "ROOM_DESC",
-        "EXIT_INFO",    "ROOM_ITEM_LIST"
+        "EXITS",        "EXITS_N",          "EXITS_S",          "EXITS_E",
+        "EXITS_W",      "EXITS_NE",         "EXITS_NW",         "EXITS_SE",
+        "EXITS_SW",     "SECTOR",           "SECTOR_N",         "SECTOR_S",
+        "SECTOR_E",     "SECTOR_W",         "SECTOR_NE",        "SECTOR_NW",
+        "SECTOR_SE",    "SECTOR_SW",        "ROOM_NAME",        "ROOM_DESC",
+        "EXIT_INFO",    "ROOM_ITEM_LIST",   "ROOM_CHAR_LIST"
     ];
 
     amc_show_mudstate("in-game");

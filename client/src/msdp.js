@@ -68,7 +68,8 @@ var msdp = {
         ROOM_AREA : null,
         ROOM_DESC : null,
         EXIT_INFO : null,
-        ROOM_ITEM_LIST : null
+        ROOM_ITEM_LIST : null,
+        ROOM_CHAR_LIST : null
     },
     renewing : {},
     incoming : [],
@@ -238,6 +239,7 @@ function msdp_update_variable(key, value) {
             amc_update_mainview_sectors(key);
             break;
         }
+        case "ROOM_CHAR_LIST":
         case "ROOM_ITEM_LIST":
         case "ROOM_NAME":
         case "ROOM_DESC":

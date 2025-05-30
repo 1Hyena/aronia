@@ -274,11 +274,13 @@ function amc_tui_create_roomview() {
     let room_desc = document.createElement("span");
     let exit_info = document.createElement("span");
     let item_list = document.createElement("span");
+    let char_list = document.createElement("span");
 
     room_name.id = "amc-roomview-name";
     room_desc.id = "amc-roomview-desc";
     exit_info.id = "amc-roomview-exit-info";
     item_list.id = "amc-roomview-item-list";
+    char_list.id = "amc-roomview-char-list";
 
     let exits = [
         "none", "north", "east", "south", "west", "up", "down"
@@ -318,6 +320,7 @@ function amc_tui_create_roomview() {
     roomview.appendChild(document.createTextNode("\n"));
     roomview.appendChild(exit_info);
     roomview.appendChild(item_list);
+    roomview.appendChild(char_list);
 
     return roomview;
 }
