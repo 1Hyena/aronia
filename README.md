@@ -21,5 +21,5 @@ TCP/IP (_telnet: aronia.ee 4000_).
 # Game Client ##################################################################
 
 Aronia has a browser-based custom MUD client called Aronia MUD Client (AMC). It
-is served at http://aronia.net.ee/ and its main purpose is to add graphical and
-audial effects to the otherwise text-based adventure.
+is served at https://aronia.net.ee/ and its main purpose is to add graphical and
+audial effects to your text-based adventure.
