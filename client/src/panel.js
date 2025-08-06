@@ -2,12 +2,12 @@
 
 function amc_calc_panel_width() {
     var w = document.getElementById('amc-body').clientWidth;
-    return Math.max(Math.round(w / 16) - 1, 0);
+    return Math.max(Math.round(w / 8) - 1, 0);
 }
 
 function amc_calc_panel_height() {
     var h = document.getElementById('amc-body').clientHeight;
-    return Math.max(Math.round(h / 32) - 1, 0);
+    return Math.max(Math.round(h / 16) - 1, 0);
 }
 
 function amc_fill_panel_framework(framework, width, height) {
@@ -184,115 +184,113 @@ function amc_crop_panel_framework(framework) {
 
 function amc_calc_panel_framework(width, height) {
     let central_top_height = Math.max(Math.floor(height / 2), 1);
-    let console_min_width = width >= 42 ? 40 : Math.max(width - 2, 1);
-    let bottom_left_max_w = Math.max(Math.floor(width / 2) - 20, 1);
+    let console_min_width = width >= 82 ? 80 : Math.max(width - 2, 1);
+    let bottom_left_max_w = Math.max(Math.floor(width / 2) - 40, 25);
+    let zonemap_max_w = Math.floor(bottom_left_max_w / 2);
+    let automap_max_w = Math.max(bottom_left_max_w - (zonemap_max_w + 1), 0);
 
     let framework = {
-        vertical : true,
+        vertical : false,
         contents : [
             {
-                vertical : false,
+                vertical : true,
                 contents : [
                     {
-                        vertical : true,
+                        key: "amc-panel-top-left",
+                        min_h: 1,
+                        min_w: bottom_left_max_w,
+                        max_w: bottom_left_max_w,
+                        priority : 3
+                    },
+                    {
+                        vertical : false,
                         contents : [
                             {
-                                key: "amc-panel-char-sheet",
-                                min_w : 18,
-                                min_h : 1,
-                                priority : 4
-                            }, {
-                                vertical : false,
-                                contents : [
-                                    {
-                                        key: "amc-panel-below-char-sheet-1st",
-                                        min_w: 8,
-                                        min_h: 1,
-                                        priority : 8
-                                    },
-                                    {
-                                        key: "amc-panel-below-char-sheet-2nd",
-                                        min_w: 1,
-                                        min_h: 1,
-                                        priority: 3
-                                    }
-                                ]
+                                key: "amc-panel-below-top-left-1st",
+                                min_w: 1,
+                                max_w: automap_max_w,
+                                min_h: 1,
+                                priority : 5
+                            },
+                            {
+                                key: "amc-panel-below-top-left-2nd",
+                                min_w: 1,
+                                max_w: zonemap_max_w,
+                                min_h: 1,
+                                priority: 4
                             }
                         ]
                     },
                     {
-                        key: "amc-panel-central-top",
-                        min_w: Math.max(17, 2*central_top_height),
-                        min_h: Math.max(9, central_top_height),
-                        max_w: 2*central_top_height,
-                        max_h: central_top_height,
-                        priority : 2
+                        key: "amc-panel-bottom-left",
+                        //min_w: 1,
+                        min_w: bottom_left_max_w,
+                        min_h: 1,
+                        max_w: bottom_left_max_w,
+                        priority: 6
                     }, {
-                        vertical : true,
-                        contents : [
-                            {
-                                key: "amc-panel-top-right",
-                                min_w: 8,
-                                min_h: 1,
-                                priority : 5
-                            }, {
-                                key: "amc-panel-below-top-right",
-                                min_w: 12,
-                                min_h: 1,
-                                priority : 6
-                            }
-                        ]
+                        key: "amc-panel-below-bottom-left",
+                        //min_w: 1,
+                        min_w: bottom_left_max_w,
+                        min_h: 1,
+                        max_h: 1,
+                        max_w: bottom_left_max_w,
+                        priority: 7
                     }
                 ]
             },
             {
-                vertical : false,
+                vertical : true,
                 contents : [
+                {
+                    vertical : false,
+                    contents : [
+                        {
+                            key: "amc-panel-central-top",
+                            min_w: Math.max(1, Math.floor(console_min_width / 2)),
+                            min_h: 1,
+                            max_h: central_top_height,
+                            priority : 2
+                        }, {
+                            vertical : true,
+                            contents : [
+                                {
+                                    key: "amc-panel-top-right",
+                                    min_w: 8,
+                                    min_h: 1,
+                                    priority : 8
+                                }, {
+                                    key: "amc-panel-below-top-right",
+                                    min_w: 12,
+                                    min_h: 1,
+                                    priority : 9
+                                }
+                            ]
+                        }
+                    ]
+                },
                     {
-                        vertical : true,
+                        key: "amc-panel-console",
+                        min_w: Math.max(8, console_min_width),
+                        min_h: 1,
+                        priority: 1
+                    }, {
+                        vertical : false,
                         contents : [
                             {
-                                key: "amc-panel-bottom-left",
-                                min_w: 1,
+                                key: "amc-panel-below-console-left",
+                                min_w: Math.max(1, console_min_width),
+                                max_w: Math.max(1, console_min_width),
                                 min_h: 1,
-                                max_w: bottom_left_max_w,
-                                priority: 7
-                            }, {
-                                key: "amc-panel-below-bottom-left",
+                                max_h: 1,
+                                priority: 0
+                            },
+                            {
+                                key: "amc-panel-below-console-right",
                                 min_w: 1,
                                 min_h: 1,
                                 max_h: 1,
-                                max_w: bottom_left_max_w,
-                                priority: 9
-                            }
-                        ]
-                    },
-                    {
-                        vertical : true,
-                        contents : [
-                            {
-                                key: "amc-panel-console",
-                                min_w: Math.max(8, console_min_width),
-                                min_h: 1,
-                                priority: 1
-                            }, {
-                                vertical : false,
-                                contents : [
-                                    {
-                                        key: "amc-panel-below-console-left",
-                                        min_w: Math.max(1, console_min_width),
-                                        min_h: 1,
-                                        max_h: 1,
-                                        priority: 0
-                                    },
-                                    {
-                                        key: "amc-panel-below-console-right",
-                                        min_w: 1,
-                                        min_h: 1,
-                                        max_h: 1,
-                                        priority: 10
-                                    }
-                                ]
+                                priority: 10
                             }
                         ]
                     }
@@ -555,7 +553,7 @@ function amc_init_panel(width, height) {
         scroll_to_bottom("amc-terminal-wrapper");
     }
 
-    var panel_top_right = document.getElementById("amc-panel-top-right");
+    var panel_top_right = document.getElementById("amc-panel-below-top-right");
 
     if (panel_top_right !== null && global.offscreen.chatview !== null) {
         var wrapper = document.createElement("div");
@@ -578,16 +576,16 @@ function amc_init_panel(width, height) {
         global.offscreen.inputbar = null;
     }
 
-    amc_init_mainview(document.getElementById("amc-panel-central-top"));
+    amc_init_mainview(document.getElementById("amc-panel-below-top-left-1st"));
 
     amc_init_zoneview(
-        document.getElementById("amc-panel-below-char-sheet-2nd")
+        document.getElementById("amc-panel-below-top-left-2nd")
     );
 
-    amc_init_statview(document.getElementById("amc-panel-char-sheet"));
-    amc_init_gearview(document.getElementById("amc-panel-below-char-sheet-1st"));
-    amc_init_itemview(document.getElementById("amc-panel-bottom-left"));
-    amc_init_roomview(document.getElementById("amc-panel-below-top-right"));
+    amc_init_statview(document.getElementById("amc-panel-top-left"));
+    amc_init_gearview(document.getElementById("amc-panel-top-right"));
+    amc_init_itemview(document.getElementById("amc-panel-central-top"));
+    amc_init_roomview(document.getElementById("amc-panel-bottom-left"));
 
     if (msdp.lists.REPORTABLE_VARIABLES !== null) {
         for (let i=0; i<msdp.lists.REPORTABLE_VARIABLES.length; ++i) {

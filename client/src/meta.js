@@ -197,6 +197,12 @@ function meta_load_artwork(id) {
 
     var artwork = [
         {
+            image : "bg-aronia-1.jpg"
+        },
+        {
+            image : "bg-aronia-2.jpg"
+        }/*,
+        {
             image : "bg-autumnal-valley.jpg"
         },
         {
@@ -205,7 +211,7 @@ function meta_load_artwork(id) {
         {
             image : "bg-elven-valley.jpg",
             position : "center"
-        }
+        }*/
     ];
 
     shuffle(artwork);

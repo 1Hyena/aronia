@@ -63,8 +63,6 @@ var global = {
                 top : true,
                 bottom : true
             }
-        },
-        view : { // TODO
         }
     },
     offscreen : {

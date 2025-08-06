@@ -119,7 +119,18 @@ function amc_tui_draw_room(map, room) {
                 }
             }
 
-            map[top_left_y + y][top_left_x + x] = {
+            let map_x = top_left_x + x;
+            let map_y = top_left_y + y;
+
+            if (map_y < 0 || map_y >= map.length) {
+                continue;
+            }
+
+            if (map_x < 0 || map_x >= map[map_y].length) {
+                continue;
+            }
+
+            map[map_y][map_x] = {
                 sector: room.key,
                 symbol: value,
                 type: type,
@@ -326,23 +337,27 @@ function amc_tui_create_roomview() {
 }
 
 function amc_tui_create_login_form() {
-    var form = document.createElement("form");
-    var table = document.createElement("table");
+    let wrap = document.createElement("div");
 
-    var form_cell_width = 20;
-    var form_cols = 2;
-    var form_rows = 3;
-    var cols = form_cols + 1 + form_cols * form_cell_width;
-    var rows = 2 * form_rows + 1;
+    wrap.id = "amc-login-form-wrapper";
 
-    var fields = [];
+    let form = document.createElement("form");
+    let table = document.createElement("table");
 
-    for (var y=0; y<rows; ++y) {
-        var row = document.createElement("tr");
+    let form_cell_width = 20;
+    let form_cols = 2;
+    let form_rows = 3;
+    let cols = form_cols + 1 + form_cols * form_cell_width;
+    let rows = 2 * form_rows + 1;
 
-        for (var x=0; x<cols; ++x) {
-            var text = null;
-            var cell = null;
+    let fields = [];
+
+    for (let y=0; y<rows; ++y) {
+        let row = document.createElement("tr");
+
+        for (let x=0; x<cols; ++x) {
+            let text = null;
+            let cell = null;
 
             if (y % 2 === 1) {
                 if (x % (form_cell_width + 1) === 1) {
@@ -393,7 +408,7 @@ function amc_tui_create_login_form() {
             else text = "─";
 
             if (text !== null) {
-                var pre = document.createElement("pre");
+                let pre = document.createElement("pre");
                 pre.append(document.createTextNode(text));
 
                 if (cell === null) {
@@ -421,9 +436,9 @@ function amc_tui_create_login_form() {
     form.setAttribute("name", "loginform");
     form.id = "amc-login-form";
 
-    var input_username = document.createElement("input");
-    var input_password = document.createElement("input");
-    var button_submit = document.createElement("input");
+    let input_username = document.createElement("input");
+    let input_password = document.createElement("input");
+    let button_submit = document.createElement("input");
 
     input_username.setAttribute("type", "text");
     input_username.setAttribute("name", "username");
@@ -489,13 +504,13 @@ function amc_tui_create_login_form() {
         }, false
     );
 
-    for (var i=0; i<fields.length; ++i) {
+    for (let i=0; i<fields.length; ++i) {
         fields[i].id = "amc-login-form-slot-"+i;
         fields[i].classList.add("amc-login-form-slot");
 
         switch (i) {
             case 0: {
-                var label = document.createElement("label");
+                let label = document.createElement("label");
                 label.setAttribute("for", "amc-login-input-username");
                 label.appendChild(document.createElement("pre")).append(
                     document.createTextNode("Account:")
@@ -506,7 +521,7 @@ function amc_tui_create_login_form() {
                 break;
             }
             case 2: {
-                var label = document.createElement("label");
+                let label = document.createElement("label");
                 label.setAttribute("for", "amc-login-input-password");
                 label.appendChild(document.createElement("pre")).append(
                     document.createTextNode("Password:")
@@ -523,23 +538,25 @@ function amc_tui_create_login_form() {
         }
     }
 
-    return form;
+    wrap.append(form);
+
+    return wrap;
 }
 
 function amc_tui_create_statview() {
-    var table = document.createElement("table");
+    let table = document.createElement("table");
 
     table.classList.add("amc-tui");
 
-    var cols = 36;
-    var rows = 14;
+    let cols = 36;
+    let rows = 14;
 
-    for (var y=0; y<rows; ++y) {
-        var row = document.createElement("tr");
+    for (let y=0; y<rows; ++y) {
+        let row = document.createElement("tr");
 
-        for (var x=0; x<cols; ++x) {
-            var text = " ";
-            var cell = null;
+        for (let x=0; x<cols; ++x) {
+            let text = " ";
+            let cell = null;
 
             if (y === 0) {
                 cell = document.createElement("td");
@@ -726,7 +743,7 @@ function amc_tui_create_statview() {
             }
 
             if (text !== null) {
-                var pre = document.createElement("pre");
+                let pre = document.createElement("pre");
                 pre.append(document.createTextNode(text));
 
                 if (cell === null) {
@@ -748,7 +765,7 @@ function amc_tui_create_statview() {
 }
 
 function amc_tui_get_secondary_top_placeholder() {
-    var placeholder =
+    let placeholder =
     "n∩n∩n∩n∩.ⁿ.ⁿ.ⁿ.ⁿ \"⌠ \"⌠\"⌠\"⌠⌂ ⌂⌂ ⌂⌂ ⌂ \n"+
     " n∩n∩n∩.ⁿ.ⁿΠ╷.ⁿ.ⁿ ↑↨ \"⌠\"⌠ ⌂⌂⌂ ⌂⌂ ⌂ ⌂\n"+
     ".ⁿn∩n∩.ⁿ.ⁿ.ⁿ│.ⁿ.ⁿ.ⁿ.ⁿ.ⁿ.ⁿ\"⌠⌂ ⌂⌂ ⌂ ⌂ \n"+
