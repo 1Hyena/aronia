@@ -9,7 +9,11 @@ function amc_show_message(container, message) {
 }
 
 function amc_show_mudstate(state) {
-    var container = document.getElementById("amc-panel-fg");
+    var container = document.getElementById("amc-panel-fg-middle");
+
+    if (container === null) {
+        return;
+    }
 
     global.mud.state = state;
 
@@ -20,7 +24,8 @@ function amc_show_mudstate(state) {
             break;
         }
         case "account-menu": {
-            amc_show_message(container, "Account menu");
+            //amc_show_message(container, "Account menu");
+            scroll_to_bottom("amc-terminal-wrapper");
             break;
         }
         case "login-manual": {
@@ -28,7 +33,10 @@ function amc_show_mudstate(state) {
             break;
         }
         case "in-game": {
-            amc_init_mainview(container);
+            amc_init_mainview(
+                document.getElementById("amc-panel-below-top-left-1st")
+            );
+
             break;
         }
         default: break;

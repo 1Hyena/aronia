@@ -1,5 +1,62 @@
 "use strict";
 
+function amc_init_foreview(container) {
+    let wrapper_id = "amc-foreview-wrapper";
+
+    if (container === null) {
+        return;
+    }
+
+    if (document.getElementById(wrapper_id) !== null) {
+        bug();
+        return;
+    }
+
+    let model_w = parseInt(container.getAttribute("colspan"), 10) - 2;
+    let model_h = parseInt(container.getAttribute("rowspan"), 10) - 1;
+
+    if (model_w <= 1 || model_h <= 1) {
+        return;
+    }
+
+    let model = {
+        width    : model_w,
+        height   : model_h,
+        vertical : true,
+        contents : [
+            {
+                key: "amc-panel-chatview",
+                min_h: 1,
+                min_w: 1,
+                priority : 0
+            },
+            {
+                key: "amc-panel-miscview",
+                min_h: 1,
+                min_w: 1,
+                priority : 1
+            }
+        ]
+    };
+
+    let panel = amc_create_panel(amc_create_panel_framework(model));
+    var wrapper = document.createElement("div");
+
+    wrapper.id = wrapper_id;
+    wrapper.appendChild(panel);
+    container.appendChild(wrapper);
+}
+
+function amc_init_chatview(container) {
+    if (container !== null && global.offscreen.chatview !== null) {
+        var wrapper = document.createElement("div");
+        wrapper.id = global.offscreen.chatview.id+"-wrapper";
+        wrapper.append(global.offscreen.chatview);
+        container.append(wrapper);
+        global.offscreen.chatview = null;
+    }
+}
+
 function amc_init_noteview(container, contents) {
     if (container === null) {
         return;
@@ -67,31 +124,6 @@ function amc_init_zoneview(container) {
 
     placeholder.appendChild(
         document.createTextNode(amc_tui_get_secondary_top_placeholder())
-    );
-
-    wrapper.appendChild(placeholder);
-
-    container.appendChild(wrapper);
-}
-
-function amc_init_gearview(container) {
-    if (container === null) {
-        return;
-    }
-
-    if (document.getElementById("amc-gearview-wrapper") !== null) {
-        bug();
-        return;
-    }
-
-    var wrapper = document.createElement("div");
-
-    wrapper.id = "amc-gearview-wrapper";
-
-    var placeholder = document.createElement("pre");
-
-    placeholder.appendChild(
-        document.createTextNode(amc_tui_get_equipment_placeholder())
     );
 
     wrapper.appendChild(placeholder);

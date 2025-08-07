@@ -427,6 +427,7 @@ function amc_tui_create_login_form() {
     }
 
     table.classList.add("amc-tui");
+    table.classList.add("ans-default");
     form.append(table);
 
     form.setAttribute("method", "post");
@@ -783,29 +784,6 @@ function amc_tui_get_secondary_top_placeholder() {
     "♣ ♠♣♠♣♠♣.ⁿ│♠♣♠♣♠♣♠♣♣ ♠♣ ♠♣ ♣ ♣ ♠♣.ⁿ ";
 
     return placeholder;
-}
-
-function amc_tui_get_equipment_placeholder() {
-    return (
-        "Equipment:\n"+
-        "\n"+
-        "a gold ring\n"+
-        "a gold ring\n"+
-        "an amulet of Holy Magic\n"+
-        "an amulet of Holy Magic\n"+
-        "a headband with bright jewel\n"+
-        "a pair of green leggings\n"+
-        "a pair of green gloves\n"+
-        "a pair of green sleeves\n"+
-        "a green coat\n"+
-        "a green belt\n"+
-        "a small runed wand\n"+
-        "a crystal gem\n"+
-        "a silver bracer\n"+
-        "a silver bracer\n"+
-        "a small silver shield\n"+
-        "an elven longsword\n"
-    );
 }
 
 function amc_tui_get_inventory_placeholder() {

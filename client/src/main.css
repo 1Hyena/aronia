@@ -56,15 +56,22 @@ pre {
     font-family: unscii, monospace;
 }
 
-table.amc-tui-fg > tr > td:not(.amc-panel) > pre {
+#amc-panel-wrapper {
+    font-size: 16px;
+    line-height: 16px;
+    filter: drop-shadow(
+        0 0 1px rgba(0, 0, 0, 1)
+    ); /* kludgy fix for FF table cell-spacing artefacts */
+}
+
+table.amc-tui-fg > tr > td:not(.amc-panel-cell) > pre {
     visibility: hidden;
 }
 
 table.amc-tui {
-    font-size: 16px;
-    line-height: 16px;
-    border-spacing: 0;
     pointer-events: initial;
+    border-spacing: 0;
+    border-radius: 1px; /* kludgy fix for Chrome's table cell-spacing artefacts */
 }
 
 table.amc-tui-fg {
@@ -74,22 +81,27 @@ table.amc-tui-fg {
     right: 0;
     bottom: 0;
     pointer-events: none;
+    background-color: transparent;
 }
 
-table.amc-tui:not(.amc-tui-fg) {
-    background-color: black;
+/*#amc:not([data-mudstate="in-game"]) #amc-panel-wrapper > table:not(.amc-tui-fg) {
+    background-color: transparent;
+}*/
+
+#amc[data-mudstate=""] #amc-panel-wrapper > table:not(.amc-tui-fg),
+#amc[data-mudstate="login"] #amc-panel-wrapper > table:not(.amc-tui-fg) {
+    display: none;
+}
+
+#amc:not([data-mudstate="in-game"]) #amc-foreview-wrapper {
+    display: none;
 }
 
 table.amc-tui > tr > td {
     vertical-align: top;
 }
 
-#amc[data-mudstate="login"] #amc-panel-central-top,
-#amc[data-mudstate="login-wrong-password"] #amc-panel-central-top {
-    vertical-align: middle;
-}
-
-.amc-panel {
+.amc-panel-cell {
     position: relative;
 }
 
@@ -109,6 +121,15 @@ div[data-target="the immortals"].amc-chat-private > span:nth-of-type(4) {
 div.amc-chat-private > span:nth-of-type(4),
 div.amc-chat-public > span:nth-of-type(4) {
     font-style: italic;
+}
+
+#amc-foreview-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
 }
 
 #amc-chatview-wrapper,
@@ -131,7 +152,6 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-inputbar-wrapper,
 #amc-zoneview-wrapper,
 #amc-statview-wrapper,
-#amc-gearview-wrapper,
 #amc-itemview-wrapper {
     position: absolute;
     top: 0;
@@ -156,17 +176,6 @@ div.amc-chat-public > span:nth-of-type(4) {
     bottom: -6px;
 }
 
-#amc-mainview-wrapper,
-#amc-zoneview-wrapper,
-#amc-roomview-wrapper,
-#amc-gearview-wrapper,
-#amc-itemview-wrapper,
-#amc-statview-wrapper,
-#amc-chatview-wrapper {
-    font-size: 16px;
-    line-height: 16px;
-}
-
 #amc-mainview {
     white-space: pre-wrap;
 }
@@ -175,6 +184,8 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-chatview {
     white-space: pre-wrap;
     word-wrap: break-word;
+    margin-top: 7px;
+    margin-bottom: 6px;
 }
 
 #amc-roomview {
@@ -194,19 +205,23 @@ div.amc-chat-public > span:nth-of-type(4) {
     display: none;
 }
 
-#amc-terminal {
-    width: 100%;
+#amc-terminal-wrapper > span:nth-child(1) {
+    display: inline-block;
     height: 100%;
+}
+
+#amc-terminal {
+    display: inline-block;
+    width: 100%;
     white-space: pre-wrap;
     word-wrap: break-word;
-    font-size: 16px;
-    line-height: 16px;
+    margin-top: 7px;
+    margin-bottom: 6px;
+    vertical-align: bottom;
 }
 
 #amc-login-form {
     position: relative;
-    font-size: 16px;
-    line-height: 16px;
 }
 
 #amc-login-form > table {

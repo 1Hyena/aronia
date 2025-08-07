@@ -189,12 +189,69 @@ function amc_get_foreground_panel_model(width, height) {
         vertical : false,
         contents : [
             {
-                key: "amc-panel-fg",
-                min_h: 1,
-                min_w: 1,
-                max_w: width,
-                max_h: height,
-                priority : 0
+                vertical: true,
+                contents: [
+                    {
+                        key: "amc-panel-fg-top-left",
+                        min_h: 1,
+                        min_w: 1,
+                        priority : 1
+                    },
+                    {
+                        key: "amc-panel-fg-left",
+                        min_h: 1,
+                        min_w: 1,
+                        priority : 1
+                    },
+                    {
+                        key: "amc-panel-fg-bottom-left",
+                        min_h: 1,
+                        min_w: 1,
+                        priority : 1
+                    }
+                ]
+            },
+            {
+                vertical: true,
+                contents: [
+                    {
+                        key: "amc-panel-fg-top",
+                        min_h: 1,
+                        min_w: 1,
+                        priority : 1
+                    },
+                    {
+                        key: "amc-panel-fg-middle",
+                        min_h: 8,
+                        min_w: 44,
+                        max_w: width,
+                        max_h: height,
+                        priority : 0
+                    },
+                    {
+                        key: "amc-panel-fg-bottom",
+                        min_h: 1,
+                        min_w: 1,
+                        priority : 1
+                    }
+                ]
+            },
+            {
+                vertical: true,
+                contents: [
+                    {
+                        key: "amc-panel-fg-top-right",
+                        min_h: 1,
+                        min_w: 1,
+                        priority : 1
+                    },
+                    {
+                        key: "amc-panel-fg-bottom-right",
+                        min_h: 1,
+                        min_w: 1,
+                        priority : 1
+                    }
+                ]
             }
         ]
     };
@@ -262,33 +319,6 @@ function amc_get_background_panel_model(width, height) {
             {
                 vertical : true,
                 contents : [
-                {
-                    vertical : false,
-                    contents : [
-                        {
-                            key: "amc-panel-central-top",
-                            min_w: Math.max(1, Math.floor(console_min_width / 2)),
-                            min_h: 1,
-                            max_h: central_top_height,
-                            priority : 2
-                        }, {
-                            vertical : true,
-                            contents : [
-                                {
-                                    key: "amc-panel-top-right",
-                                    min_w: 8,
-                                    min_h: 1,
-                                    priority : 8
-                                }, {
-                                    key: "amc-panel-below-top-right",
-                                    min_w: 12,
-                                    min_h: 1,
-                                    priority : 9
-                                }
-                            ]
-                        }
-                    ]
-                },
                     {
                         key: "amc-panel-console",
                         min_w: Math.max(8, console_min_width),
@@ -474,6 +504,7 @@ function amc_create_panel(framework) {
     let table = document.createElement("table");
 
     table.classList.add("amc-tui");
+    table.classList.add("ans-default");
 
     for (let y=0; y<map.length; ++y) {
         let tr = null;
@@ -512,7 +543,7 @@ function amc_create_panel(framework) {
             td.setAttribute("colspan", tui[key].width - 1);
             td.setAttribute("rowspan", tui[key].height - 1);
             td.id = key;
-            td.classList.add("amc-panel");
+            td.classList.add("amc-panel-cell");
 
             tr.append(td);
 
@@ -574,6 +605,7 @@ function amc_init_panel(width, height) {
     if (panel_console !== null && global.offscreen.terminal !== null) {
         var wrapper = document.createElement("div");
         wrapper.id = global.offscreen.terminal.id+"-wrapper";
+        wrapper.append(document.createElement("span"));
         wrapper.append(global.offscreen.terminal);
         wrapper.addEventListener(
             'scroll',
@@ -586,16 +618,6 @@ function amc_init_panel(width, height) {
         global.offscreen.terminal = null;
 
         scroll_to_bottom("amc-terminal-wrapper");
-    }
-
-    var panel_top_right = document.getElementById("amc-panel-below-top-right");
-
-    if (panel_top_right !== null && global.offscreen.chatview !== null) {
-        var wrapper = document.createElement("div");
-        wrapper.id = global.offscreen.chatview.id+"-wrapper";
-        wrapper.append(global.offscreen.chatview);
-        panel_top_right.append(wrapper);
-        global.offscreen.chatview = null;
     }
 
     var panel_below_console_left = document.getElementById(
@@ -617,9 +639,10 @@ function amc_init_panel(width, height) {
         document.getElementById("amc-panel-below-top-left-2nd")
     );
 
+    amc_init_foreview(document.getElementById("amc-panel-fg-top-right"));
+    amc_init_chatview(document.getElementById("amc-panel-chatview"));
     amc_init_statview(document.getElementById("amc-panel-top-left"));
-    amc_init_gearview(document.getElementById("amc-panel-top-right"));
-    amc_init_itemview(document.getElementById("amc-panel-central-top"));
+    amc_init_itemview(document.getElementById("amc-panel-miscview"));
     amc_init_roomview(document.getElementById("amc-panel-bottom-left"));
 
     if (msdp.lists.REPORTABLE_VARIABLES !== null) {
@@ -631,6 +654,8 @@ function amc_init_panel(width, height) {
             }
         }
     }
+
+    amc_show_mudstate(global.mud.state);
 
     return;
 }
