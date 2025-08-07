@@ -182,14 +182,36 @@ function amc_crop_panel_framework(framework) {
     } while (again);
 }
 
-function amc_calc_panel_framework(width, height) {
+function amc_get_foreground_panel_model(width, height) {
+    let model = {
+        width    : width,
+        height   : height,
+        vertical : false,
+        contents : [
+            {
+                key: "amc-panel-fg",
+                min_h: 1,
+                min_w: 1,
+                max_w: width,
+                max_h: height,
+                priority : 0
+            }
+        ]
+    };
+
+    return model;
+}
+
+function amc_get_background_panel_model(width, height) {
     let central_top_height = Math.max(Math.floor(height / 2), 1);
     let console_min_width = width >= 82 ? 80 : Math.max(width - 2, 1);
     let bottom_left_max_w = Math.max(Math.floor(width / 2) - 40, 25);
     let zonemap_max_w = Math.floor(bottom_left_max_w / 2);
     let automap_max_w = Math.max(bottom_left_max_w - (zonemap_max_w + 1), 0);
 
-    let framework = {
+    let model = {
+        width    : width,
+        height   : height,
         vertical : false,
         contents : [
             {
@@ -223,14 +245,12 @@ function amc_calc_panel_framework(width, height) {
                     },
                     {
                         key: "amc-panel-bottom-left",
-                        //min_w: 1,
                         min_w: bottom_left_max_w,
                         min_h: 1,
                         max_w: bottom_left_max_w,
                         priority: 6
                     }, {
                         key: "amc-panel-below-bottom-left",
-                        //min_w: 1,
                         min_w: bottom_left_max_w,
                         min_h: 1,
                         max_h: 1,
@@ -299,7 +319,13 @@ function amc_calc_panel_framework(width, height) {
         ]
     };
 
-    let reserve_border = [ framework ];
+    return model;
+}
+
+function amc_create_panel_framework(model) {
+    let width = model.width;
+    let height = model.height;
+    let reserve_border = [ model ];
 
     while (reserve_border.length > 0) {
         let fw = reserve_border.pop();
@@ -330,18 +356,18 @@ function amc_calc_panel_framework(width, height) {
     }
 
     for (let i=0; i<=10; ++i) {
-        amc_fill_panel_framework(framework, 0, 0);
+        amc_fill_panel_framework(model, 0, 0);
 
-        if (framework.width <= width && framework.height <= height) {
+        if (model.width <= width && model.height <= height) {
             break;
         }
 
-        amc_crop_panel_framework(framework);
+        amc_crop_panel_framework(model);
     };
 
-    amc_fill_panel_framework(framework, width, height);
+    amc_fill_panel_framework(model, width, height);
 
-    let buf = [ { data : framework, x : 0, y : 0 } ];
+    let buf = [ { data : model, x : 0, y : 0 } ];
 
     while (buf.length > 0) {
         let fw = buf.shift();
@@ -385,7 +411,7 @@ function amc_calc_panel_framework(width, height) {
         }
     }
 
-    return framework;
+    return model;
 }
 
 function amc_get_border_symbol(map, x, y) {
@@ -502,8 +528,15 @@ function amc_create_panel(framework) {
 }
 
 function amc_init_panel(width, height) {
-    let fw = amc_calc_panel_framework(width, height);
-    let panel = amc_create_panel(fw);
+    let panel_bg = amc_create_panel(
+        amc_create_panel_framework(amc_get_background_panel_model(width, height))
+    );
+
+    let panel_fg = amc_create_panel(
+        amc_create_panel_framework(amc_get_foreground_panel_model(width, height))
+    );
+
+    panel_fg.classList.add("amc-tui-fg");
 
     if (global.offscreen.terminal === null) {
         var view = document.getElementById("amc-terminal");
@@ -532,7 +565,9 @@ function amc_init_panel(width, height) {
         }
     }
 
-    document.getElementById("amc-panel-wrapper").replaceChildren(panel);
+    document.getElementById("amc-panel-wrapper").replaceChildren(
+        panel_bg, panel_fg
+    );
 
     var panel_console = document.getElementById("amc-panel-console");
 

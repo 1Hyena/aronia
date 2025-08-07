@@ -9,7 +9,7 @@ function amc_show_message(container, message) {
 }
 
 function amc_show_mudstate(state) {
-    var container = document.getElementById("amc-panel-central-top");
+    var container = document.getElementById("amc-panel-fg");
 
     global.mud.state = state;
 

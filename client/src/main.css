@@ -56,19 +56,28 @@ pre {
     font-family: unscii, monospace;
 }
 
-#amc-panel-wrapper {
-    display: inline-block;
-    vertical-align: middle;
-    font-size: 16px;
-    line-height: 16px;
-    background-color: black;
-    border-radius: 0.5rem;
-    filter: drop-shadow(0 0 0.25rem rgba(0, 0, 0, 1));
-    text-align: left;
+table.amc-tui-fg > tr > td:not(.amc-panel) > pre {
+    visibility: hidden;
 }
 
 table.amc-tui {
+    font-size: 16px;
+    line-height: 16px;
     border-spacing: 0;
+    pointer-events: initial;
+}
+
+table.amc-tui-fg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+table.amc-tui:not(.amc-tui-fg) {
+    background-color: black;
 }
 
 table.amc-tui > tr > td {
@@ -103,7 +112,6 @@ div.amc-chat-public > span:nth-of-type(4) {
 }
 
 #amc-chatview-wrapper,
-#amc-login-form-wrapper,
 #amc-roomview-wrapper,
 #amc-noteview-wrapper,
 #amc-terminal-wrapper {
@@ -118,6 +126,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
 }
 
+#amc-login-form-wrapper,
 #amc-mainview-wrapper,
 #amc-inputbar-wrapper,
 #amc-zoneview-wrapper,
@@ -133,18 +142,11 @@ div.amc-chat-public > span:nth-of-type(4) {
 }
 
 #amc-chatview-wrapper,
-#amc-login-form-wrapper,
 #amc-roomview-wrapper,
 #amc-terminal-wrapper {
     top: -7px;
     right: -1px;
     bottom: -6px;
-}
-
-#amc-login-form-wrapper {
-    left: -2px;
-    display: grid;
-    place-items: center;
 }
 
 #amc-inputbar-wrapper {
@@ -202,7 +204,7 @@ div.amc-chat-public > span:nth-of-type(4) {
 }
 
 #amc-login-form {
-    text-align: center;
+    position: relative;
     font-size: 16px;
     line-height: 16px;
 }
