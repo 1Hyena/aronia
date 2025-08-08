@@ -465,10 +465,33 @@ function amc_update_terminal() {
     }
 }
 
+function amc_match_game_line(line) {
+    var expressions = [];
+
+    expressions.push("(^)( Account Menu:)($)");
+
+    if (expressions.length === 0) {
+        return;
+    }
+
+    for (let i=0; i<expressions.length; ++i) {
+        let regex = new RegExp(expressions[i]);
+        let match = regex.exec(line) || [];
+
+        if (match.length !== 4) {
+            continue;
+        }
+
+        if (i === 0) {
+            amc_set_mud_state("account-menu");
+        }
+    }
+}
+
 function amc_match_login_line(line) {
     var expressions = [];
 
-    switch (global.mud.state) {
+    switch (amc_get_mud_state()) {
         case "": {
             expressions.push("(^Login)( )(> $)");
             break;
@@ -507,17 +530,17 @@ function amc_match_login_line(line) {
             continue;
         }
 
-        switch (global.mud.state) {
+        switch (amc_get_mud_state()) {
             case "": {
-                global.mud.state = "login";
+                amc_set_mud_state("login");
                 break;
             }
             case "login": {
-                global.mud.state = "login-manual";
+                amc_set_mud_state("login-manual");
                 break;
             }
             case "login-sending-username": {
-                global.mud.state = "login-sending-password";
+                amc_set_mud_state("login-sending-password");
                 amc_send_command(global.mud.account.password);
                 break;
             }
@@ -528,15 +551,15 @@ function amc_match_login_line(line) {
                     break;
                 }
                 else if (i === 2) {
-                    global.mud.state = "login-wrong-password";
+                    amc_set_mud_state("login-wrong-password");
                     break;
                 }
 
-                global.mud.state = "account-menu";
+                amc_set_mud_state("account-menu");
                 break;
             }
             case "login-manual": {
-                global.mud.state = "account-menu";
+                amc_set_mud_state("account-menu");
                 break;
             }
             default: break;
@@ -650,7 +673,7 @@ function amc_match_chat_line(line) {
 }
 
 function amc_match_line(line) {
-    switch (global.mud.state) {
+    switch (amc_get_mud_state()) {
         case "":
         case "login":
         case "login-sending-username":
@@ -658,6 +681,10 @@ function amc_match_line(line) {
         case "login-wrong-password":
         case "login-sending-password": {
             amc_match_login_line(line);
+            break;
+        }
+        case "in-game": {
+            amc_match_game_line(line);
             break;
         }
         default: break;

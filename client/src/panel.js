@@ -569,76 +569,18 @@ function amc_init_panel(width, height) {
 
     panel_fg.classList.add("amc-tui-fg");
 
-    if (global.offscreen.terminal === null) {
-        var view = document.getElementById("amc-terminal");
-
-        if (view !== null) {
-            view.parentNode.removeChild(view);
-            global.offscreen.terminal = view;
-        }
-    }
-
-    if (global.offscreen.chatview === null) {
-        var view = document.getElementById("amc-chatview");
-
-        if (view !== null) {
-            view.parentNode.removeChild(view);
-            global.offscreen.chatview = view;
-        }
-    }
-
-    if (global.offscreen.inputbar === null) {
-        var view = document.getElementById("amc-inputbar");
-
-        if (view !== null) {
-            view.parentNode.removeChild(view);
-            global.offscreen.inputbar = view;
-        }
-    }
+    amc_deinit_terminal();
+    amc_deinit_chatview();
+    amc_deinit_inputbar();
 
     document.getElementById("amc-panel-wrapper").replaceChildren(
         panel_bg, panel_fg
     );
 
-    var panel_console = document.getElementById("amc-panel-console");
-
-    if (panel_console !== null && global.offscreen.terminal !== null) {
-        var wrapper = document.createElement("div");
-        wrapper.id = global.offscreen.terminal.id+"-wrapper";
-        wrapper.append(document.createElement("span"));
-        wrapper.append(global.offscreen.terminal);
-        wrapper.addEventListener(
-            'scroll',
-            function(e) {
-                amc_update_scroll();
-            }
-        );
-
-        panel_console.append(wrapper);
-        global.offscreen.terminal = null;
-
-        scroll_to_bottom("amc-terminal-wrapper");
-    }
-
-    var panel_below_console_left = document.getElementById(
-        "amc-panel-below-console-left"
-    );
-
-    if (panel_below_console_left !== null
-    && global.offscreen.inputbar !== null) {
-        var wrapper = document.createElement("div");
-        wrapper.id = global.offscreen.inputbar.id+"-wrapper";
-        wrapper.append(global.offscreen.inputbar);
-        panel_below_console_left.append(wrapper);
-        global.offscreen.inputbar = null;
-    }
-
+    amc_init_terminal(document.getElementById("amc-panel-console"));
+    amc_init_inputbar(document.getElementById("amc-panel-below-console-left"));
     amc_init_mainview(document.getElementById("amc-panel-below-top-left-1st"));
-
-    amc_init_zoneview(
-        document.getElementById("amc-panel-below-top-left-2nd")
-    );
-
+    amc_init_zoneview(document.getElementById("amc-panel-below-top-left-2nd"));
     amc_init_foreview(document.getElementById("amc-panel-fg-top-right"));
     amc_init_chatview(document.getElementById("amc-panel-chatview"));
     amc_init_statview(document.getElementById("amc-panel-top-left"));
@@ -655,7 +597,7 @@ function amc_init_panel(width, height) {
         }
     }
 
-    amc_show_mudstate(global.mud.state);
+    amc_show_mudstate(amc_get_mud_state());
 
     return;
 }

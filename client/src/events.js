@@ -26,7 +26,6 @@ function amc_event_change_energy(value) {
 
 function amc_event_change_character(value) {
     if (value.length === 0) {
-        amc_show_mudstate("");
         return;
     }
 

@@ -105,10 +105,10 @@ function amc_main_loop() {
 
     var amc = document.getElementById("amc");
 
-    if (amc.getAttribute("data-mudstate") !== global.mud.state) {
-        amc.setAttribute("data-mudstate", global.mud.state);
+    if (amc.getAttribute("data-mudstate") !== amc_get_mud_state()) {
+        amc.setAttribute("data-mudstate", amc_get_mud_state());
 
-        amc_show_mudstate(global.mud.state);
+        amc_show_mudstate(amc_get_mud_state());
     }
 
     let blinking_elements = document.getElementsByClassName("ans-blinking");
@@ -216,7 +216,7 @@ function amc_connect() {
         setTimeout(
             function() {
                 amc_print("#Reconnecting...\n");
-                global.mud.state = "";
+                amc_set_mud_state("");
                 amc_connect();
             }, 3000
         );

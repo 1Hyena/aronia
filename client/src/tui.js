@@ -526,7 +526,7 @@ function amc_tui_create_login_form() {
     input_username.setAttribute("autofocus", "");
     input_username.id = "amc-login-input-username";
 
-    if (global.mud.state === "login-wrong-password") {
+    if (amc_get_mud_state() === "login-wrong-password") {
         input_username.setAttribute("disabled", "");
         input_username.value = global.mud.account.username;
     }
@@ -551,34 +551,36 @@ function amc_tui_create_login_form() {
                 return;
             }
 
-            if (global.mud.state !== "login"
-            &&  global.mud.state !== "login-wrong-password") {
+            if (amc_get_mud_state() !== "login"
+            &&  amc_get_mud_state() !== "login-wrong-password") {
                 return;
             }
 
             e.target.submitted = true;
 
-            setTimeout(function(target){
-                global.mud.account.username = document.getElementById(
-                    "amc-login-input-username"
-                ).value;
+            setTimeout(
+                function(target){
+                    global.mud.account.username = document.getElementById(
+                        "amc-login-input-username"
+                    ).value;
 
-                global.mud.account.password = document.getElementById(
-                    "amc-login-input-password"
-                ).value;
+                    global.mud.account.password = document.getElementById(
+                        "amc-login-input-password"
+                    ).value;
 
-                if (global.mud.state === "login") {
-                    global.mud.state = "login-sending-username";
-                    amc_send_command(global.mud.account.username);
-                }
-                else if (global.mud.state === "login-wrong-password") {
-                    global.mud.state = "login-sending-password";
-                    amc_send_command(global.mud.account.password);
-                }
+                    if (amc_get_mud_state() === "login") {
+                        amc_set_mud_state("login-sending-username");
+                        amc_send_command(global.mud.account.username);
+                    }
+                    else if (amc_get_mud_state() === "login-wrong-password") {
+                        amc_set_mud_state("login-sending-password");
+                        amc_send_command(global.mud.account.password);
+                    }
 
-                target.parentNode.removeChild(target);
-                history.replaceState(history.state, 'Login');
-            }, 1, e.target);
+                    target.parentNode.removeChild(target);
+                    history.replaceState(history.state, 'Login');
+                }, 1, e.target
+            );
         }, false
     );
 

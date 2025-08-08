@@ -13,8 +13,22 @@ function amc_show_login(container) {
     container.replaceChildren(centered);
 }
 
+function amc_show_console(container) {
+    amc_deinit_terminal();
+    amc_init_terminal(container);
+    scroll_to_bottom("amc-terminal-wrapper");
+}
+
 function amc_show_message(container, message) {
     amc_init_noteview(container, document.createTextNode(message));
+}
+
+function amc_get_mud_state() {
+    return global.mud.state;
+}
+
+function amc_set_mud_state(state) {
+    global.mud.state = state;
 }
 
 function amc_show_mudstate(state) {
@@ -24,12 +38,13 @@ function amc_show_mudstate(state) {
         return;
     }
 
-    global.mud.state = state;
+    amc_set_mud_state(state);
 
     switch (state) {
         case "login-wrong-password":
         case "login" : {
             amc_show_login(container);
+
             break;
         }
         case "account-menu": {
