@@ -336,6 +336,80 @@ function amc_tui_create_roomview() {
     return roomview;
 }
 
+function amc_tui_create_centered(content, container_w, container_h) {
+    let content_w = parseInt(content.getAttribute("data-colspan"), 10);
+    let content_h = parseInt(content.getAttribute("data-rowspan"), 10);
+
+    let cols = container_w;
+    let rows = container_h;
+
+    let rows_top = Math.floor((rows - content_h) / 2);
+    let rows_bottom = (rows - content_h) - rows_top;
+    let side_space = cols - content_w;
+    let cols_left = Math.floor(side_space / 2);
+    let cols_right = side_space - cols_left;
+
+    let table = document.createElement("table");
+
+    table.classList.add("amc-tui");
+
+    for (let y=0; y<rows; ++y) {
+        let row = null;
+
+        for (let x=0; x<cols; ++x) {
+            let margin = (
+                x < cols_left ||
+                x >= cols_left + content_w ||
+                y < rows_top ||
+                y >= rows_top + content_h
+            );
+
+            let create_centered = (x === cols_left && y === rows_top);
+
+            if (row === null) {
+                if (create_centered || margin) {
+                    row = document.createElement("tr");
+                }
+            }
+
+            if (row === null) {
+                continue;
+            }
+
+            let cell = null;
+
+            if (create_centered || margin) {
+                cell = document.createElement("td");
+            }
+
+            if (cell === null) {
+                continue;
+            }
+
+            if (create_centered) {
+                cell.setAttribute("colspan", content_w);
+                cell.setAttribute("rowspan", content_h);
+                cell.classList.add("amc-tui-cell");
+                cell.append(content);
+            }
+            else {
+                let pre = document.createElement("pre");
+
+                pre.append(document.createTextNode(" "));
+                cell.append(pre);
+            }
+
+            row.append(cell);
+        }
+
+        if (row !== null) {
+            table.append(row);
+        }
+    }
+
+    return table;
+}
+
 function amc_tui_create_login_form() {
     let wrap = document.createElement("div");
 
@@ -349,6 +423,9 @@ function amc_tui_create_login_form() {
     let form_rows = 3;
     let cols = form_cols + 1 + form_cols * form_cell_width;
     let rows = 2 * form_rows + 1;
+
+    wrap.setAttribute("data-colspan", cols);
+    wrap.setAttribute("data-rowspan", rows);
 
     let fields = [];
 

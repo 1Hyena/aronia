@@ -1,7 +1,16 @@
 "use strict";
 
 function amc_show_login(container) {
-    container.replaceChildren(amc_tui_create_login_form());
+    let container_w = parseInt(container.getAttribute("colspan"), 10);
+    let container_h = parseInt(container.getAttribute("rowspan"), 10);
+
+    let centered = amc_tui_create_centered(
+        amc_tui_create_login_form(), container_w, container_h
+    );
+
+    centered.classList.add("amc-tui-fg");
+
+    container.replaceChildren(centered);
 }
 
 function amc_show_message(container, message) {
@@ -9,7 +18,7 @@ function amc_show_message(container, message) {
 }
 
 function amc_show_mudstate(state) {
-    var container = document.getElementById("amc-panel-fg-middle");
+    var container = document.getElementById("amc-panel-fg-bottom");
 
     if (container === null) {
         return;

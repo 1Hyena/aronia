@@ -64,7 +64,7 @@ pre {
     ); /* kludgy fix for FF table cell-spacing artefacts */
 }
 
-table.amc-tui-fg > tr > td:not(.amc-panel-cell) > pre {
+table.amc-tui-fg > tr > td:not(.amc-tui-cell) > pre {
     visibility: hidden;
 }
 
@@ -101,7 +101,7 @@ table.amc-tui > tr > td {
     vertical-align: top;
 }
 
-.amc-panel-cell {
+.amc-tui-cell {
     position: relative;
 }
 

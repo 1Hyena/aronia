@@ -222,17 +222,17 @@ function amc_get_foreground_panel_model(width, height) {
                     },
                     {
                         key: "amc-panel-fg-middle",
+                        min_h: 1,
+                        min_w: 1,
+                        priority : 1
+                    },
+                    {
+                        key: "amc-panel-fg-bottom",
                         min_h: 8,
                         min_w: 44,
                         max_w: width,
                         max_h: height,
                         priority : 0
-                    },
-                    {
-                        key: "amc-panel-fg-bottom",
-                        min_h: 1,
-                        min_w: 1,
-                        priority : 1
                     }
                 ]
             },
@@ -543,7 +543,7 @@ function amc_create_panel(framework) {
             td.setAttribute("colspan", tui[key].width - 1);
             td.setAttribute("rowspan", tui[key].height - 1);
             td.id = key;
-            td.classList.add("amc-panel-cell");
+            td.classList.add("amc-tui-cell");
 
             tr.append(td);
 
