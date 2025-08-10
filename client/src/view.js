@@ -12,36 +12,12 @@ function amc_init_foreview(container) {
         return;
     }
 
-    let model_w = parseInt(container.getAttribute("colspan"), 10) - 2;
-    let model_h = parseInt(container.getAttribute("rowspan"), 10) - 1;
+    let model_w = parseInt(container.getAttribute("colspan"), 10) - 1;
+    let model_h = parseInt(container.getAttribute("rowspan"), 10);
 
     if (model_w <= 1 || model_h <= 1) {
         return;
     }
-
-    /*
-    let model = {
-        width    : model_w,
-        height   : model_h,
-        vertical : true,
-        contents : [
-            {
-                key: "amc-panel-chatview",
-                min_h: 1,
-                min_w: 1,
-                priority : 0
-            },
-            {
-                key: "amc-panel-miscview",
-                min_h: 1,
-                min_w: 1,
-                priority : 1
-            }
-        ]
-    };
-
-    let panel = amc_create_panel(amc_create_panel_framework(model));
-    */
 
     let layout = {
         padding: {

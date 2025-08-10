@@ -519,6 +519,86 @@ function amc_panel_inflate_framework(framework, width, height) {
     let width_remaining = width;
     let height_remaining = height;
 
+    hcells.sort((a, b) => a.width > b.width ? 1 : -1);
+
+    let last_w = 0;
+
+    while (hcells.length > 0) {
+        for (let i=0; i<hcells.length; ++i) {
+            let cell = hcells[i];
+            let cw = cell.width;
+
+            if (cell.pruned || cw >= cell.max_w) {
+                hcells[i] = null;
+                continue;
+            }
+
+            if (last_w < cw) {
+                ++last_w;
+                break;
+            }
+
+            cell.width++;
+
+            let next_width_remaining = (
+                width - amc_panel_get_framework_width(framework)
+            );
+
+            if (next_width_remaining < 0) {
+                cell.width--;
+                hcells[i] = null;
+            }
+            else width_remaining = next_width_remaining;
+        }
+
+        hcells = hcells.filter(
+            function (el) {
+                return el !== null;
+            }
+        );
+    }
+
+    vcells.sort((a, b) => a.height > b.height ? 1 : -1);
+
+    let last_h = 0;
+
+    while (vcells.length > 0) {
+        for (let i=0; i<vcells.length; ++i) {
+            let cell = vcells[i];
+            let ch = cell.height;
+
+            if (cell.pruned || ch >= cell.max_h) {
+                vcells[i] = null;
+                continue;
+            }
+
+            if (last_h < ch) {
+                ++last_h;
+                break;
+            }
+
+            cell.height++;
+
+            let next_height_remaining = (
+                height - amc_panel_get_framework_height(framework)
+            );
+
+            if (next_height_remaining < 0) {
+                cell.height--;
+                vcells[i] = null;
+            }
+            else height_remaining = next_height_remaining;
+        }
+
+        vcells = vcells.filter(
+            function (el) {
+                return el !== null;
+            }
+        );
+    }
+
+    // old version:
+    /*
     while (hcells.length > 0) {
         let cell = hcells.shift();
 
@@ -572,6 +652,7 @@ function amc_panel_inflate_framework(framework, width, height) {
             vcells.push(cell);
         }
     }
+    */
 }
 
 function amc_panel_situate_framework(framework, x, y) {
@@ -614,6 +695,32 @@ function amc_panel_calc_framework(layout, width, height) {
     amc_panel_situate_framework(fw, 0, 0);
 
     return fw;
+}
+
+function amc_panel_get_border_symbol(map, x, y) {
+    let bits = 0;
+
+    if (y > 0                   && !map[y-1][x]) bits += 0b0001; // north
+    if (y + 1 < map.length      && !map[y+1][x]) bits += 0b0010; // south
+    if (x + 1 < map[y].length   && !map[y][x+1]) bits += 0b0100; // east
+    if (x > 0                   && !map[y][x-1]) bits += 0b1000; // west
+
+    switch (bits) {
+        case 0b0011: return "║";
+        case 0b0101: return "╚";
+        case 0b0110: return "╔";
+        case 0b0111: return "╠";
+        case 0b1001: return "╝";
+        case 0b1010: return "╗";
+        case 0b1011: return "╣";
+        case 0b1100: return "═";
+        case 0b1101: return "╩";
+        case 0b1110: return "╦";
+        case 0b1111: return "╬";
+        default: break;
+    }
+
+    return " ";
 }
 
 function amc_panel_from_framework(framework) {
@@ -667,7 +774,11 @@ function amc_panel_from_framework(framework) {
                 let td = document.createElement("td");
                 let pre = document.createElement("pre");
 
-                pre.append(document.createTextNode(cell ? " " : "#"));
+                pre.append(
+                    document.createTextNode(
+                        amc_panel_get_border_symbol(map, x, y)
+                    )
+                );
 
                 td.append(pre);
                 tr.append(td);
@@ -740,7 +851,9 @@ function amc_panel_get_foreground_layout(width, height) {
                     },
                     {
                         key: "amc-panel-fg-bottom",
-                        priority : 0
+                        priority : 0,
+                        min_h: 8,
+                        min_w: 44
                     }
                 ]
             },
@@ -762,6 +875,23 @@ function amc_panel_get_foreground_layout(width, height) {
 }
 
 function amc_panel_get_background_layout(width, height) {
+    let sidebar_width = 40;
+    let console_width = 80;
+    let console_begin = Math.max(Math.floor(width / 2 - console_width / 2), 0);
+
+    if (console_begin < sidebar_width) {
+        console_begin = sidebar_width;
+
+        if (width - console_begin < console_width) {
+            console_begin = 0;
+        }
+    }
+
+    let console_min_width = Math.min(width - console_begin, width - 2);
+    let console_max_width = width; //console_min_width;
+    let command_min_width = Math.min(console_min_width, console_width);
+    let command_max_width = command_min_width;
+
     return {
         padding: {
             top: 1,
@@ -781,11 +911,15 @@ function amc_panel_get_background_layout(width, height) {
                         contents : [
                             {
                                 key: "amc-panel-below-top-left-1st",
-                                priority : 5
+                                priority : 5,
+                                min_w : 21,
+                                min_h : 11
                             },
                             {
                                 key: "amc-panel-below-top-left-2nd",
-                                priority: 4
+                                priority: 4,
+                                min_w: 5,
+                                min_h: 3
                             }
                         ]
                     },
@@ -794,7 +928,8 @@ function amc_panel_get_background_layout(width, height) {
                         priority: 6
                     }, {
                         key: "amc-panel-below-bottom-left",
-                        priority: 7
+                        priority: 7,
+                        max_h: 1
                     }
                 ]
             },
@@ -803,17 +938,23 @@ function amc_panel_get_background_layout(width, height) {
                 contents : [
                     {
                         key: "amc-panel-console",
-                        priority: 1
+                        priority: 1,
+                        min_w: console_min_width,
+                        max_w: console_max_width
                     }, {
                         vertical : false,
                         contents : [
                             {
                                 key: "amc-panel-below-console-left",
-                                priority: 0
+                                priority: 0,
+                                max_h: 1,
+                                min_w: command_min_width,
+                                max_w: command_max_width
                             },
                             {
                                 key: "amc-panel-below-console-right",
-                                priority: 10
+                                priority: 10,
+                                max_h: 1
                             }
                         ]
                     }
@@ -1005,32 +1146,6 @@ function amc_create_panel_framework(model) {
     }
 
     return model;
-}
-
-function amc_get_border_symbol(map, x, y) {
-    let bits = 0;
-
-    if (y > 0                   && !map[y-1][x]) bits += 0b0001; // north
-    if (y + 1 < map.length      && !map[y+1][x]) bits += 0b0010; // south
-    if (x + 1 < map[y].length   && !map[y][x+1]) bits += 0b0100; // east
-    if (x > 0                   && !map[y][x-1]) bits += 0b1000; // west
-
-    switch (bits) {
-        case 0b0011: return "║";
-        case 0b0101: return "╚";
-        case 0b0110: return "╔";
-        case 0b0111: return "╠";
-        case 0b1001: return "╝";
-        case 0b1010: return "╗";
-        case 0b1011: return "╣";
-        case 0b1100: return "═";
-        case 0b1101: return "╩";
-        case 0b1110: return "╦";
-        case 0b1111: return "╬";
-        default: break;
-    }
-
-    return " ";
 }
 
 function amc_create_panel(framework) {

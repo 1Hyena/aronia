@@ -55,7 +55,8 @@ var global = {
                 reverse: null,
                 italic: null,
                 strikethrough: null,
-                fg : null
+                fg : null,
+                sigreset : undefined
             },
             buffer : null,
             hidden : [],

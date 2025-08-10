@@ -194,7 +194,7 @@ function terminal_deserialize_esc(data) {
 
         if (data[0] === 27
         &&  data[1] === 91
-        &&  data[data.length - 1] === 109) {
+        &&  data[data.length - 1] === "m".charCodeAt(0)) {
             let parts = String.fromCharCode(
                 ...data.slice(2, data.length - 1)
             ).split(";");
@@ -206,6 +206,13 @@ function terminal_deserialize_esc(data) {
                     case 0: { // reset all
                         for (const [key, value] of Object.entries(state_reset)) {
                             state[key] = value;
+                        }
+
+                        if (parts.length === 1) {
+                            // Kludgy hack to break color interpolation. This is
+                            // triggered by a single ANSI reset sequence (ESC[0m).
+
+                            state.sigreset = true;
                         }
 
                         break;
@@ -343,6 +350,10 @@ function terminal_data_to_node(data, output) {
 
         if (unicode.length > 0) {
             terminal_text_to_node(unicode, output, state);
+
+            if ("sigreset" in state) {
+                delete state.sigreset;
+            }
         }
     }
 }
@@ -351,9 +362,13 @@ function terminal_text_to_node(string, output, ansi) {
     ansi = typeof ansi !== 'undefined' ? ansi : {};
 
     let plain = true;
+    let plainsettings = {
+        "sigreset" : undefined,
+        "title"    : undefined
+    };
 
     for (const [key, value] of Object.entries(ansi)) {
-        if (ansi[key] !== null) {
+        if (ansi[key] !== null && key in plainsettings == false) {
             plain = false;
             break;
         }
@@ -426,6 +441,10 @@ function terminal_text_to_node(string, output, ansi) {
 
             if ("hidden" in ansi && ansi.hidden === true) {
                 span.classList.add("ans-hidden");
+            }
+
+            if ("sigreset" in ansi && ansi.sigreset === true) {
+                span.classList.add("ans-sigreset");
             }
 
             appendage = span;

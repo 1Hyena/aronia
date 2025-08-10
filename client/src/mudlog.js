@@ -107,6 +107,8 @@ function amc_handle_txt(data) {
                 data : [...unicode]
             }
         );
+
+        global.mud.log.ansi.sigreset = undefined;
     }
 }
 
@@ -119,7 +121,9 @@ function amc_handle_esc(data) {
     }
 
     for (const [key, value] of Object.entries(state)) {
-        global.mud.log.ansi[key] = value;
+        if (key in global.mud.log.ansi) {
+            global.mud.log.ansi[key] = value;
+        }
     }
 }
 
@@ -378,6 +382,7 @@ function amc_update_terminal() {
         if (el_next !== null
         &&  el_prev !== null
         &&  el_next.classList.contains("ans-lerp")
+        && !el_next.classList.contains("ans-sigreset")
         &&  el_prev.classList.contains("ans-lerp")
         &&  el_prev.getAttribute("data-fg") != el.getAttribute("data-fg")
         &&  el_next.getAttribute("data-fg") != el.getAttribute("data-fg")) {
@@ -392,6 +397,7 @@ function amc_update_terminal() {
 
         if (el_next !== null
         &&  el_next.classList.contains("ans-lerp")
+        && !el_next.classList.contains("ans-sigreset")
         &&  el_next.getAttribute("data-fg") != el.getAttribute("data-fg")) {
             el.classList.add(
                 "ans-lerp-"+el.getAttribute("data-fg")+
@@ -414,6 +420,10 @@ function amc_update_terminal() {
 
         if (el.classList.contains("ans-lerp")) {
             el.classList.remove("ans-lerp");
+        }
+
+        if (el.classList.contains("ans-sigreset")) {
+            el.classList.remove("ans-sigreset");
         }
     }
 
