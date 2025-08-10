@@ -877,20 +877,28 @@ function amc_panel_get_foreground_layout(width, height) {
 function amc_panel_get_background_layout(width, height) {
     let sidebar_width = 40;
     let console_width = 80;
-    let console_begin = Math.max(Math.floor(width / 2 - console_width / 2), 0);
 
-    if (console_begin < sidebar_width) {
-        console_begin = sidebar_width;
+    let padding_min_width = Math.max(width - (console_width+sidebar_width+4), 0);
 
-        if (width - console_begin < console_width) {
-            console_begin = 0;
-        }
+    if (padding_min_width > sidebar_width) {
+        padding_min_width = Math.floor((padding_min_width + sidebar_width)/2);
     }
 
-    let console_min_width = Math.min(width - console_begin, width - 2);
-    let console_max_width = width; //console_min_width;
-    let command_min_width = Math.min(console_min_width, console_width);
+    let command_min_width = Math.max(
+        Math.min(width-(sidebar_width+padding_min_width+4), console_width), 0
+    );
+
+    if (padding_min_width <= 0) {
+        padding_min_width = width; // let's force pruning
+        command_min_width = console_width;
+    }
+
+    if (command_min_width + 2 > width) {
+        command_min_width = Math.max(width - 2, 0);
+    }
+
     let command_max_width = command_min_width;
+    let padding_max_width = padding_min_width;
 
     return {
         padding: {
@@ -904,7 +912,9 @@ function amc_panel_get_background_layout(width, height) {
                 contents : [
                     {
                         key: "amc-panel-top-left",
-                        priority : 3
+                        priority : 3,
+                        min_w: 19,
+                        min_h: 5
                     },
                     {
                         vertical : false,
@@ -938,9 +948,7 @@ function amc_panel_get_background_layout(width, height) {
                 contents : [
                     {
                         key: "amc-panel-console",
-                        priority: 1,
-                        min_w: console_min_width,
-                        max_w: console_max_width
+                        priority: 1
                     }, {
                         vertical : false,
                         contents : [
@@ -954,7 +962,9 @@ function amc_panel_get_background_layout(width, height) {
                             {
                                 key: "amc-panel-below-console-right",
                                 priority: 10,
-                                max_h: 1
+                                max_h: 1,
+                                min_w: padding_min_width,
+                                max_w: padding_max_width
                             }
                         ]
                     }
