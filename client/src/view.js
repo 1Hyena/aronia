@@ -19,6 +19,7 @@ function amc_init_foreview(container) {
         return;
     }
 
+    /*
     let model = {
         width    : model_w,
         height   : model_h,
@@ -40,6 +41,30 @@ function amc_init_foreview(container) {
     };
 
     let panel = amc_create_panel(amc_create_panel_framework(model));
+    */
+
+    let layout = {
+        padding: {
+            top: 1,
+            left: 1
+        },
+        vertical : true,
+        contents : [
+            {
+                key: "amc-panel-chatview",
+                priority : 0
+            },
+            {
+                key: "amc-panel-miscview",
+                priority : 1
+            }
+        ]
+    };
+
+    let panel = amc_panel_from_framework(
+        amc_panel_calc_framework(layout, model_w, model_h)
+    );
+
     var wrapper = document.createElement("div");
 
     wrapper.id = wrapper_id;
