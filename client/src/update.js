@@ -152,6 +152,172 @@ function amc_update_mainview_exits(msdp_var) {
     }
 }
 
+function amc_update_zoneview(msdp_var) {
+    if (msdp_var in msdp.variables == false) {
+        bug();
+        return;
+    }
+
+    if ("MAP" in msdp.variables == false) {
+        bug();
+        return;
+    }
+
+    let msdp_map = msdp.variables["MAP"];
+    let zoneview = document.getElementById("amc-zoneview");
+
+    if (zoneview === null) {
+        return;
+    }
+
+    let cols = parseInt(zoneview.getAttribute("data-width"), 10);
+    let rows = parseInt(zoneview.getAttribute("data-height"), 10);
+
+    let map = new Array(rows);
+
+    for (let y = 0; y < map.length; ++y) {
+        map[y] = new Array(cols);
+        map[y].fill(" ");
+    }
+
+    let scale_y = Math.ceil(rows / 16);
+    let scale_x = Math.ceil(cols / 32);
+    let scale = Math.max(scale_x, scale_y);
+
+    let xorigin = parseInt(zoneview.getAttribute("data-xorigin"), 10);
+    let yorigin = parseInt(zoneview.getAttribute("data-yorigin"), 10);
+
+    for (let i=0; i<msdp_map.length; ++i) {
+        let room = msdp_map[i];
+
+        if (room.vnum === msdp.variables.ROOM_VNUM) {
+            let new_xorigin = parseInt(room.x, 10);
+            let new_yorigin = parseInt(room.y, 10);
+
+            if (xorigin != new_xorigin) {
+                xorigin = new_xorigin;
+                zoneview.setAttribute("data-xorigin", xorigin);
+            }
+
+            if (yorigin != new_yorigin) {
+                yorigin = new_yorigin;
+                zoneview.setAttribute("data-yorigin", yorigin);
+            }
+
+            break;
+        }
+    }
+
+    xorigin *= 2 * scale;
+    yorigin *= scale;
+
+    xorigin = Math.max(xorigin, Math.ceil(cols / 2));
+    xorigin = Math.min(xorigin, 16 * 2 * scale - Math.ceil(cols / 2));
+
+    yorigin = Math.max(yorigin, Math.ceil(rows / 2));
+    yorigin = Math.min(yorigin, 16 * scale - Math.ceil(rows / 2));
+
+    let translate_x = Math.floor(cols / 2) - xorigin;
+    let translate_y = Math.floor(rows / 2) - yorigin;
+
+    for (let i=0; i<msdp_map.length; ++i) {
+        let room = msdp_map[i];
+        let x = (parseInt(room.x, 10) * 2 * scale) + translate_x;
+        let y = (parseInt(room.y, 10) * scale) + translate_y;
+
+        if (x >= cols || y >= rows || x < 0 || y < 0) {
+            continue;
+        }
+
+        let exits = [...room.exits];
+
+        exits = Object.fromEntries(exits.map(key => [key, undefined]));
+
+        let bits = 0;
+
+        if ("N" in exits) bits += 0b0001; // north
+        if ("S" in exits) bits += 0b0010; // south
+        if ("E" in exits) bits += 0b0100; // east
+        if ("W" in exits) bits += 0b1000; // west
+
+        let symbol = " ";
+
+        switch (bits) {
+            case 0b0001: symbol = "╵"; break;
+            case 0b0010: symbol = "╷"; break;
+            case 0b0100: symbol = "╶"; break;
+            case 0b1000: symbol = "╴"; break;
+            case 0b0011: symbol = "│"; break;
+            case 0b0101: symbol = "└"; break;
+            case 0b0110: symbol = "┌"; break;
+            case 0b0111: symbol = "├"; break;
+            case 0b1001: symbol = "┘"; break;
+            case 0b1010: symbol = "┐"; break;
+            case 0b1011: symbol = "┤"; break;
+            case 0b1100: symbol = "─"; break;
+            case 0b1101: symbol = "┴"; break;
+            case 0b1110: symbol = "┬"; break;
+            case 0b1111: symbol = "┼"; break;
+            default: break;
+        }
+
+        map[y][x] = symbol;
+    }
+
+    var tunneler = function(field, x, y, dx, dy, symbol) {
+        while (y >= 0 && y < field.length && x >= 0 && x < field[y].length) {
+            if (field[y][x] !== " ") {
+                break;
+            }
+
+            field[y][x] = symbol;
+
+            x += dx;
+            y += dy;
+        }
+    };
+
+    for (let i=0; i<msdp_map.length; ++i) {
+        let room = msdp_map[i];
+        let x = (parseInt(room.x, 10) * 2 * scale) + translate_x;
+        let y = (parseInt(room.y, 10) * scale) + translate_y;
+
+        if (x >= cols || y >= rows || x < 0 || y < 0) {
+            continue;
+        }
+
+        let exits = [...room.exits];
+
+        exits = Object.fromEntries(exits.map(key => [key, undefined]));
+
+        if ("N" in exits) tunneler(map, x, y - 1, 0, -1,    "│");
+        if ("S" in exits) tunneler(map, x, y + 1, 0, 1,     "│");
+        if ("E" in exits) tunneler(map, x + 1, y, 1, 0,     "─");
+        if ("W" in exits) tunneler(map, x - 1, y, -1, 0,    "─");
+
+        if (room.vnum === msdp.variables.ROOM_VNUM) {
+            map[y][x] = "@";
+        }
+    }
+
+    let view = new DocumentFragment();
+    let text = "";
+
+    for (let y=0; y<map.length; ++y) {
+        for (let x=0; x<map[y].length; ++x) {
+            let char = map[y][x];
+
+            text += char;
+        }
+
+        text += "\n";
+    }
+
+    view.appendChild(document.createTextNode(text));
+
+    zoneview.replaceChildren(view);
+}
+
 function amc_update_roomview(msdp_var) {
     let msdp_var_to_id_map = {
         ROOM_NAME: "amc-roomview-name",

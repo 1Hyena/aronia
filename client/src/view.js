@@ -202,15 +202,14 @@ function amc_init_zoneview(container) {
 
     wrapper.id = "amc-zoneview-wrapper";
 
-    var placeholder = document.createElement("pre");
-
-    placeholder.appendChild(
-        document.createTextNode(amc_tui_get_secondary_top_placeholder())
+    wrapper.appendChild(
+        amc_tui_create_zoneview(
+            parseInt(container.getAttribute("colspan"), 10),
+            parseInt(container.getAttribute("rowspan"), 10)
+        )
     );
 
-    wrapper.appendChild(placeholder);
-
-    container.appendChild(wrapper);
+    container.replaceChildren(wrapper);
 }
 
 function amc_init_itemview(container) {

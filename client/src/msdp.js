@@ -65,11 +65,13 @@ var msdp = {
         SECTOR_SE : null,
         SECTOR_SW : null,
         ROOM_NAME : null,
+        ROOM_VNUM : null,
         ROOM_AREA : null,
         ROOM_DESC : null,
         EXIT_INFO : null,
         ROOM_ITEM_LIST : null,
-        ROOM_CHAR_LIST : null
+        ROOM_CHAR_LIST : null,
+        MAP : null
     },
     renewing : {},
     incoming : [],
@@ -215,6 +217,11 @@ function msdp_update_variable(key, value) {
 
     switch (key) {
         default: break;
+        case "ROOM_VNUM":
+        case "MAP": {
+            amc_update_zoneview(key);
+            break;
+        }
         case "EXITS":
         case "EXITS_N":
         case "EXITS_S":

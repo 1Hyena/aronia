@@ -140,6 +140,18 @@ function amc_tui_draw_room(map, room) {
     }
 }
 
+function amc_tui_create_zoneview(cols, rows) {
+    let zoneview = document.createElement("div");
+
+    zoneview.id = "amc-zoneview";
+    zoneview.setAttribute("data-width", cols);
+    zoneview.setAttribute("data-height", rows);
+    zoneview.setAttribute("data-xorigin", 8);
+    zoneview.setAttribute("data-yorigin", 8);
+
+    return zoneview;
+}
+
 function amc_tui_create_mainview(cols, rows) {
     let mainview = document.createElement("div");
 
@@ -844,6 +856,7 @@ function amc_tui_create_statview() {
     return table;
 }
 
+/*
 function amc_tui_get_secondary_top_placeholder() {
     let placeholder =
     "n∩n∩n∩n∩.ⁿ.ⁿ.ⁿ.ⁿ \"⌠ \"⌠\"⌠\"⌠⌂ ⌂⌂ ⌂⌂ ⌂ \n"+
@@ -864,6 +877,7 @@ function amc_tui_get_secondary_top_placeholder() {
 
     return placeholder;
 }
+*/
 
 function amc_tui_get_inventory_placeholder() {
     return (

@@ -176,6 +176,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     bottom: -6px;
 }
 
+#amc-zoneview,
 #amc-mainview {
     white-space: pre-wrap;
 }
