@@ -242,23 +242,45 @@ function amc_update_zoneview(msdp_var) {
 
         let symbol = " ";
 
-        switch (bits) {
-            case 0b0001: symbol = "╵"; break;
-            case 0b0010: symbol = "╷"; break;
-            case 0b0100: symbol = "╶"; break;
-            case 0b1000: symbol = "╴"; break;
-            case 0b0011: symbol = "│"; break;
-            case 0b0101: symbol = "└"; break;
-            case 0b0110: symbol = "┌"; break;
-            case 0b0111: symbol = "├"; break;
-            case 0b1001: symbol = "┘"; break;
-            case 0b1010: symbol = "┐"; break;
-            case 0b1011: symbol = "┤"; break;
-            case 0b1100: symbol = "─"; break;
-            case 0b1101: symbol = "┴"; break;
-            case 0b1110: symbol = "┬"; break;
-            case 0b1111: symbol = "┼"; break;
-            default: break;
+        if ("U" in exits || "D" in exits) {
+            switch (bits) {
+                case 0b0001: symbol = "╹"; break;
+                case 0b0010: symbol = "╻"; break;
+                case 0b0100: symbol = "╺"; break;
+                case 0b1000: symbol = "╸"; break;
+                case 0b0011: symbol = "┃"; break;
+                case 0b0101: symbol = "┗"; break;
+                case 0b0110: symbol = "┏"; break;
+                case 0b0111: symbol = "┣"; break;
+                case 0b1001: symbol = "┛"; break;
+                case 0b1010: symbol = "┓"; break;
+                case 0b1011: symbol = "┫"; break;
+                case 0b1100: symbol = "━"; break;
+                case 0b1101: symbol = "┻"; break;
+                case 0b1110: symbol = "┳"; break;
+                case 0b1111: symbol = "╋"; break;
+                default: break;
+            }
+        }
+        else {
+            switch (bits) {
+                case 0b0001: symbol = "╵"; break;
+                case 0b0010: symbol = "╷"; break;
+                case 0b0100: symbol = "╶"; break;
+                case 0b1000: symbol = "╴"; break;
+                case 0b0011: symbol = "│"; break;
+                case 0b0101: symbol = "└"; break;
+                case 0b0110: symbol = "┌"; break;
+                case 0b0111: symbol = "├"; break;
+                case 0b1001: symbol = "┘"; break;
+                case 0b1010: symbol = "┐"; break;
+                case 0b1011: symbol = "┤"; break;
+                case 0b1100: symbol = "─"; break;
+                case 0b1101: symbol = "┴"; break;
+                case 0b1110: symbol = "┬"; break;
+                case 0b1111: symbol = "┼"; break;
+                default: break;
+            }
         }
 
         map[y][x] = symbol;
@@ -299,7 +321,13 @@ function amc_update_zoneview(msdp_var) {
 
         if (room.vnum === msdp.variables.ROOM_VNUM) {
             map[y][x] = "@";
-            refresh = false;
+
+            if (y > scale
+            && y + scale < map.length
+            && x > 2 * scale
+            && x + 2 * scale < map[y].length) {
+                refresh = false;
+            }
         }
     }
 
