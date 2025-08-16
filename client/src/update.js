@@ -166,7 +166,7 @@ function amc_update_zoneview(msdp_var) {
     let msdp_map = msdp.variables["MAP"];
     let zoneview = document.getElementById("amc-zoneview");
 
-    if (zoneview === null) {
+    if (zoneview === null || msdp_map === null) {
         return;
     }
 
@@ -277,6 +277,8 @@ function amc_update_zoneview(msdp_var) {
         }
     };
 
+    let refresh = true;
+
     for (let i=0; i<msdp_map.length; ++i) {
         let room = msdp_map[i];
         let x = (parseInt(room.x, 10) * 2 * scale) + translate_x;
@@ -297,6 +299,7 @@ function amc_update_zoneview(msdp_var) {
 
         if (room.vnum === msdp.variables.ROOM_VNUM) {
             map[y][x] = "@";
+            refresh = false;
         }
     }
 
@@ -316,6 +319,18 @@ function amc_update_zoneview(msdp_var) {
     view.appendChild(document.createTextNode(text));
 
     zoneview.replaceChildren(view);
+
+    if (refresh) {
+        if (zoneview.hasAttribute("data-refresh")) {
+            zoneview.removeAttribute("data-refresh");
+            msdp_send_variable("MAP");
+        }
+    }
+    else {
+        if (!zoneview.hasAttribute("data-refresh")) {
+            zoneview.setAttribute("data-refresh", '');
+        }
+    }
 }
 
 function amc_update_roomview(msdp_var) {

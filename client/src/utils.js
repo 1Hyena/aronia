@@ -271,13 +271,19 @@ function scroll_to_bottom(container_id, fun) {
             var view = document.getElementById(settings.container);
 
             if (view !== null) {
-                view.scrollTop = view.scrollHeight;
+                let options = {top: view.scrollHeight, behavior: "instant"};
+
+                view.scrollTo(options);
 
                 if (settings.fun !== null) {
                     settings.fun();
                 }
+
+                options.top = view.scrollHeight;
+
+                view.scrollTo(options);
             }
-        }, 1, { container: container_id, fun: fun }
+        }, 0, { container: container_id, fun: fun }
     );
 }
 

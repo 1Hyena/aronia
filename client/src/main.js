@@ -83,7 +83,6 @@ function amc_update_scroll() {
 
     if (!was_bottom && is_bottom) {
         amc_update_terminal();
-        amc_optimize_terminal();
     }
 
     if (!was_top && is_top) {

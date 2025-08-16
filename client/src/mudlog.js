@@ -284,17 +284,12 @@ function amc_optimize_terminal() {
 }
 
 function amc_update_terminal() {
-    if (global.mud.log.buffer === null
-    || !amc_scrolled_bottom()) {
+    if (global.mud.log.buffer === null || !amc_scrolled_bottom()) {
         return;
     }
 
     let output = (
         global.offscreen.terminal || document.getElementById("amc-terminal")
-    );
-
-    let bottom = (
-        output.parentNode ? is_scrolled_bottom(output.parentNode) : false
     );
 
     let children = global.mud.log.buffer.childNodes;
@@ -470,9 +465,7 @@ function amc_update_terminal() {
         output.appendChild(buffer);
     }
 
-    if (bottom) {
-        scroll_to_bottom("amc-terminal-wrapper", amc_optimize_terminal);
-    }
+    scroll_to_bottom("amc-terminal-wrapper", amc_optimize_terminal);
 }
 
 function amc_match_game_line(line) {
