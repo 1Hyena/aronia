@@ -173,16 +173,44 @@ function amc_update_zoneview(msdp_var) {
     let cols = parseInt(zoneview.getAttribute("data-width"), 10);
     let rows = parseInt(zoneview.getAttribute("data-height"), 10);
 
+    var translator = function(setup, room_x, room_y) {
+        let cols = setup.cols;
+        let rows = setup.rows;
+        let origin_x = setup.origin.x;
+        let origin_y = setup.origin.y;
+
+        let scale_y = Math.ceil(rows / 16);
+        let scale_x = Math.ceil(cols / 32);
+        let scale = Math.max(scale_x, scale_y);
+
+        origin_x *= 2 * scale;
+        origin_y *= scale;
+
+        origin_x = Math.max(origin_x, Math.ceil(cols / 2));
+        origin_x = Math.min(origin_x, 16 * 2 * scale - Math.ceil(cols / 2));
+
+        origin_y = Math.max(origin_y, Math.ceil(rows / 2));
+        origin_y = Math.min(origin_y, 16 * scale - Math.ceil(rows / 2));
+
+        let translate_x = Math.floor(cols / 2) - origin_x;
+        let translate_y = Math.floor(rows / 2) - origin_y;
+
+        return {
+            x : (room_x * 2 * scale) + translate_x,
+            y : (room_y * scale) + translate_y,
+            scale : {
+                x : 2 * scale,
+                y : scale
+            }
+        };
+    }
+
     let map = new Array(rows);
 
     for (let y = 0; y < map.length; ++y) {
         map[y] = new Array(cols);
-        map[y].fill(" ");
+        map[y].fill("");
     }
-
-    let scale_y = Math.ceil(rows / 16);
-    let scale_x = Math.ceil(cols / 32);
-    let scale = Math.max(scale_x, scale_y);
 
     let xorigin = parseInt(zoneview.getAttribute("data-xorigin"), 10);
     let yorigin = parseInt(zoneview.getAttribute("data-yorigin"), 10);
@@ -208,22 +236,22 @@ function amc_update_zoneview(msdp_var) {
         }
     }
 
-    xorigin *= 2 * scale;
-    yorigin *= scale;
-
-    xorigin = Math.max(xorigin, Math.ceil(cols / 2));
-    xorigin = Math.min(xorigin, 16 * 2 * scale - Math.ceil(cols / 2));
-
-    yorigin = Math.max(yorigin, Math.ceil(rows / 2));
-    yorigin = Math.min(yorigin, 16 * scale - Math.ceil(rows / 2));
-
-    let translate_x = Math.floor(cols / 2) - xorigin;
-    let translate_y = Math.floor(rows / 2) - yorigin;
+    let translation_setup = {
+        cols : cols,
+        rows : rows,
+        origin: {
+            x: xorigin,
+            y: yorigin
+        }
+    };
 
     for (let i=0; i<msdp_map.length; ++i) {
         let room = msdp_map[i];
-        let x = (parseInt(room.x, 10) * 2 * scale) + translate_x;
-        let y = (parseInt(room.y, 10) * scale) + translate_y;
+        let translation = translator(
+            translation_setup, parseInt(room.x, 10), parseInt(room.y, 10)
+        );
+        let x = translation.x;
+        let y = translation.y;
 
         if (x >= cols || y >= rows || x < 0 || y < 0) {
             continue;
@@ -240,7 +268,7 @@ function amc_update_zoneview(msdp_var) {
         if ("E" in exits) bits += 0b0100; // east
         if ("W" in exits) bits += 0b1000; // west
 
-        let symbol = " ";
+        let symbol = "";
 
         if ("U" in exits || "D" in exits) {
             switch (bits) {
@@ -288,7 +316,7 @@ function amc_update_zoneview(msdp_var) {
 
     var tunneler = function(field, x, y, dx, dy, symbol) {
         while (y >= 0 && y < field.length && x >= 0 && x < field[y].length) {
-            if (field[y][x] !== " ") {
+            if (field[y][x] !== "") {
                 break;
             }
 
@@ -300,11 +328,15 @@ function amc_update_zoneview(msdp_var) {
     };
 
     let refresh = true;
+    let decoration_queue = [];
 
     for (let i=0; i<msdp_map.length; ++i) {
         let room = msdp_map[i];
-        let x = (parseInt(room.x, 10) * 2 * scale) + translate_x;
-        let y = (parseInt(room.y, 10) * scale) + translate_y;
+        let translation = translator(
+            translation_setup, parseInt(room.x, 10), parseInt(room.y, 10)
+        );
+        let x = translation.x;
+        let y = translation.y;
 
         if (x >= cols || y >= rows || x < 0 || y < 0) {
             continue;
@@ -322,12 +354,185 @@ function amc_update_zoneview(msdp_var) {
         if (room.vnum === msdp.variables.ROOM_VNUM) {
             map[y][x] = "@";
 
-            if (y > scale
-            && y + scale < map.length
-            && x > 2 * scale
-            && x + 2 * scale < map[y].length) {
+            if (y > translation.scale.y
+            && y + translation.scale.y < map.length
+            && x > translation.scale.x
+            && x + translation.scale.x < map[y].length) {
                 refresh = false;
             }
+        }
+
+        decoration_queue.push(
+            {
+                room: room,
+                x: x,
+                y: y,
+                sector: room.sector,
+                ttl: {
+                    x: translation.scale.x * 2,
+                    y: translation.scale.y * 2
+                },
+                cost : 0,
+                sequence : 0
+            }
+        );
+    }
+
+    var decorator = function(field, expansion) {
+        let x = expansion.x;
+        let y = expansion.y;
+        let sector = expansion.sector;
+        let ttl = expansion.ttl;
+        let room = expansion.room;
+
+        if (y < 0 || y >= field.length || x < 0 || x >= field[y].length) {
+            return [];
+        }
+
+        let sectors = {
+            underground: {
+                symbols : [ "▒", "░" ],
+                cost: 3
+            },
+            inside: {
+                symbols : [ " " ],
+                cost: Number.MAX_SAFE_INTEGER
+            },
+            shop: {
+                symbols : [ "$" ],
+                cost: Number.MAX_SAFE_INTEGER
+            },
+            guild: {
+                symbols : [ "%" ],
+                cost: Number.MAX_SAFE_INTEGER
+            },
+            forest: {
+                symbols : [ "♠", "♣", "↨", "↑", " ", " ", " " ],
+                cost: 1
+            },
+            desert: {
+                symbols : [ "=" ],
+                cost: 1
+            },
+            field: {
+                symbols : [ ".", ":", "ⁿ" ],
+                cost: 1
+            },
+            hills: {
+                symbols : [ "n", "∩", " ", " ", " " ],
+                cost: 2
+            },
+            city: {
+                symbols : [ "Π", "⌂", "⏏", "⌂", "⏏", "⌂", " " ],
+                cost: Number.MAX_SAFE_INTEGER
+            }
+        };
+
+        if (sector in sectors) {
+            if (field[y][x] === "") {
+                let symbols = sectors[sector].symbols;
+                let vnum = parseInt(room.vnum, 10);
+                let index = ttl.x + ttl.y * (expansion.sequence + 1) + vnum;
+                let symbol = symbols[(index) % symbols.length];
+
+                field[y][x] = symbol;
+            }
+        }
+        else return [];
+
+        let directions = [
+            { dx: -1, dy:  0 },
+            { dx:  1, dy:  0 },
+            { dx:  0, dy:  1 },
+            { dx:  0, dy: -1 },
+            { dx: -1, dy: -1 },
+            { dx:  1, dy: -1 },
+            { dx: -1, dy:  1 },
+            { dx:  1, dy:  1 }
+        ];
+
+        let expansions = [];
+
+        for (let i=0; i<directions.length; ++i) {
+            let dir = directions[i];
+            let next_x = x + dir.dx;
+            let next_y = y + dir.dy;
+
+            if (next_y < 0
+            ||  next_y >= field.length
+            ||  next_x < 0
+            ||  next_x >= field[next_y].length) {
+                continue;
+            }
+
+            if (field[next_y][next_x] !== "") {
+                continue;
+            }
+
+            let cost = sectors[sector].cost;
+
+            if ("cost" in expansion) {
+                cost = expansion.cost;
+            }
+
+            if ("direction" in expansion) {
+                if (expansion.direction.dx != dir.dx
+                || expansion.direction.dy != dir.dy) {
+                    cost *= 2;
+                }
+            }
+
+            if (cost !== 0 && dir.dx !== 0 && dir.dy !== 0) {
+                continue;
+            }
+
+            let ttl_x = dir.dx !== 0 ? ttl.x - cost : ttl.x;
+            let ttl_y = dir.dy !== 0 ? ttl.y - cost : ttl.y;
+
+            if (ttl_x < 0 || ttl_y < 0) {
+                continue;
+            }
+
+            expansions.push(
+                {
+                    room: room,
+                    x: next_x,
+                    y: next_y,
+                    sector: sector,
+                    ttl: {
+                        x: ttl_x,
+                        y: ttl_y
+                    },
+                    direction: dir,
+                    sequence: expansions.length
+                }
+            );
+        }
+
+        return expansions;
+    };
+
+    while (decoration_queue.length > 0) {
+        let next_queue = {};
+
+        while (decoration_queue.length > 0) {
+            let expansion = decoration_queue.pop();
+            let expansions = decorator(map, expansion);
+
+            while (expansions.length > 0) {
+                let exp = expansions.pop();
+                let key = exp.x+"-"+exp.y;
+
+                if (key in next_queue) {
+                    continue;
+                }
+
+                next_queue[key] = exp;
+            }
+        }
+
+        for (const [key, value] of Object.entries(next_queue)) {
+            decoration_queue.push(value);
         }
     }
 
@@ -336,7 +541,8 @@ function amc_update_zoneview(msdp_var) {
 
     for (let y=0; y<map.length; ++y) {
         for (let x=0; x<map[y].length; ++x) {
-            let char = map[y][x];
+            let pieces = [ " ", ...map[y][x] ];
+            let char = pieces.pop();
 
             text += char;
         }
