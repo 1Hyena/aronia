@@ -325,6 +325,7 @@ function amc_create_inputbar() {
                     }
                 );
 
+                scroll_to_bottom("amc-terminal-wrapper");
                 amc_send_command(event.target.value);
                 event.target.select();
             }
