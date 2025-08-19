@@ -420,7 +420,7 @@ function amc_update_zoneview(msdp_var) {
                 cost: Number.MAX_SAFE_INTEGER
             },
             forest: {
-                symbols : [ "♠", "♣", "↨", "↟", "↑", "↥", " ", " ", " " ],
+                symbols : [ "♠", "♣", "↨", "↟", "↑", "↥", "τ", ".", "." ],
                 style: "\x1B[0;32m",
                 cost: 1
             },
