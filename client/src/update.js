@@ -314,21 +314,73 @@ function amc_update_zoneview(msdp_var) {
         map[y][x] = symbol;
     }
 
-    var tunneler = function(field, x, y, dx, dy, symbol) {
+    var tunneler = function(field, x, y, dx, dy, symbol, roads) {
+        let tunnel = [];
+        let end_key = "";
+
         while (y >= 0 && y < field.length && x >= 0 && x < field[y].length) {
             if (field[y][x] !== "") {
+                end_key = x+"-"+y;
+
                 break;
             }
 
-            field[y][x] = symbol;
+            tunnel.push(
+                {
+                    x: x,
+                    y: y
+                }
+            );
 
             x += dx;
             y += dy;
+        }
+
+        let prefix = "";
+        let suffix = "";
+
+        if (roads !== null && end_key in roads) {
+            prefix = "\x1B[0;31m";
+            suffix = "\x1B[0m";
+        }
+
+        while (tunnel.length > 0) {
+            let pos = tunnel.pop();
+
+            field[pos.y][pos.x] = prefix + symbol + suffix;
         }
     };
 
     let refresh = true;
     let decoration_queue = [];
+    let road_positions = {};
+
+    for (let i=0; i<msdp_map.length; ++i) {
+        let room = msdp_map[i];
+
+        if (room.sector !== "road") {
+            continue;
+        }
+
+        let translation = translator(
+            translation_setup, parseInt(room.x, 10), parseInt(room.y, 10)
+        );
+        let x = translation.x;
+        let y = translation.y;
+
+        if (x >= cols || y >= rows || x < 0 || y < 0) {
+            continue;
+        }
+
+        let key = x+"-"+y;
+        road_positions[key] = undefined;
+
+        let room_symbol = map[y][x];
+        let prefix = "\x1B[0;31m";
+        let suffix = "\x1B[0m";
+
+        map[y][x] = prefix + room_symbol + suffix;
+    }
 
     for (let i=0; i<msdp_map.length; ++i) {
         let room = msdp_map[i];
@@ -346,10 +398,12 @@ function amc_update_zoneview(msdp_var) {
 
         exits = Object.fromEntries(exits.map(key => [key, undefined]));
 
-        if ("N" in exits) tunneler(map, x, y - 1, 0, -1,    "┊" );
-        if ("S" in exits) tunneler(map, x, y + 1, 0, 1,     "┊" );
-        if ("E" in exits) tunneler(map, x + 1, y, 1, 0,     "╌" );
-        if ("W" in exits) tunneler(map, x - 1, y, -1, 0,    "╌" );
+        let rp = room.sector === "road" ? road_positions : null;
+
+        if ("N" in exits) tunneler(map, x, y - 1, 0, -1,    "┊", rp );
+        if ("S" in exits) tunneler(map, x, y + 1, 0, 1,     "┊", rp );
+        if ("E" in exits) tunneler(map, x + 1, y, 1, 0,     "╌", rp );
+        if ("W" in exits) tunneler(map, x - 1, y, -1, 0,    "╌", rp );
 
         if (room.vnum === msdp.variables.ROOM_VNUM) {
             map[y][x] = "\x1B[1;36m@\x1B[0m";
