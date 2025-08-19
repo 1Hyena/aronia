@@ -346,10 +346,10 @@ function amc_update_zoneview(msdp_var) {
 
         exits = Object.fromEntries(exits.map(key => [key, undefined]));
 
-        if ("N" in exits) tunneler(map, x, y - 1, 0, -1,    "│");
-        if ("S" in exits) tunneler(map, x, y + 1, 0, 1,     "│");
-        if ("E" in exits) tunneler(map, x + 1, y, 1, 0,     "─");
-        if ("W" in exits) tunneler(map, x - 1, y, -1, 0,    "─");
+        if ("N" in exits) tunneler(map, x, y - 1, 0, -1,    "┊" );
+        if ("S" in exits) tunneler(map, x, y + 1, 0, 1,     "┊" );
+        if ("E" in exits) tunneler(map, x + 1, y, 1, 0,     "╌" );
+        if ("W" in exits) tunneler(map, x - 1, y, -1, 0,    "╌" );
 
         if (room.vnum === msdp.variables.ROOM_VNUM) {
             map[y][x] = "\x1B[1;36m@\x1B[0m";
@@ -425,7 +425,7 @@ function amc_update_zoneview(msdp_var) {
                 cost: 1
             },
             desert: {
-                symbols : [ "~", "≈" ],
+                symbols : [ "≋", "≈", "≈", "∼", "~", "∼", "~"],
                 style: "\x1B[1;33m",
                 cost: 1
             },
@@ -445,7 +445,9 @@ function amc_update_zoneview(msdp_var) {
                 cost: 2
             },
             mountain: {
-                symbols : [ "⌂", "▲", " " ],
+                symbols : [
+                    "^", "⌂", "▲", "\x1B[1;30m▲\x1B[0m", " "
+                ],
                 cost: 2
             },
             city: {
