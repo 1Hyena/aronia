@@ -352,7 +352,7 @@ function amc_update_zoneview(msdp_var) {
         if ("W" in exits) tunneler(map, x - 1, y, -1, 0,    "─");
 
         if (room.vnum === msdp.variables.ROOM_VNUM) {
-            map[y][x] = "@";
+            map[y][x] = "\x1B[1;36m@\x1B[0m";
 
             if (y > translation.scale.y
             && y + translation.scale.y < map.length
@@ -391,39 +391,66 @@ function amc_update_zoneview(msdp_var) {
 
         let sectors = {
             underground: {
-                symbols : [ "▒", "░" ],
+                symbols : [ "▒", "▓" ],
+                style: "\x1B[1;30m",
                 cost: 3
             },
             inside: {
                 symbols : [ " " ],
                 cost: Number.MAX_SAFE_INTEGER
             },
+            swim: {
+                symbols : [ "≈" ],
+                style: "\x1B[1;34m",
+                cost: Number.MAX_SAFE_INTEGER
+            },
+            noswim: {
+                symbols : [ "≋", "≈" ],
+                style: "\x1B[0;34m",
+                cost: 3
+            },
             shop: {
                 symbols : [ "$" ],
+                style: "\x1B[0;32m",
                 cost: Number.MAX_SAFE_INTEGER
             },
             guild: {
                 symbols : [ "%" ],
+                style: "\x1B[1;32m",
                 cost: Number.MAX_SAFE_INTEGER
             },
             forest: {
-                symbols : [ "♠", "♣", "↨", "↑", " ", " ", " " ],
+                symbols : [ "♠", "♣", "↨", "↟", "↑", "↥", " ", " ", " " ],
+                style: "\x1B[0;32m",
                 cost: 1
             },
             desert: {
-                symbols : [ "=" ],
+                symbols : [ "~", "≈" ],
+                style: "\x1B[1;33m",
                 cost: 1
             },
             field: {
                 symbols : [ ".", ":", "ⁿ" ],
+                style: "\x1B[1;32m",
+                cost: 1
+            },
+            moors: {
+                symbols : [ "\"", "ⁿ", "⌠" ],
+                style: "\x1B[0;32m",
                 cost: 1
             },
             hills: {
                 symbols : [ "n", "∩", " ", " ", " " ],
+                style: "\x1B[1;32m",
+                cost: 2
+            },
+            mountain: {
+                symbols : [ "⌂", "▲", " " ],
                 cost: 2
             },
             city: {
                 symbols : [ "Π", "⌂", "⏏", "⌂", "⏏", "⌂", " " ],
+                style: "\x1B[1;37m",
                 cost: Number.MAX_SAFE_INTEGER
             }
         };
@@ -434,8 +461,15 @@ function amc_update_zoneview(msdp_var) {
                 let vnum = parseInt(room.vnum, 10);
                 let index = ttl.x + ttl.y * (expansion.sequence + 1) + vnum;
                 let symbol = symbols[(index) % symbols.length];
+                let prefix = "";
+                let suffix = "";
 
-                field[y][x] = symbol;
+                if ("style" in sectors[sector]) {
+                    prefix = sectors[sector].style;
+                    suffix = "\x1B[0m";
+                }
+
+                field[y][x] = prefix + symbol + suffix;
             }
         }
         else return [];
@@ -536,13 +570,56 @@ function amc_update_zoneview(msdp_var) {
         }
     }
 
+    var get_fow_thickness = function(field, x, y) {
+        let directions = [
+            { dx: -1, dy:  0, level: 1 },
+            { dx:  1, dy:  0, level: 1 },
+            { dx:  0, dy:  1, level: 1 },
+            { dx:  0, dy: -1, level: 1 },
+            { dx: -2, dy:  0, level: 3 },
+            { dx:  2, dy:  0, level: 3 },
+            { dx:  0, dy:  2, level: 3 },
+            { dx:  0, dy: -2, level: 3 },
+            { dx: -1, dy: -1, level: 2 },
+            { dx:  1, dy: -1, level: 2 },
+            { dx: -1, dy:  1, level: 2 },
+            { dx:  1, dy:  1, level: 2 }
+        ];
+
+        let thickness = 0;
+
+        for (let i=0; i<directions.length; ++i) {
+            let nx = directions[i].dx + x;
+            let ny = directions[i].dy + y;
+
+            if (ny < 0 || ny >= field.length
+            ||  nx < 0 || nx >= field[ny].length) {
+                thickness += directions[i].level;
+
+                continue;
+            }
+
+            if (field[ny][nx] === "") {
+                thickness += directions[i].level;
+            }
+        }
+
+        return thickness;
+    }
+
     let view = new DocumentFragment();
     let text = "";
 
     for (let y=0; y<map.length; ++y) {
         for (let x=0; x<map[y].length; ++x) {
-            let pieces = [ " ", ...map[y][x] ];
-            let char = pieces.pop();
+            let thickness = get_fow_thickness(map, x, y);
+            let fogofwar = (
+                thickness >= 24 ? "▓" :
+                thickness >= 19 ? "▒" :
+                thickness >=  8 ? "░" : " "
+            );
+            let pieces = [ ...map[y][x] ];
+            let char = pieces.length === 0 ? fogofwar : map[y][x];
 
             text += char;
         }
@@ -550,7 +627,9 @@ function amc_update_zoneview(msdp_var) {
         text += "\n";
     }
 
-    view.appendChild(document.createTextNode(text));
+    //view.appendChild(document.createTextNode(text));
+
+    terminal_data_to_node(text, view);
 
     zoneview.replaceChildren(view);
 
