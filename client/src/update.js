@@ -971,13 +971,13 @@ function amc_update_statview_health_bar() {
     amc_text_to_tui_class(classname, bar);
 }
 
-function amc_update_statview_energy_bar() {
-    let classname = "amc-statview-energy-bar";
+function amc_update_statview_spirit_bar() {
+    let classname = "amc-statview-spirit-bar";
     let cells = document.getElementsByClassName(classname).length;
-    let energy = msdp.variables.ENERGY && msdp.variables.ENERGY_MAX > 0 ? (
-        parseInt(msdp.variables.ENERGY) / parseInt(msdp.variables.ENERGY_MAX)
+    let spirit = msdp.variables.SPIRIT && msdp.variables.SPIRIT_MAX > 0 ? (
+        parseInt(msdp.variables.SPIRIT) / parseInt(msdp.variables.SPIRIT_MAX)
     ) : 0;
-    let left = Math.max(Math.min(Math.floor(energy * cells), cells), 0);
+    let left = Math.max(Math.min(Math.floor(spirit * cells), cells), 0);
     let bar = "▒".repeat(left)+"░".repeat(cells - left);
 
     amc_text_to_tui_class(classname, bar);

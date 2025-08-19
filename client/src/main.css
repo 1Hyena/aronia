@@ -329,11 +329,11 @@ input[type="submit"]:hover {
     color: maroon;
 }
 
-.amc-statview-energy-bar[data-symbol="▒"] {
+.amc-statview-spirit-bar[data-symbol="▒"] {
     color: royalblue;
 }
 
-.amc-statview-energy-bar[data-symbol="░"] {
+.amc-statview-spirit-bar[data-symbol="░"] {
     color: maroon;
 }
 

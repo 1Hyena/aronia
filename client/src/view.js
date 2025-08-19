@@ -275,7 +275,7 @@ function amc_init_statview(container) {
     container.appendChild(wrapper);
 
     amc_text_to_tui_class("amc-statview-label-health", "Health:");
-    amc_text_to_tui_class("amc-statview-label-energy", "Energy:");
+    amc_text_to_tui_class("amc-statview-label-spirit", "Spirit:");
     amc_text_to_tui_class("amc-statview-label-ac", "Armor Class:");
     amc_text_to_tui_class("amc-statview-label-hitroll", "To Hit:");
     amc_text_to_tui_class("amc-statview-label-damroll", "To Damage:");

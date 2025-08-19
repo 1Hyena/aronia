@@ -29,8 +29,8 @@ var msdp = {
         EXPERIENCE_TNL_MAX : null,
         HEALTH : null,
         HEALTH_MAX : null,
-        ENERGY : null,
-        ENERGY_MAX : null,
+        SPIRIT : null,
+        SPIRIT_MAX : null,
         LEVEL : null,
         MONEY : null,
         TO_HIT : null,
@@ -302,16 +302,16 @@ function msdp_update_variable(key, value) {
             amc_update_statview_health_bar();
             break;
         }
-        case "ENERGY": {
-            amc_text_to_tui_class("amc-statview-energy", value, "right");
-            amc_update_statview_energy_bar();
+        case "SPIRIT": {
+            amc_text_to_tui_class("amc-statview-spirit", value, "right");
+            amc_update_statview_spirit_bar();
             break;
         }
-        case "ENERGY_MAX": {
+        case "SPIRIT_MAX": {
             amc_text_to_tui_class(
-                "amc-statview-energy-max", value.padStart(4, " ")
+                "amc-statview-spirit-max", value.padStart(4, " ")
             );
-            amc_update_statview_energy_bar();
+            amc_update_statview_spirit_bar();
             break;
         }
         case "LEVEL": {
@@ -431,8 +431,8 @@ function msdp_handle_variable(key, value) {
             amc_event_change_health(value);
             break;
         }
-        case "ENERGY": {
-            amc_event_change_energy(value);
+        case "SPIRIT": {
+            amc_event_change_spirit(value);
             break;
         }
         case "CHARACTER_NAME": {

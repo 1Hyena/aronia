@@ -682,22 +682,22 @@ function amc_tui_create_statview() {
             else if (y === 4) {
                 if (x >= 1 && x < 8) {
                     cell = document.createElement("td");
-                    cell.classList.add("amc-statview-label-energy");
+                    cell.classList.add("amc-statview-label-spirit");
                 }
                 else if (x >= 8 && x < 13) {
                     cell = document.createElement("td");
-                    cell.classList.add("amc-statview-energy");
+                    cell.classList.add("amc-statview-spirit");
                 }
                 else if (x === 13) {
                     text = "/";
                 }
                 else if (x >= 14 && x < 19) {
                     cell = document.createElement("td");
-                    cell.classList.add("amc-statview-energy-max");
+                    cell.classList.add("amc-statview-spirit-max");
                 }
                 else if (x >= 20 && x < 35) {
                     cell = document.createElement("td");
-                    cell.classList.add("amc-statview-energy-bar");
+                    cell.classList.add("amc-statview-spirit-bar");
                 }
             }
             else if (y === 6) {

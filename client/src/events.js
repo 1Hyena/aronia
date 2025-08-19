@@ -12,15 +12,15 @@ function amc_event_change_health(value) {
     }
 }
 
-function amc_event_change_energy(value) {
-    if (msdp.variables.ENERGY === null
-    ||  msdp.variables.ENERGY_MAX === null) {
+function amc_event_change_spirit(value) {
+    if (msdp.variables.SPIRIT === null
+    ||  msdp.variables.SPIRIT_MAX === null) {
         return;
     }
 
-    if (parseInt(value) >= parseInt(msdp.variables.ENERGY_MAX)
-    &&  parseInt(msdp.variables.ENERGY) < parseInt(msdp.variables.ENERGY_MAX)) {
-        play_sound("sfx-energy", 0.5);
+    if (parseInt(value) >= parseInt(msdp.variables.SPIRIT_MAX)
+    &&  parseInt(msdp.variables.SPIRIT) < parseInt(msdp.variables.SPIRIT_MAX)) {
+        play_sound("sfx-spirit", 0.5);
     }
 }
 
