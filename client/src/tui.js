@@ -338,8 +338,14 @@ function amc_tui_create_roomview() {
         exit_info.appendChild(dir_span);
     }
 
-    roomview.appendChild(room_name);
-    roomview.appendChild(room_desc);
+    let details = document.createElement("details");
+    let summary = document.createElement("summary");
+
+
+    summary.appendChild(room_name);
+    details.appendChild(summary);
+    details.appendChild(room_desc);
+    roomview.appendChild(details);
     roomview.appendChild(document.createTextNode("\n"));
     roomview.appendChild(exit_info);
     roomview.appendChild(item_list);

@@ -164,10 +164,16 @@ function amc_update_zoneview(msdp_var) {
     }
 
     let msdp_map = msdp.variables["MAP"];
+    let msdp_area= msdp.variables["AREA_NAME"];
+
     let zoneview = document.getElementById("amc-zoneview");
 
     if (zoneview === null || msdp_map === null) {
         return;
+    }
+
+    if (msdp_area === null) {
+        msdp_area = "";
     }
 
     let cols = parseInt(zoneview.getAttribute("data-width"), 10);
@@ -663,11 +669,20 @@ function amc_update_zoneview(msdp_var) {
         return thickness;
     }
 
+    let area = [...msdp_area];
     let view = new DocumentFragment();
     let text = "";
 
     for (let y=0; y<map.length; ++y) {
         for (let x=0; x<map[y].length; ++x) {
+            if (y + 1 === map.length
+            &&  area.length > 0
+            &&  x >= map[y].length - area.length) {
+                let pos = x - Math.max(map[y].length - area.length, 0);
+                text += area[pos];
+                continue;
+            }
+
             let thickness = get_fow_thickness(map, x, y);
             let fogofwar = (
                 thickness >= 24 ? "▓" :

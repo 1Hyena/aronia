@@ -66,7 +66,7 @@ var msdp = {
         SECTOR_SW : null,
         ROOM_NAME : null,
         ROOM_VNUM : null,
-        ROOM_AREA : null,
+        AREA_NAME : null,
         ROOM_DESC : null,
         EXIT_INFO : null,
         ROOM_ITEM_LIST : null,
@@ -218,6 +218,7 @@ function msdp_update_variable(key, value) {
     switch (key) {
         default: break;
         case "ROOM_VNUM":
+        case "AREA_NAME":
         case "MAP": {
             amc_update_zoneview(key);
             break;

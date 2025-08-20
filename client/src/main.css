@@ -206,6 +206,19 @@ div.amc-chat-public > span:nth-of-type(4) {
     display: none;
 }
 
+#amc-roomview > details > summary {
+    display: inline-block;
+    cursor: pointer;
+}
+
+#amc-roomview > details > summary::marker {
+    content: "";
+}
+
+#amc-roomview > details > summary:hover {
+    filter: drop-shadow(0 0 0.5vmin rgba(255, 255, 255, 0.50));
+}
+
 #amc-terminal-wrapper > span:nth-child(1) {
     display: inline-block;
     height: 100%;
