@@ -27,11 +27,11 @@ function amc_init_foreview(container) {
         vertical : true,
         contents : [
             {
-                key: "amc-panel-chatview",
+                key: "amc-panel-miscview",
                 priority : 0
             },
             {
-                key: "amc-panel-miscview",
+                key: "amc-panel-chatview",
                 priority : 1
             }
         ]
