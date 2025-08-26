@@ -147,12 +147,13 @@ div.amc-chat-public > span:nth-of-type(4) {
     scrollbar-color: rgba(255,255,255,0.5) rgba(255,255,255,0.25);
 }
 
+.amc-linkview-wrapper,
 #amc-login-form-wrapper,
 #amc-mainview-wrapper,
 #amc-inputbar-wrapper,
 #amc-zoneview-wrapper,
-#amc-statview-wrapper,
-#amc-itemview-wrapper {
+#amc-gearview-wrapper,
+#amc-statview-wrapper {
     position: absolute;
     top: 0;
     left: 0;
@@ -169,11 +170,37 @@ div.amc-chat-public > span:nth-of-type(4) {
     bottom: -6px;
 }
 
+.amc-linkview-wrapper,
 #amc-inputbar-wrapper {
     top: -7px;
     left: -2px;
     right: -1px;
     bottom: -6px;
+}
+
+.amc-linkview{
+    margin-top: 7px;
+    margin-left: 2px;
+}
+
+#amc-foreview-wrapper:not([data-tab="GEAR"]) #amc-gearview-wrapper,
+#amc-foreview-wrapper:not([data-tab="CHAT"]) #amc-chatview-wrapper {
+    display: none;
+}
+
+.amc-linkview-wrapper[data-tab="PAGE"]:hover,
+.amc-linkview-wrapper[data-tab="GEAR"]:hover,
+.amc-linkview-wrapper[data-tab="CHAT"]:hover {
+    cursor: pointer;
+    filter: drop-shadow(0 0 0.5vmin rgba(255, 255, 255, 0.50));
+}
+
+#amc-foreview-wrapper[data-tab="PAGE"] .amc-linkview-wrapper[data-tab="PAGE"],
+#amc-foreview-wrapper[data-tab="GEAR"] .amc-linkview-wrapper[data-tab="GEAR"],
+#amc-foreview-wrapper[data-tab="CHAT"] .amc-linkview-wrapper[data-tab="CHAT"] {
+    cursor: default;
+    filter: none;
+    text-decoration: underline;
 }
 
 #amc-zoneview,

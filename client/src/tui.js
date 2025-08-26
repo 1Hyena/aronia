@@ -1,5 +1,54 @@
 "use strict";
 
+function amc_tui_create_linkview(title) {
+    var wrapper = document.createElement("div");
+
+    wrapper.classList.add("amc-linkview-wrapper");
+    wrapper.setAttribute("data-tab", title);
+
+    var content = document.createElement("pre");
+
+    content.classList.add("amc-linkview");
+    content.appendChild(document.createTextNode(title));
+    wrapper.appendChild(content);
+
+    wrapper.addEventListener(
+        "click", function(e) {
+            let target = e.currentTarget;
+            let parent = target.parentNode;
+            let tab = target.getAttribute("data-tab");
+
+            while (parent) {
+                if (parent.hasAttribute("data-tab")) {
+                    if (parent.getAttribute("data-tab") !== tab) {
+                        parent.setAttribute("data-tab", tab);
+                    }
+
+                    return;
+                }
+
+                parent = parent.parentNode;
+            }
+        }
+    );
+
+    return wrapper;
+}
+
+function amc_tui_create_button(title, cols, rows) {
+    let symbols = [...title];
+
+    symbols.splice(cols);
+
+    let button = document.createElement("div");
+
+    button.appendChild(document.createTextNode(symbols.join("")));
+    button.setAttribute("data-colspan", symbols.length);
+    button.setAttribute("data-rowspan", rows);
+
+    return amc_tui_create_centered(button, cols, rows);
+}
+
 function amc_text_to_tui_class(name, text, alignment) {
     alignment = typeof alignment !== 'undefined' ? alignment : "left";
 
@@ -862,6 +911,16 @@ function amc_tui_create_statview() {
     return table;
 }
 
+function amc_tui_get_inventory_placeholder() {
+    return (
+        "Inventory:\n"+
+        "\n"+
+        "(3) a yellow potion\n"+
+        "a beaverskin bracer\n"+
+        "a runed elven scroll\n"
+    );
+}
+
 /*
 function amc_tui_get_secondary_top_placeholder() {
     let placeholder =
@@ -884,13 +943,3 @@ function amc_tui_get_secondary_top_placeholder() {
     return placeholder;
 }
 */
-
-function amc_tui_get_inventory_placeholder() {
-    return (
-        "Inventory:\n"+
-        "\n"+
-        "(3) a yellow potion\n"+
-        "a beaverskin bracer\n"+
-        "a runed elven scroll\n"
-    );
-}

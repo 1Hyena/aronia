@@ -659,10 +659,15 @@ function amc_init_panel(width, height) {
     amc_init_mainview(document.getElementById("amc-panel-below-top-left-1st"));
     amc_init_zoneview(document.getElementById("amc-panel-below-top-left-2nd"));
     amc_init_foreview(document.getElementById("amc-panel-fg-top-right"));
-    amc_init_chatview(document.getElementById("amc-panel-chatview"));
+    amc_init_chatview(document.getElementById("amc-panel-miscview"));
+    amc_init_gearview(document.getElementById("amc-panel-miscview"));
     amc_init_statview(document.getElementById("amc-panel-top-left"));
-    amc_init_itemview(document.getElementById("amc-panel-miscview"));
     amc_init_roomview(document.getElementById("amc-panel-bottom-left"));
+    amc_init_tab1view(document.getElementById("amc-panel-tab1view"));
+    amc_init_tab2view(document.getElementById("amc-panel-tab2view"));
+    amc_init_tab3view(document.getElementById("amc-panel-tab3view"));
+    amc_init_btn1view(document.getElementById("amc-panel-btn1view"));
+    amc_init_btn2view(document.getElementById("amc-panel-btn2view"));
 
     if (msdp.lists.REPORTABLE_VARIABLES !== null) {
         for (let i=0; i<msdp.lists.REPORTABLE_VARIABLES.length; ++i) {

@@ -27,12 +27,40 @@ function amc_init_foreview(container) {
         vertical : true,
         contents : [
             {
-                key: "amc-panel-miscview",
-                priority : 0
+                vertical: false,
+                contents: [
+                    {
+                        key: "amc-panel-tab1view",
+                        priority : 10,
+                        max_h: 1
+                    },
+                    {
+                        key: "amc-panel-tab2view",
+                        priority : 11,
+                        max_h: 1
+                    },
+                    {
+                        key: "amc-panel-tab3view",
+                        priority : 12,
+                        max_h: 1
+                    },
+                    {
+                        key: "amc-panel-btn1view",
+                        priority : 2,
+                        max_w: 3,
+                        max_h: 1
+                    },
+                    {
+                        key: "amc-panel-btn2view",
+                        priority : 1,
+                        max_w: 3,
+                        max_h: 1
+                    }
+                ]
             },
             {
-                key: "amc-panel-chatview",
-                priority : 1
+                key: "amc-panel-miscview",
+                priority : 0
             }
         ]
     };
@@ -43,8 +71,66 @@ function amc_init_foreview(container) {
 
     var wrapper = document.createElement("div");
 
+    wrapper.setAttribute("data-tab", "PAGE");
     wrapper.id = wrapper_id;
     wrapper.appendChild(panel);
+    container.appendChild(wrapper);
+}
+
+function amc_init_tab1view(container) {
+    if (container !== null) {
+        container.replaceChildren(amc_tui_create_linkview("PAGE"));
+    }
+}
+
+function amc_init_tab2view(container) {
+    if (container !== null) {
+        container.replaceChildren(amc_tui_create_linkview("GEAR"));
+    }
+}
+
+function amc_init_tab3view(container) {
+    if (container !== null) {
+        container.replaceChildren(amc_tui_create_linkview("CHAT"));
+    }
+}
+
+function amc_init_btn1view(container) {
+    if (container !== null) {
+        let colspan = parseInt(container.getAttribute("colspan"), 10);
+        container.replaceChildren(amc_tui_create_button("⬍", colspan, 1));
+    }
+}
+
+function amc_init_btn2view(container) {
+    if (container !== null) {
+        let colspan = parseInt(container.getAttribute("colspan"), 10);
+        container.replaceChildren(amc_tui_create_button("🗖", colspan, 1));
+    }
+}
+
+function amc_init_gearview(container) {
+    if (container === null) {
+        return;
+    }
+
+    if (document.getElementById("amc-gearview-wrapper") !== null) {
+        bug();
+        return;
+    }
+
+    var wrapper = document.createElement("div");
+
+    wrapper.id = "amc-gearview-wrapper";
+
+    var placeholder = document.createElement("pre");
+
+    placeholder.appendChild(
+        document.createTextNode(amc_tui_get_inventory_placeholder())
+    );
+
+    wrapper.appendChild(placeholder);
+
     container.appendChild(wrapper);
 }
 
@@ -210,31 +296,6 @@ function amc_init_zoneview(container) {
     );
 
     container.replaceChildren(wrapper);
-}
-
-function amc_init_itemview(container) {
-    if (container === null) {
-        return;
-    }
-
-    if (document.getElementById("amc-itemview-wrapper") !== null) {
-        bug();
-        return;
-    }
-
-    var wrapper = document.createElement("div");
-
-    wrapper.id = "amc-itemview-wrapper";
-
-    var placeholder = document.createElement("pre");
-
-    placeholder.appendChild(
-        document.createTextNode(amc_tui_get_inventory_placeholder())
-    );
-
-    wrapper.appendChild(placeholder);
-
-    container.appendChild(wrapper);
 }
 
 function amc_init_roomview(container) {
