@@ -4,6 +4,11 @@ html {
     width: 100dvw;
     height: 100dvh;
     font-family: unscii, monospace;
+    font-size: 16px;
+}
+
+html.amc-gui-x2 {
+    font-size: 32px;
 }
 
 body {
@@ -57,8 +62,8 @@ pre {
 }
 
 #amc-panel-wrapper {
-    font-size: 16px;
-    line-height: 16px;
+    font-size: 1rem;
+    line-height: 1rem;
     filter: drop-shadow(
         0 0 1px rgba(0, 0, 0, 1)
     ); /* kludgy fix for FF table cell-spacing artefacts */
@@ -71,7 +76,7 @@ table.amc-tui-fg > tr > td:not(.amc-tui-cell) > pre {
 table.amc-tui {
     pointer-events: initial;
     border-spacing: 0;
-    border-radius: 1px; /* kludgy fix for Chrome's table cell-spacing artefacts */
+    border-radius: 1px; /* kludgy fix for Chrome's table cell-spacing blur */
 }
 
 table.amc-tui-fg {
@@ -83,10 +88,6 @@ table.amc-tui-fg {
     pointer-events: none;
     background-color: transparent;
 }
-
-/*#amc:not([data-mudstate="in-game"]) #amc-panel-wrapper > table:not(.amc-tui-fg) {
-    background-color: transparent;
-}*/
 
 #amc[data-mudstate=""] #amc-panel-wrapper > table:not(.amc-tui-fg),
 #amc[data-mudstate="login"] #amc-panel-wrapper > table:not(.amc-tui-fg) {
@@ -165,22 +166,22 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-chatview-wrapper,
 #amc-roomview-wrapper,
 #amc-terminal-wrapper {
-    top: -7px;
-    right: -1px;
-    bottom: -6px;
+    top: -0.4375rem;
+    right: -0.0625rem;
+    bottom: -0.375rem;
 }
 
 .amc-linkview-wrapper,
 #amc-inputbar-wrapper {
-    top: -7px;
-    left: -2px;
-    right: -1px;
-    bottom: -6px;
+    top: -0.4375rem;
+    left: -0.125rem;
+    right: -0.0625rem;
+    bottom: -0.375rem;
 }
 
 .amc-linkview{
-    margin-top: 7px;
-    margin-left: 2px;
+    margin-top: 0.4375rem;
+    margin-left: 0.125rem;
 }
 
 #amc-foreview-wrapper:not([data-tab="GEAR"]) #amc-gearview-wrapper,
@@ -188,6 +189,8 @@ div.amc-chat-public > span:nth-of-type(4) {
     display: none;
 }
 
+.amc-linkview-wrapper[data-btn="⬍"]:hover,
+.amc-linkview-wrapper[data-btn="🗖"]:hover,
 .amc-linkview-wrapper[data-tab="PAGE"]:hover,
 .amc-linkview-wrapper[data-tab="GEAR"]:hover,
 .amc-linkview-wrapper[data-tab="CHAT"]:hover {
@@ -212,8 +215,8 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-chatview {
     white-space: pre-wrap;
     word-wrap: break-word;
-    margin-top: 7px;
-    margin-bottom: 6px;
+    margin-top: 0.4375rem;
+    margin-bottom: 0.375rem;
 }
 
 #amc-roomview {
@@ -256,8 +259,8 @@ div.amc-chat-public > span:nth-of-type(4) {
     width: 100%;
     white-space: pre-wrap;
     word-wrap: break-word;
-    margin-top: 7px;
-    margin-bottom: 6px;
+    margin-top: 0.4375rem;
+    margin-bottom: 0.375rem;
     vertical-align: bottom;
 }
 
@@ -329,17 +332,18 @@ input[type="text"], input[type="password"], input[type="submit"], textarea {
     color-scheme: dark;
     border-left: 0.5vmin dotted transparent;
     border-right: 0.5vmin dotted transparent;
-    font-size: 16px;
-    line-height: 16px;
-    top: -7px;
-    left: -3px;
-    right: -3px;
-    bottom: -7px;
+    font-size: 1rem;
+    line-height: 1rem;
+
+    top: -0.4375rem;
+    left: -0.1875rem;
+    right: -0.1875rem;
+    bottom: -0.4375rem;
 }
 
 #amc-inputbar-wrapper > input[type="text"] {
-    font-size: 16px;
-    line-height: 16px;
+    font-size: 1rem;
+    line-height: 1rem;
 }
 
 textarea:focus, input:focus{

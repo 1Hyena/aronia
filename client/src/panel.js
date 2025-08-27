@@ -1,13 +1,21 @@
 "use strict";
 
+function amc_get_scale() {
+    if (document.documentElement.classList.contains("amc-gui-x2")) {
+        return 2.0;
+    }
+
+    return 1.0;
+}
+
 function amc_calc_panel_width() {
     var w = document.getElementById('amc-body').clientWidth;
-    return Math.max(Math.floor(w / 8), 0);
+    return Math.max(Math.floor(w / (8 * amc_get_scale())), 0);
 }
 
 function amc_calc_panel_height() {
     var h = document.getElementById('amc-body').clientHeight;
-    return Math.max(Math.floor(h / 16), 0);
+    return Math.max(Math.floor(h / (16 * amc_get_scale())), 0);
 }
 
 function amc_panel_layout_to_framework(layout) {

@@ -46,7 +46,42 @@ function amc_tui_create_button(title, cols, rows) {
     button.setAttribute("data-colspan", symbols.length);
     button.setAttribute("data-rowspan", rows);
 
-    return amc_tui_create_centered(button, cols, rows);
+    let centered = amc_tui_create_centered(button, cols, rows);
+
+    centered.classList.add("amc-linkview");
+
+    let wrapper = document.createElement("div");
+
+    wrapper.classList.add("amc-linkview-wrapper");
+    wrapper.setAttribute("data-btn", title);
+
+    wrapper.addEventListener(
+        "click", function(e) {
+            let target = e.currentTarget;
+            let btn = target.getAttribute("data-btn");
+
+            if (btn === "⬍") {
+                document.documentElement.classList.toggle("amc-gui-x2");
+                amc_init_panel(amc_calc_panel_width(), amc_calc_panel_height());
+            }
+            else if (btn === "🗖") {
+                if (document.fullscreenElement === null) {
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen();
+                    }
+                }
+                else if (document.fullscreenElement) {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            }
+        }
+    );
+
+    wrapper.appendChild(centered);
+
+    return wrapper;
 }
 
 function amc_text_to_tui_class(name, text, alignment) {
