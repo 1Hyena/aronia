@@ -1,5 +1,52 @@
 "use strict";
 
+function amc_event_echo(value) {
+    let page = document.getElementById("amc-pageview");
+
+    if (page !== null && page.hasAttribute("data-recording") == false) {
+        page.setAttribute("data-recording", value.line);
+    }
+}
+
+function amc_event_command(value) {
+    let paged_commands = [
+        "help", "list", "equipment", "inventory", "score", "map", "zonemap",
+        "who", "where", "scan", "scout", "consider", "wizlist", "ranking",
+        "group", "areamap", "exits", "practice", "wizhelp", "affects", "traits",
+        "areas", "commands", "compare", "count", "credits", "examine", "lore",
+        "health", "read", "rules", "skills", "socials", "spells", "story",
+        "weather", "info", "whois", "charlist", "worth", "time", "trophy",
+        "attributes", "relations", "replay", "trainers", "warscore", "criminal",
+        "mudstat", "store", "balance"
+    ];
+
+    let page = document.getElementById("amc-pageview");
+
+    if (page === null || page.hasAttribute("data-recording") == false) {
+        return;
+    }
+
+    let input = page.getAttribute("data-recording");
+
+    page.removeAttribute("data-recording");
+
+    if (paged_commands.includes(value) == false) {
+        return;
+    }
+
+    let frag = new DocumentFragment();
+
+    for (let i=0; i<global.mud.log.text.utf8.packets.length; ++i) {
+        let str = global.mud.log.text.utf8.packets[i].data.join("");
+
+        terminal_text_to_node(
+            str, frag, global.mud.log.text.utf8.packets[i].ansi
+        );
+    }
+
+    page.replaceChildren(document.createTextNode("> "+input+"\n"), frag);
+}
+
 function amc_event_change_health(value) {
     if (msdp.variables.HEALTH === null
     ||  msdp.variables.HEALTH_MAX === null) {

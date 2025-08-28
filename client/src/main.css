@@ -133,6 +133,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     overflow: hidden;
 }
 
+#amc-pageview-wrapper,
 #amc-chatview-wrapper,
 #amc-roomview-wrapper,
 #amc-noteview-wrapper,
@@ -164,6 +165,7 @@ div.amc-chat-public > span:nth-of-type(4) {
 }
 
 #amc-chatview-wrapper,
+#amc-pageview-wrapper,
 #amc-roomview-wrapper,
 #amc-terminal-wrapper {
     top: -0.4375rem;
@@ -184,6 +186,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     margin-left: 0.125rem;
 }
 
+#amc-foreview-wrapper:not([data-tab="PAGE"]) #amc-pageview-wrapper,
 #amc-foreview-wrapper:not([data-tab="GEAR"]) #amc-gearview-wrapper,
 #amc-foreview-wrapper:not([data-tab="CHAT"]) #amc-chatview-wrapper {
     display: none;
@@ -219,11 +222,13 @@ div.amc-chat-public > span:nth-of-type(4) {
     margin-bottom: 0.375rem;
 }
 
+#amc-pageview,
 #amc-roomview {
     display: none;
     white-space: pre;
 }
 
+#amc[data-mudstate="in-game"] #amc-pageview,
 #amc[data-mudstate="in-game"] #amc-roomview {
     display: initial;
 }

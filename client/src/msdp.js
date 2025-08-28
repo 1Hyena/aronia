@@ -71,7 +71,9 @@ var msdp = {
         EXIT_INFO : null,
         ROOM_ITEM_LIST : null,
         ROOM_CHAR_LIST : null,
-        MAP : null
+        MAP : null,
+        ECHO : null,
+        COMMAND : null
     },
     renewing : {},
     incoming : [],
@@ -407,6 +409,18 @@ function msdp_handle_variable(key, value) {
     if (key in msdp.variables == false) {
         bug();
         return;
+    }
+
+    switch (key) {
+        default: break;
+        case "COMMAND": {
+            amc_event_command(value);
+            break;
+        }
+        case "ECHO": {
+            amc_event_echo(value);
+            break;
+        }
     }
 
     if (key in msdp.renewing) {

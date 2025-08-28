@@ -109,6 +109,29 @@ function amc_init_btn2view(container) {
     }
 }
 
+function amc_init_pageview(container) {
+    if (container === null) {
+        return;
+    }
+
+    if (document.getElementById("amc-pageview-wrapper") !== null) {
+        bug();
+        return;
+    }
+
+    var wrapper = document.createElement("div");
+
+    wrapper.id = "amc-pageview-wrapper";
+
+    var pageview = document.createElement("div");
+
+    pageview.id = "amc-pageview";
+
+    wrapper.appendChild(pageview);
+
+    container.appendChild(wrapper);
+}
+
 function amc_init_gearview(container) {
     if (container === null) {
         return;
