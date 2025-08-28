@@ -18,9 +18,10 @@ var msdp = {
     },
     variables : {
         ACCOUNT_NAME : null,
-        CHARACTER_NAME : null,
-        CHARACTER_RACE : null,
-        CHARACTER_CLASS : null,
+        CHAR_NAME : null,
+        CHAR_RACE : null,
+        CHAR_CLASS : null,
+        CHAR_ITEM_LIST : null,
         SERVER_ID : null,
         SERVER_TIME : null,
         WORLD_TIME : null,
@@ -260,16 +261,20 @@ function msdp_update_variable(key, value) {
         case "ACCOUNT_NAME": {
             break;
         }
-        case "CHARACTER_NAME": {
-            amc_update_statview_character_title();
+        case "CHAR_NAME": {
+            amc_update_statview_char_title();
             break;
         }
-        case "CHARACTER_RACE": {
-            amc_update_statview_character_title();
+        case "CHAR_RACE": {
+            amc_update_statview_char_title();
             break;
         }
-        case "CHARACTER_CLASS": {
-            amc_update_statview_character_title();
+        case "CHAR_CLASS": {
+            amc_update_statview_char_title();
+            break;
+        }
+        case "CHAR_ITEM_LIST": {
+            amc_update_gearview(key);
             break;
         }
         case "SERVER_ID": {
@@ -450,8 +455,8 @@ function msdp_handle_variable(key, value) {
             amc_event_change_spirit(value);
             break;
         }
-        case "CHARACTER_NAME": {
-            amc_event_change_character(value);
+        case "CHAR_NAME": {
+            amc_event_change_char(value);
             break;
         }
     }

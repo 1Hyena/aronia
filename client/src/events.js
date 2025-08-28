@@ -71,7 +71,7 @@ function amc_event_change_spirit(value) {
     }
 }
 
-function amc_event_change_character(value) {
+function amc_event_change_char(value) {
     if (value.length === 0) {
         return;
     }
@@ -83,7 +83,7 @@ function amc_event_change_character(value) {
         "SECTOR_E",     "SECTOR_W",         "SECTOR_NE",        "SECTOR_NW",
         "SECTOR_SE",    "SECTOR_SW",        "ROOM_NAME",        "ROOM_DESC",
         "EXIT_INFO",    "ROOM_ITEM_LIST",   "ROOM_CHAR_LIST",   "MAP",
-        "ROOM_VNUM",    "AREA_NAME"
+        "ROOM_VNUM",    "AREA_NAME",        "CHAR_ITEM_LIST"
     ];
 
     amc_show_mudstate("in-game");

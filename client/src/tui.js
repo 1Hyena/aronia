@@ -946,6 +946,7 @@ function amc_tui_create_statview() {
     return table;
 }
 
+/*
 function amc_tui_get_inventory_placeholder() {
     return (
         "Inventory:\n"+
@@ -955,6 +956,7 @@ function amc_tui_get_inventory_placeholder() {
         "a runed elven scroll\n"
     );
 }
+*/
 
 /*
 function amc_tui_get_secondary_top_placeholder() {

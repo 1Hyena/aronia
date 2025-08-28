@@ -657,6 +657,8 @@ function amc_init_panel(width, height) {
     amc_deinit_terminal();
     amc_deinit_chatview();
     amc_deinit_inputbar();
+    amc_deinit_pageview();
+    amc_deinit_gearview();
 
     document.getElementById("amc-panel-wrapper").replaceChildren(
         panel_bg, panel_fg

@@ -134,6 +134,8 @@ function amc_init() {
     amc_create_chatview();
     amc_create_terminal();
     amc_create_inputbar();
+    amc_create_pageview();
+    amc_create_gearview();
 
     amc_init_panel(amc_calc_panel_width(), amc_calc_panel_height());
 

@@ -69,7 +69,9 @@ var global = {
     offscreen : {
         terminal : null,
         chatview : null,
-        inputbar : null
+        inputbar : null,
+        pageview : null,
+        gearview : null
     },
     buggy : {},
     last_interval : 0

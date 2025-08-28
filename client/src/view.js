@@ -109,52 +109,60 @@ function amc_init_btn2view(container) {
     }
 }
 
-function amc_init_pageview(container) {
-    if (container === null) {
-        return;
+function amc_init_gearview(container) {
+    if (container !== null && global.offscreen.gearview !== null) {
+        var wrapper = document.createElement("div");
+
+        wrapper.id = global.offscreen.gearview.id+"-wrapper";
+        wrapper.append(global.offscreen.gearview);
+        container.append(wrapper);
+        global.offscreen.gearview = null;
     }
-
-    if (document.getElementById("amc-pageview-wrapper") !== null) {
-        bug();
-        return;
-    }
-
-    var wrapper = document.createElement("div");
-
-    wrapper.id = "amc-pageview-wrapper";
-
-    var pageview = document.createElement("div");
-
-    pageview.id = "amc-pageview";
-
-    wrapper.appendChild(pageview);
-
-    container.appendChild(wrapper);
 }
 
-function amc_init_gearview(container) {
-    if (container === null) {
-        return;
+function amc_deinit_gearview() {
+    if (global.offscreen.gearview === null) {
+        let view = document.getElementById("amc-gearview");
+
+        if (view !== null) {
+            view.parentNode.removeChild(view);
+            global.offscreen.gearview = view;
+        }
+
+        let wrap = document.getElementById(view.id+"-wrapper");
+
+        if (wrap !== null) {
+            wrap.parentNode.removeChild(wrap);
+        }
     }
+}
 
-    if (document.getElementById("amc-gearview-wrapper") !== null) {
-        bug();
-        return;
+function amc_init_pageview(container) {
+    if (container !== null && global.offscreen.pageview !== null) {
+        var wrapper = document.createElement("div");
+
+        wrapper.id = global.offscreen.pageview.id+"-wrapper";
+        wrapper.append(global.offscreen.pageview);
+        container.append(wrapper);
+        global.offscreen.pageview = null;
     }
+}
 
-    var wrapper = document.createElement("div");
+function amc_deinit_pageview() {
+    if (global.offscreen.pageview === null) {
+        let view = document.getElementById("amc-pageview");
 
-    wrapper.id = "amc-gearview-wrapper";
+        if (view !== null) {
+            view.parentNode.removeChild(view);
+            global.offscreen.pageview = view;
+        }
 
-    var placeholder = document.createElement("pre");
+        let wrap = document.getElementById(view.id+"-wrapper");
 
-    placeholder.appendChild(
-        document.createTextNode(amc_tui_get_inventory_placeholder())
-    );
-
-    wrapper.appendChild(placeholder);
-
-    container.appendChild(wrapper);
+        if (wrap !== null) {
+            wrap.parentNode.removeChild(wrap);
+        }
+    }
 }
 
 function amc_init_terminal(container) {
@@ -369,6 +377,34 @@ function amc_init_statview(container) {
     amc_text_to_tui_class("amc-statview-label-int", "INT:");
     amc_text_to_tui_class("amc-statview-label-wis", "WIS:");
     amc_text_to_tui_class("amc-statview-label-con", "CON:");
+}
+
+function amc_create_gearview() {
+    if (document.getElementById("amc-gearview") !== null
+    ||  global.offscreen.gearview !== null) {
+        bug();
+        return;
+    }
+
+    var view = document.createElement("div");
+
+    view.id = "amc-gearview";
+
+    global.offscreen.gearview = view;
+}
+
+function amc_create_pageview() {
+    if (document.getElementById("amc-pageview") !== null
+    ||  global.offscreen.pageview !== null) {
+        bug();
+        return;
+    }
+
+    var view = document.createElement("div");
+
+    view.id = "amc-pageview";
+
+    global.offscreen.pageview = view;
 }
 
 function amc_create_chatview() {

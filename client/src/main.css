@@ -133,6 +133,7 @@ div.amc-chat-public > span:nth-of-type(4) {
     overflow: hidden;
 }
 
+#amc-gearview-wrapper,
 #amc-pageview-wrapper,
 #amc-chatview-wrapper,
 #amc-roomview-wrapper,
@@ -166,6 +167,7 @@ div.amc-chat-public > span:nth-of-type(4) {
 
 #amc-chatview-wrapper,
 #amc-pageview-wrapper,
+#amc-gearview-wrapper,
 #amc-roomview-wrapper,
 #amc-terminal-wrapper {
     top: -0.4375rem;
@@ -223,12 +225,14 @@ div.amc-chat-public > span:nth-of-type(4) {
 }
 
 #amc-pageview,
+#amc-gearview,
 #amc-roomview {
     display: none;
     white-space: pre;
 }
 
 #amc[data-mudstate="in-game"] #amc-pageview,
+#amc[data-mudstate="in-game"] #amc-gearview,
 #amc[data-mudstate="in-game"] #amc-roomview {
     display: initial;
 }

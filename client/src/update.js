@@ -1,5 +1,56 @@
 "use strict";
 
+function amc_update_gearview(msdp_var) {
+    let msdp_var_to_id_map = {
+        CHAR_ITEM_LIST: "amc-gearview"
+    };
+
+    if (msdp_var in msdp_var_to_id_map == false
+    ||  msdp_var in msdp.variables == false
+    ||  msdp.variables[msdp_var] === null) {
+        bug();
+        return;
+    }
+
+    let el = document.getElementById(msdp_var_to_id_map[msdp_var]);
+
+    if (el === null) {
+        return;
+    }
+
+    switch (msdp_var) {
+        case "CHAR_ITEM_LIST": {
+            let list = msdp.variables[msdp_var];
+
+            if (list == false) {
+                list = [];
+            }
+
+            if (list.length > 0) {
+                list = list.join("\n");
+
+                let fragment = new DocumentFragment();
+
+                terminal_data_to_node(list, fragment);
+                list = fragment.textContent;
+
+                if (el.textContent !== list) {
+                    el.replaceChildren(fragment);
+                }
+            }
+            else if (el.textContent !== "") {
+                el.replaceChildren();
+            }
+
+            break;
+        }
+        default: {
+            bug();
+            break;
+        }
+    }
+}
+
 function amc_update_mainview_sectors(msdp_var) {
     let mainview = document.getElementById("amc-mainview");
 
@@ -940,21 +991,21 @@ function amc_update_roomview(msdp_var) {
     }
 }
 
-function amc_update_statview_character_title() {
+function amc_update_statview_char_title() {
     let value = "";
 
-    if (msdp.variables.CHARACTER_NAME !== null) {
-        value = capitalize(msdp.variables.CHARACTER_NAME);
+    if (msdp.variables.CHAR_NAME !== null) {
+        value = capitalize(msdp.variables.CHAR_NAME);
 
-        if (msdp.variables.CHARACTER_RACE || msdp.variables.CHARACTER_CLASS) {
+        if (msdp.variables.CHAR_RACE || msdp.variables.CHAR_CLASS) {
             value += ",";
 
-            if (msdp.variables.CHARACTER_RACE) {
-                value += " "+capitalize(msdp.variables.CHARACTER_RACE);
+            if (msdp.variables.CHAR_RACE) {
+                value += " "+capitalize(msdp.variables.CHAR_RACE);
             }
 
-            if (msdp.variables.CHARACTER_CLASS) {
-                value += " "+capitalize(msdp.variables.CHARACTER_CLASS);
+            if (msdp.variables.CHAR_CLASS) {
+                value += " "+capitalize(msdp.variables.CHAR_CLASS);
             }
         }
     }
