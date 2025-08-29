@@ -250,7 +250,6 @@ div.amc-chat-public > span:nth-of-type(4) {
 }
 
 #amc-roomview > details > summary {
-    display: inline-block;
     cursor: pointer;
 }
 
