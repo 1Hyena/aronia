@@ -48,15 +48,33 @@ function amc_handle_iac(data) {
         }
 
         if (data[1] === telnet.WILL && data[2] === telnet.TELOPT_EOR) {
-            amc_send_bytes([ telnet.IAC, telnet.DO, telnet.TELOPT_EOR ]);
+            if (telnet.server.eor == false) {
+                amc_send_bytes([ telnet.IAC, telnet.DO, telnet.TELOPT_EOR ]);
 
-            telnet.server.eor = true;
+                telnet.server.eor = true;
+            }
         }
         else if (data[1] === telnet.WILL && data[2] === telnet.MSDP) {
-            amc_send_bytes([ telnet.IAC, telnet.DO, telnet.MSDP ]);
+            if (telnet.server.msdp == false) {
+                amc_send_bytes([ telnet.IAC, telnet.DO, telnet.MSDP ]);
 
-            telnet.server.msdp = true;
-            msdp_handler();
+                telnet.server.msdp = true;
+                msdp_handler();
+            }
+        }
+        else if (data[1] === telnet.WILL && data[2] === telnet.TELOPT_BIN) {
+            if (telnet.server.binary == false) {
+                amc_send_bytes([ telnet.IAC, telnet.DO, telnet.TELOPT_BIN ]);
+
+                telnet.server.binary = true;
+            }
+        }
+        else if (data[1] === telnet.DO && data[2] === telnet.TELOPT_BIN) {
+            if (telnet.client.binary == false) {
+                amc_send_bytes([ telnet.IAC, telnet.WILL, telnet.TELOPT_BIN ]);
+
+                telnet.client.binary = true;
+            }
         }
         else if (data[1] === telnet.WILL) {
             amc_send_bytes([ telnet.IAC, telnet.DONT, data[2] ]);

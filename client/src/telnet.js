@@ -11,9 +11,14 @@ var telnet = {
     EOR         : 239,
     TELOPT_EOR  : 25,
     MSDP        : 69,
+    TELOPT_BIN  : 0,
     server : {
         eor     : false,
-        msdp    : false
+        msdp    : false,
+        binary  : false
+    },
+    client : {
+        binary : false
     }
 };
 
