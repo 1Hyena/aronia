@@ -1,5 +1,40 @@
 "use strict";
 
+
+function amc_update_timeview(msdp_var) {
+    if (msdp_var !== "WORLD_TIME") {
+        return;
+    }
+
+    let el = document.getElementById("amc-timeview");
+
+    if (el === null) {
+        return;
+    }
+
+    let cols = parseInt(el.getAttribute("data-colspan"), 10);
+    let hour = parseInt(msdp.variables[msdp_var].split(":")[0], 10);
+
+    let ansi = (
+        hour ===  6 ? "\x1B[1;33m" :
+        hour === 19 ? "\x1B[0;31m" :
+        hour   > 19 || hour < 6 ? "\x1B[0;34m" : ""
+    );
+
+    let value = (hour <= 12 ? hour : hour - 12) + (hour < 12 ? " AM " : " PM ");
+    let symbols = [...value];
+
+    symbols.splice(cols);
+
+    let time = symbols.join("").padStart(cols, " ");
+
+    let fragment = new DocumentFragment();
+
+    terminal_data_to_node(ansi+time, fragment);
+
+    el.replaceChildren(fragment);
+}
+
 function amc_update_gearview(msdp_var) {
     let msdp_var_to_id_map = {
         CHAR_ITEM_LIST: "amc-gearview"

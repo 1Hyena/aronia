@@ -1,12 +1,29 @@
 "use strict";
 
+function amc_tui_create_textview(id, cols, rows) {
+    var wrapper = document.createElement("div");
+
+    wrapper.classList.add("amc-textview-wrapper");
+
+    var content = document.createElement("div");
+
+    content.id = id;
+    content.classList.add("amc-textview");
+    content.setAttribute("data-colspan", cols);
+    content.setAttribute("data-rowspan", rows);
+
+    wrapper.appendChild(content);
+
+    return wrapper;
+}
+
 function amc_tui_create_linkview(title) {
     var wrapper = document.createElement("div");
 
     wrapper.classList.add("amc-linkview-wrapper");
     wrapper.setAttribute("data-tab", title);
 
-    var content = document.createElement("pre");
+    var content = document.createElement("div");
 
     content.classList.add("amc-linkview");
     content.appendChild(document.createTextNode(title));

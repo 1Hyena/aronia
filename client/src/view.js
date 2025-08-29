@@ -109,6 +109,18 @@ function amc_init_btn2view(container) {
     }
 }
 
+function amc_init_timeview(container) {
+    if (container !== null) {
+        let textview = amc_tui_create_textview(
+            "amc-timeview",
+            parseInt(container.getAttribute("colspan"), 10),
+            parseInt(container.getAttribute("rowspan"), 10)
+        );
+
+        container.replaceChildren(textview);
+    }
+}
+
 function amc_init_gearview(container) {
     if (container !== null && global.offscreen.gearview !== null) {
         var wrapper = document.createElement("div");

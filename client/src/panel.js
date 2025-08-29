@@ -674,6 +674,7 @@ function amc_init_panel(width, height) {
     amc_init_gearview(document.getElementById("amc-panel-miscview"));
     amc_init_statview(document.getElementById("amc-panel-top-left"));
     amc_init_roomview(document.getElementById("amc-panel-bottom-left"));
+    amc_init_timeview(document.getElementById("amc-panel-below-console-right"));
     amc_init_tab1view(document.getElementById("amc-panel-tab1view"));
     amc_init_tab2view(document.getElementById("amc-panel-tab2view"));
     amc_init_tab3view(document.getElementById("amc-panel-tab3view"));

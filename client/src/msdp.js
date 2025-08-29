@@ -284,6 +284,7 @@ function msdp_update_variable(key, value) {
             break;
         }
         case "WORLD_TIME": {
+            amc_update_timeview(key);
             break;
         }
         case "EXPERIENCE": {
@@ -417,6 +418,9 @@ function msdp_handle_variable(key, value) {
     }
 
     switch (key) {
+        // Doesn't matter if the value has changed or not. These events will
+        // always fire.
+
         default: break;
         case "COMMAND": {
             amc_event_command(value);
@@ -436,6 +440,9 @@ function msdp_handle_variable(key, value) {
     }
 
     switch (key) {
+        // These events are fired before the value of the variable is changed in
+        // the internal variable dictionary.
+
         default: break;
         case "SERVER_ID": {
             log("Server identifies as "+value+".");
