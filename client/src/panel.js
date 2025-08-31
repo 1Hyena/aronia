@@ -601,7 +601,8 @@ function amc_panel_get_background_layout(width, height) {
                     {
                         key: "amc-panel-bottom-left",
                         priority: 6
-                    }, {
+                    },
+                    {
                         key: "amc-panel-below-bottom-left",
                         priority: 7,
                         max_h: 1
