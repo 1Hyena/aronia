@@ -57,6 +57,12 @@ function amc_init_foreview(container) {
                         priority : 1,
                         max_w: 3,
                         max_h: 1
+                    },
+                    {
+                        key: "amc-panel-btn3view",
+                        priority : 1,
+                        max_w: 3,
+                        max_h: 1
                     }
                 ]
             },
@@ -104,11 +110,18 @@ function amc_init_tab3view(container) {
 function amc_init_btn1view(container) {
     if (container !== null) {
         let colspan = parseInt(container.getAttribute("colspan"), 10);
-        container.replaceChildren(amc_tui_create_button("⬍", colspan, 1));
+        container.replaceChildren(amc_tui_create_button("♬", colspan, 1));
     }
 }
 
 function amc_init_btn2view(container) {
+    if (container !== null) {
+        let colspan = parseInt(container.getAttribute("colspan"), 10);
+        container.replaceChildren(amc_tui_create_button("⬍", colspan, 1));
+    }
+}
+
+function amc_init_btn3view(container) {
     if (container !== null) {
         let colspan = parseInt(container.getAttribute("colspan"), 10);
         container.replaceChildren(amc_tui_create_button("🗖", colspan, 1));

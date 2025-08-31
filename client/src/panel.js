@@ -684,6 +684,7 @@ function amc_init_panel(width, height) {
     amc_init_tab3view(document.getElementById("amc-panel-tab3view"));
     amc_init_btn1view(document.getElementById("amc-panel-btn1view"));
     amc_init_btn2view(document.getElementById("amc-panel-btn2view"));
+    amc_init_btn3view(document.getElementById("amc-panel-btn3view"));
 
     foreview = document.getElementById("amc-foreview");
 

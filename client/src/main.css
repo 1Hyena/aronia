@@ -189,11 +189,17 @@ div.amc-chat-public > span:nth-of-type(4) {
     display: none;
 }
 
+html.amc-sfx-off .amc-linkview-wrapper[data-btn="♬"] {
+    opacity: 0.5;
+}
+
+.amc-linkview-wrapper[data-btn="♬"]:hover,
 .amc-linkview-wrapper[data-btn="⬍"]:hover,
 .amc-linkview-wrapper[data-btn="🗖"]:hover,
 .amc-linkview-wrapper[data-tab="PAGE"]:hover,
 .amc-linkview-wrapper[data-tab="GEAR"]:hover,
 .amc-linkview-wrapper[data-tab="CHAT"]:hover {
+    color: white;
     cursor: pointer;
     filter: drop-shadow(0 0 0.5vmin rgba(255, 255, 255, 0.50));
 }
@@ -201,6 +207,7 @@ div.amc-chat-public > span:nth-of-type(4) {
 #amc-foreview[data-tab="PAGE"] .amc-linkview-wrapper[data-tab="PAGE"],
 #amc-foreview[data-tab="GEAR"] .amc-linkview-wrapper[data-tab="GEAR"],
 #amc-foreview[data-tab="CHAT"] .amc-linkview-wrapper[data-tab="CHAT"] {
+    color: unset;
     cursor: default;
     filter: none;
     text-decoration: underline;

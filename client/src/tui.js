@@ -77,7 +77,10 @@ function amc_tui_create_button(title, cols, rows) {
             let target = e.currentTarget;
             let btn = target.getAttribute("data-btn");
 
-            if (btn === "⬍") {
+            if (btn === "♬") {
+                document.documentElement.classList.toggle("amc-sfx-off");
+            }
+            else if (btn === "⬍") {
                 document.documentElement.classList.toggle("amc-gui-x2");
                 amc_init_panel(amc_calc_panel_width(), amc_calc_panel_height());
             }
