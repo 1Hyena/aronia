@@ -765,7 +765,10 @@ function amc_print_log() {
 
         for (let j=0, sz = packets[i].data.length; j<sz; ++j) {
             if (packets[i].data[j] !== "\n") {
-                line.push(packets[i].data[j]);
+                if (packets[i].data[j] !== "\r") {
+                    line.push(packets[i].data[j]);
+                }
+
                 continue;
             }
 

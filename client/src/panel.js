@@ -640,6 +640,9 @@ function amc_panel_get_background_layout(width, height) {
 }
 
 function amc_init_panel(width, height) {
+    let foreview = document.getElementById("amc-foreview");
+    let foreview_tab = foreview ? foreview.getAttribute("data-tab") : "PAGE";
+
     let panel_bg = amc_panel_from_framework(
         amc_panel_calc_framework(
             amc_panel_get_background_layout(width, height),  width, height
@@ -680,6 +683,12 @@ function amc_init_panel(width, height) {
     amc_init_tab3view(document.getElementById("amc-panel-tab3view"));
     amc_init_btn1view(document.getElementById("amc-panel-btn1view"));
     amc_init_btn2view(document.getElementById("amc-panel-btn2view"));
+
+    foreview = document.getElementById("amc-foreview");
+
+    if (foreview) {
+        foreview.setAttribute("data-tab", foreview_tab);
+    }
 
     if (msdp.lists.REPORTABLE_VARIABLES !== null) {
         for (let i=0; i<msdp.lists.REPORTABLE_VARIABLES.length; ++i) {

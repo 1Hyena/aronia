@@ -1,13 +1,15 @@
 "use strict";
 
 function amc_init_foreview(container) {
-    let wrapper_id = "amc-foreview-wrapper";
+    let foreview_id = "amc-foreview";
+    let wrapper_id = foreview_id + "-wrapper";
 
     if (container === null) {
         return;
     }
 
-    if (document.getElementById(wrapper_id) !== null) {
+    if (document.getElementById(wrapper_id) !== null
+    ||  document.getElementById(foreview_id) !== null) {
         bug();
         return;
     }
@@ -65,15 +67,19 @@ function amc_init_foreview(container) {
         ]
     };
 
-    let panel = amc_panel_from_framework(
+    let foreview = amc_panel_from_framework(
         amc_panel_calc_framework(layout, model_w, model_h)
     );
 
+    foreview.setAttribute("data-tab", "PAGE");
+
+    foreview.id = foreview_id;
+
     var wrapper = document.createElement("div");
 
-    wrapper.setAttribute("data-tab", "PAGE");
     wrapper.id = wrapper_id;
-    wrapper.appendChild(panel);
+
+    wrapper.appendChild(foreview);
     container.appendChild(wrapper);
 }
 

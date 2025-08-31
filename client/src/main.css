@@ -124,15 +124,6 @@ div.amc-chat-public > span:nth-of-type(4) {
     font-style: italic;
 }
 
-#amc-foreview-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
-}
-
 #amc-gearview-wrapper,
 #amc-pageview-wrapper,
 #amc-chatview-wrapper,
@@ -152,6 +143,7 @@ div.amc-chat-public > span:nth-of-type(4) {
 
 .amc-textview-wrapper,
 .amc-linkview-wrapper,
+#amc-foreview-wrapper,
 #amc-login-form-wrapper,
 #amc-mainview-wrapper,
 #amc-inputbar-wrapper,
@@ -191,9 +183,9 @@ div.amc-chat-public > span:nth-of-type(4) {
     margin-left: 0.125rem;
 }
 
-#amc-foreview-wrapper:not([data-tab="PAGE"]) #amc-pageview-wrapper,
-#amc-foreview-wrapper:not([data-tab="GEAR"]) #amc-gearview-wrapper,
-#amc-foreview-wrapper:not([data-tab="CHAT"]) #amc-chatview-wrapper {
+#amc-foreview:not([data-tab="PAGE"]) #amc-pageview-wrapper,
+#amc-foreview:not([data-tab="GEAR"]) #amc-gearview-wrapper,
+#amc-foreview:not([data-tab="CHAT"]) #amc-chatview-wrapper {
     display: none;
 }
 
@@ -206,9 +198,9 @@ div.amc-chat-public > span:nth-of-type(4) {
     filter: drop-shadow(0 0 0.5vmin rgba(255, 255, 255, 0.50));
 }
 
-#amc-foreview-wrapper[data-tab="PAGE"] .amc-linkview-wrapper[data-tab="PAGE"],
-#amc-foreview-wrapper[data-tab="GEAR"] .amc-linkview-wrapper[data-tab="GEAR"],
-#amc-foreview-wrapper[data-tab="CHAT"] .amc-linkview-wrapper[data-tab="CHAT"] {
+#amc-foreview[data-tab="PAGE"] .amc-linkview-wrapper[data-tab="PAGE"],
+#amc-foreview[data-tab="GEAR"] .amc-linkview-wrapper[data-tab="GEAR"],
+#amc-foreview[data-tab="CHAT"] .amc-linkview-wrapper[data-tab="CHAT"] {
     cursor: default;
     filter: none;
     text-decoration: underline;
