@@ -53,10 +53,6 @@ body {
     white-space: nowrap;
 }
 
-.sndc-main-font {
-    font-family: unscii, monospace;
-}
-
 pre {
     font-family: unscii, monospace;
 }
